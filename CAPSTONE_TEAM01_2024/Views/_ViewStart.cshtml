@@ -1,0 +1,11 @@
+﻿@{
+    switch (ViewData["page"])
+    {
+        case "Index":
+            Layout = "_LoginLayout";
+            break;
+        default:
+            Layout = "_MainLayout";
+            break;
+    }
+}

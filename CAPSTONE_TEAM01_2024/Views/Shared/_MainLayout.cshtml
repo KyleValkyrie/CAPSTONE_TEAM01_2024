@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no"  />
+    <title>@ViewData["Title"] - CAPSTONE_TEAM01_2024</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/CAPSTONE_TEAM01_2024.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <!-- Main navbar -->
+        <nav class="navbar navbar-expand-sm navbar-light bg-danger border-bottom box-shadow mb-3">
+            <!-- Logo and name / Left navbar -->
+            <div class="container-fluid">
+                <img src="~/Resources/Img/logoVL.png" class="brand-image elevation-3" style="width: 50px; height: auto;>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><b class="m-2 text-black text-center">ACADEMIC ADVISOR<br>MANAGEMENT</b></a>
+
+                <!-- Space coz im clueless -->
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-center">
+                </div>
+
+                <!-- Right navbar links -->
+                <ul class="navbar-nav ml-auto">
+                    <li class="user-panel mt-1 pb-1 mb-1 d-flex">
+                        <div class="image">
+                            <img src="~/Resources/Img/user2-160x160.jpg" class="rounded-circle elevation-2" alt="User Image" style="width: 50px; height: auto;">
+                        </div>
+                        <div class="info">
+                            <a href="#" class="d-block">Alexander Pierce</a>
+                        </div>
+                        <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button"></a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <!--Content of pages-->
+    <div class="container-fluid">
+        <div class ="row">
+            <div class="col-sm-2 d-sm-inline-flex justify-content-center">
+                <ul class="navbar-nav flex-grow-1 ">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="HomePage">Home Page</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+    </div>
+        
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - Team 01 CAPSTONE - VLU IT Department
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

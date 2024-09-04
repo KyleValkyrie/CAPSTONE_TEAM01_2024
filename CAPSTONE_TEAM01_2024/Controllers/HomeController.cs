@@ -25,6 +25,12 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return View();
         }
 
+        public IActionResult SchoolYear()
+        {
+            ViewData["page"] = "SchoolYear";
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

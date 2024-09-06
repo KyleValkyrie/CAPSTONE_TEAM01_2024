@@ -50,17 +50,3 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
-
-.overlay 
-{
-    position :absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:auto;
-    background-color:black;
-}
-#videoContainer
-{
-    position:relative;
-}

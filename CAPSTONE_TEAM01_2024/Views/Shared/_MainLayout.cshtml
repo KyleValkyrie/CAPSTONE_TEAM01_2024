@@ -11,7 +11,7 @@
 <body>
     <header>
         <!-- Main navbar -->
-        <nav class="navbar navbar-expand-sm navbar-light bg-danger border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-light bg-danger border-bottom box-shadow mb-3" style="height:8vh !important;">
             <!-- Logo and name / Left navbar -->
             <div class="container-fluid">
                 <img src="~/Resources/Img/logoVL.png" class="brand-image elevation-3" style="width: 50px; height: auto;>
@@ -37,13 +37,11 @@
         </nav>
     </header>
     <!--Content of pages-->
-    <div class="container-fluid">
-        <div class ="row">
-            <div class="col-sm-2 d-sm-inline-flex justify-content-center box-shadow ml-3" style="background-color:gray">
+    <div class="container-fluid" style="border:3px solid black; height:84vh;">
+        <div class="row" style="border:3px solid red">
+            <!--Side Navbar-->
+            <div class="col-sm-2 d-sm-inline-flex justify-content-center box-shadow ml-3" style="border:3px solid blue">
                 <ul class="navbar-nav flex-grow-1 ">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Dang Nhap</a>
-                    </li>
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="HomePage">Trang Chu</a>
                     </li>
@@ -52,7 +50,8 @@
                     </li>
                 </ul>
             </div>
-            <div class="col">
+            <!--Content of page-->
+            <div class="col" style="border:3px solid yellow;">
                 <main role="main" class="pb-3">
                     @RenderBody()
                 </main>
@@ -61,9 +60,17 @@
     </div>
         
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - Team 01 CAPSTONE - VLU IT Department
+    <!--Footer-->
+    <footer class="border-top text-muted">
+        <div class="container-fluid" id="Login_Footer">
+            <div style="float:left; display:inline;">
+                <b style="color:#d72235;">&copy; 2024 - Van Lang University<br></b>
+                <b>IT Department</b>
+            </div>
+            <div style="float:right;">
+                <b style="color:#d72235;">CAPSTONE 2024 - TEAM 01<br></b>
+                <b>Software Engineer Major</b>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

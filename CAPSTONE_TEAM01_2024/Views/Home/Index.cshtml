@@ -1,15 +1,31 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Users Page";
+    Layout = "_LoginLayout";
 }
 
+@if (ViewData.Keys.Contains("message"))
+{
+    <p style="color: red">
+        @ViewData["message"]
+    </p>
+}
 <!-- Page content -->
-<div class="container-fluid d-flex justify-content-center align-items-center" id="Login_Content" style="background-color: rgba(0,0,0,0.5);height:85vh">
-    <button id="Login_Button" style=" width: 400px !important;
-                                      height: 400px !important;
-                                      background-color: rgba(128,128,128,0.5) !important;
-                                      border: 5px solid gray;">
-        <h1 class="fs-1 fw-bold text-white">DANG NHAP</h1>
-        <img src="~/Resources/Img/logoVL.png" style="width:50%; height:auto">
-        <h2 class="fs-4 text-white">Su dung tai khoan Email VLU</h2>
-    </button>
+<div class="container-fluid d-flex justify-content-center align-items-center"
+     id="Login_Content"
+     style="background-color: rgba(0,0,0,0.5);height:85vh;">
+    <form>
+        <button asp-controller="Users" asp-action="ExternalLogin" asp-route-provider="Microsoft"
+                type="submit"
+                id="Login_Button"
+                style="width: 400px !important;
+                       height: 400px !important;
+                       background-color: rgba(128,128,128,0.5);
+                       border: 5px solid gray;"
+                onmouseover="this.bgColor='red'"
+                onmouseout="this.bgColor='rgba(128,128,128,0.5)'">
+            <h1 class="fs-1 fw-bold text-white">DANG NHAP</h1>
+            <img src="~/Resources/Img/logoVL.png" style="width:50%; height:auto">
+            <h2 class="fs-4 text-white">Su dung tai khoan Email VLU</h2>
+        </button>
+    </form>
 </div>

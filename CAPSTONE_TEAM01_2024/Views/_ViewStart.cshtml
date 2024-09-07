@@ -2,9 +2,11 @@
     switch (ViewData["page"])
     {
         case "Index":
+        case "LoginPage":
             Layout = "_LoginLayout";
             break;
-        default:
+        case "HomePage":
+        case "SchoolYear":
             Layout = "_MainLayout";
             break;
     }

@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Users Page";
+    Layout = "_LoginLayout";
+}
+
+@if (ViewData.Keys.Contains("message"))
+{
+    <p style="color: red">
+        @ViewData["message"]
+    </p>
+}
+<!-- Page content -->
+<div class="d-flex justify-content-center align-items-center style="
+     style="background-color: rgba(0,0,0,0.5);height:85vh;">
+    <div class="container align-items-center" style="width: 400px !important;
+                height: 400px !important;
+                background-color: white !important;
+                border: 5px solid gray;">
+        <h1>Login</h1><br />
+        <div>Powered by Microsoft Technology</div>
+        <a class="btn btn-success" asp-action="ExternalLogin" asp-route-provider="Microsoft">
+            Continue with your VLU Email information
+        </a>
+    </div>
+    
+</div>

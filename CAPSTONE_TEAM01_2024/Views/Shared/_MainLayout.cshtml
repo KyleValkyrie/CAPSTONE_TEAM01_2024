@@ -11,11 +11,11 @@
 <body>
     <header>
         <!-- Main navbar -->
-        <nav class="navbar navbar-expand-sm navbar-light bg-danger border-bottom box-shadow mb-3" style="height:8vh !important;">
+        <nav class="navbar navbar-expand-sm navbar-light border-bottom box-shadow" id="Login_Top_Nav" style="height:8vh;">
             <!-- Logo and name / Left navbar -->
             <div class="container-fluid">
                 <img src="~/Resources/Img/logoVL.png" class="brand-image elevation-3" style="width: 50px; height: auto;>
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><b class="m-2 text-white text-center">ACADEMIC ADVISOR<br>MANAGEMENT</b></a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><b class="m-2 text-white text-center">QUAN LI<br>CO VAN HOC TAP</b></a>
 
                 <!-- Space coz im clueless -->
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-center">
@@ -28,31 +28,37 @@
                             <img src="~/Resources/Img/user2-160x160.jpg" class="rounded-circle elevation-2" alt="User Image" style="width: 50px; height: auto;">
                         </div>
                         <div class="info">
-                            <a href="#" class="d-block">Alexander Pierce</a>
+                            <a class="text-white d-block" href="#">@User.Identity!.Name</a>
                         </div>
                         <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button"></a>
+                    </li>
+                    <li class="nav-item">
+                        <form class="form-inline" asp-action="logout" asp-controller="users">
+                            <button type="submit" class="nav-link btn btn-link text-dark">
+                                Logout
+                            </button>
+                        </form>
                     </li>
                 </ul>
             </div>
         </nav>
     </header>
     <!--Content of pages-->
-    <div class="container-fluid" style="border:3px solid black; height:84vh;">
-        <div class="row" style="border:3px solid red">
+    <div class="container-fluid d-flex flex-collumn" id="Content_Display">
             <!--Side Navbar-->
-            <div class="col-sm-2 d-sm-inline-flex justify-content-center box-shadow ml-3" style="border:3px solid blue">
-                <ul class="navbar-nav flex-grow-1 ">
-                    <li class="nav-item">
+        <div class ="p-3 box-shadow" id="SideNav">
+                <ul class="navbar-nav flex-grow-1">
+                <li class="nav-item text-center">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="HomePage">Trang Chu</a>
                     </li>
-                    <li class="nav-item">
+                <li class="nav-item text-center">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SchoolYear">Nam Hoc</a>
                     </li>
                 </ul>
             </div>
             <!--Content of page-->
-            <div class="col" style="border:3px solid yellow;">
-                <main role="main" class="pb-3">
+            <div id="Content_Panel">
+                <main role="main">
                     @RenderBody()
                 </main>
             </div>

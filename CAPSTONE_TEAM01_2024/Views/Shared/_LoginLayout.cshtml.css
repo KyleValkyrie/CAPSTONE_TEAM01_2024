@@ -59,4 +59,7 @@ button.accept-policy {
     padding-right: 3rem !important;
     background-color: #d72235 !important;
 }
-
+#Login_Button:hover {
+    background-color: rgba(255,0,0,0.5) !important;
+    border: 5px solid black !important;
+}

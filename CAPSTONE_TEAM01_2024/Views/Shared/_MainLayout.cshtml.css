@@ -50,3 +50,34 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+#Content_Display{
+    height: 85vh;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+#SideNav {
+    width: 15%;
+    height: 100%;
+}
+#Content_Panel {
+    width: 85%;
+    height: 100%;
+    background-color: #f2f3f7;
+    z-index:-2;
+}
+#Login_Top_Nav {
+    background-color: #d72235;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+#Login_Footer {
+    padding-top: 0.5rem !important;
+    padding-left: 3rem !important;
+    padding-right: 3rem !important;
+    background-color: #d72235 !important;
+}
+.nav-item{
+    font-size:1rem;
+    font-weight:bold;
+}
+

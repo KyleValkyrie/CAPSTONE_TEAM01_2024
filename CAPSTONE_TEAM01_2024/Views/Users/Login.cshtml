@@ -10,7 +10,7 @@
     </p>
 }
 <!-- Page content -->
-<div class="d-flex justify-content-center align-items-center style="
+@* <div class="d-flex justify-content-center align-items-center style="
      style="background-color: rgba(0,0,0,0.5);height:85vh;">
     <div class="container align-items-center" style="width: 400px !important;
                 height: 400px !important;
@@ -22,5 +22,26 @@
             Continue with your VLU Email information
         </a>
     </div>
-    
+</div> *@
+
+<div class="container-fluid d-flex justify-content-center align-items-center"
+     id="Login_Content"
+     style="background-color: rgba(0,0,0,0.5);height:85vh;">
+    <a id="Login_Button" class="button d-flex-column justify-content-center align-items-center text-center"
+       asp-controller="Users" asp-action="ExternalLogin" asp-route-provider="Microsoft"
+        id="Login_Button"
+        style="width: 400px !important;
+               height: 400px !important;
+               background-color: rgba(128,128,128,0.3);
+               border: 5px solid gray;
+               padding-top:1.5%;
+               margin:0;
+               text-decoration:none;"
+        onmouseover="Hovered(this)"
+        onmouseout="Unhovered(this)">
+            <h1 class="fs-1 fw-bold text-white">ĐĂNG NHẬP</h1>
+            <img src="~/Resources/Img/logoVL.png" style="width:50%; height:auto" />
+            <h2 class="fs-4 text-white">Sử dụng tài khoản Email VLU</h2>
+
+    </a>
 </div>

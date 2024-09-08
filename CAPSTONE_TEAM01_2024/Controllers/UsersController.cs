@@ -65,7 +65,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             }
 
             ExternalLogin(info.LoginProvider, "~/");
-            var externalLoginResult = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: true, bypassTwoFactor: true);
+            var externalLoginResult = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
 
             if (externalLoginResult.Succeeded)
             {

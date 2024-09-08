@@ -15,7 +15,7 @@
             <!-- Logo and name / Left navbar -->
             <div class="container-fluid">
                 <img src="~/Resources/Img/logoVL.png" class="brand-image elevation-3" style="width: 50px; height: auto;>
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><b class="m-2 text-white text-center">ACADEMIC ADVISOR<br>MANAGEMENT</b></a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><b class="m-2 text-white text-center">QUẢN LÝ CÔNG TÁC<br>CỐ VẤN HỌC TẬP</b></a>
                 <!-- Space coz im clueless -->
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-center"></div>
             </div>
@@ -33,18 +33,32 @@
     <footer class="border-top text-muted" >
         <div class="container-fluid" id="Login_Footer">
             <div style="float:left; display:inline;">
-                <b style="color:#d72235;">&copy; 2024 - Van Lang University</b>
-                 <b>IT Department</b>
+                <b style="color:#d72235;">&copy; 2024 - Đại học Văn Lang<br></b>
+                 <b>Ban Công Nghệ Thông Tin</b>
             </div>
             <div style="float:right;">
-                <b style ="color:#d72235;">CAPSTONE 2024 - TEAM 01<br></b>
-                <b>Software Engineer Major</b>
+                <b style ="color:#d72235;">CAPSTONE 2024 - Nhóm 01<br></b>
+                <b>Chuyên ngành Kỹ thuật Phần Mềm</b>
             </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        function Hovered(x) {
+            x.style.height = "450px";
+            x.style.width = "450px";
+            x.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+            x.style.border = "5px solid gray";           
+        }
+        function Unhovered(x) {
+            x.style.height = "400px";
+            x.style.width = "400px";
+            x.style.backgroundColor = "rgba(128, 128, 128, 0.3)";
+            x.style.border = "5px solid gray";
+        }
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

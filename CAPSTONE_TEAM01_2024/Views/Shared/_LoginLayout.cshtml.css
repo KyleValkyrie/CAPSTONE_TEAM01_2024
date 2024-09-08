@@ -46,17 +46,10 @@ button.accept-policy {
   line-height: 60px;
 }
 #Content_Page {
-    height: 85vh;
+    height: 90vh;
+    width: 100vw;
     padding: 0 !important;
     margin: 0 !important;
 }
-#Login_Top_Nav {
-  background-color: #d72235;
-}
-#Login_Footer {
-    padding-top: 0.5rem !important;
-    padding-left: 3rem !important;
-    padding-right: 3rem !important;
-    background-color: #d72235 !important;
-}
+
 

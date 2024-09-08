@@ -9,39 +9,36 @@
         @ViewData["message"]
     </p>
 }
-<!-- Page content -->
-@* <div class="d-flex justify-content-center align-items-center style="
-     style="background-color: rgba(0,0,0,0.5);height:85vh;">
-    <div class="container align-items-center" style="width: 400px !important;
-                height: 400px !important;
-                background-color: white !important;
-                border: 5px solid gray;">
-        <h1>Login</h1><br />
-        <div>Powered by Microsoft Technology</div>
-        <a class="btn btn-success" asp-action="ExternalLogin" asp-route-provider="Microsoft">
-            Continue with your VLU Email information
-        </a>
-    </div>
-</div> *@
 
-<div class="container-fluid d-flex justify-content-center align-items-center"
+<div class="container-fluid d-flex flex-column justify-content-center align-items-center"
      id="Login_Content"
-     style="background-color: rgba(0,0,0,0.5);height:85vh;">
+     style="background-color: rgba(0,0,0,0.7);height:100vh;">
+    <div>
+        <div class="text-center">
+            <h1 class="fs-5 text-light p-0 m-0">TRƯỜNG ĐẠI HỌC</h1>
+            <h2 class="fs-1 text-light fw-bold p-0 m-0" style="letter-spacing: 6px">VĂN LANG</h2>
+        </div>
+</div>
+    <div>
+        <h3 class="fs-1 text-light fw-bold p-3 m-3">HỆ THỐNG QUẢN LÝ CÔNG TÁC CỐ VẤN HỌC TẬP</h3>
+    </div>
     <a id="Login_Button" class="button d-flex-column justify-content-center align-items-center text-center"
        asp-controller="Users" asp-action="ExternalLogin" asp-route-provider="Microsoft"
         id="Login_Button"
         style="width: 400px !important;
                height: 400px !important;
-               background-color: rgba(128,128,128,0.3);
+               background-color: rgba(128,128,128,0.6);
                border: 5px solid gray;
                padding-top:1.5%;
                margin:0;
                text-decoration:none;"
         onmouseover="Hovered(this)"
         onmouseout="Unhovered(this)">
-            <h1 class="fs-1 fw-bold text-white">ĐĂNG NHẬP</h1>
+            <h1 class="fs-1 fw-bold text-light">ĐĂNG NHẬP</h1>
             <img src="~/Resources/Img/logoVL.png" style="width:50%; height:auto" />
-            <h2 class="fs-4 text-white">Sử dụng tài khoản Email VLU</h2>
-
+            <h2 class="fs-4 text-light">Sử dụng tài khoản Email VLU</h2>
     </a>
+    <div>
+        <h3 class="fs-5 text-light fw-bold p-4 m-4">&copy; 2024 - Bản quyền thuộc khoa Công Nghệ Thông Tin, trường đại học Văn Lang</h3>
+    </div>
 </div>

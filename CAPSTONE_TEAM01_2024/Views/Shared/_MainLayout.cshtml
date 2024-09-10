@@ -52,7 +52,7 @@
                            asp-area="" asp-controller="Home" asp-action="HomePage"
                            style="text-decoration:none">
                             <div class=" col-2">
-                                <img src="~/Resources/Img/Icon2.png" 
+                                <img src="~/Resources/Img/Icon3.png" 
                                      style="width:40px;
                                             height:auto;
                                             padding-right:0.5rem;">
@@ -63,6 +63,21 @@
                         </a>
                     </li>
                 <li class="nav-item text-center p-2 m-2">
+                    <a class=" row d-flexnav-link  text-dark"
+                       asp-area="" asp-controller="ProfileManager" asp-action="ProfileManager"
+                       style="text-decoration:none">
+                        <div class=" col-2">
+                            <img src="~/Resources/Img/Icon2.png"
+                                 style="width:40px;
+                                            height:auto;
+                                            padding-right:0.5rem;">
+                        </div>
+                        <div class="col-8 fs-6">
+                            QUẢN LÝ TÀI KHOẢN
+                        </div>
+                    </a>
+                </li>
+                <li class="nav-item text-center p-2 m-2">
                     <div class="row d-flex nav-link text-dark" style="text-decoration:none">
                         <div class="col-2">
                             <img src="~/Resources/Img/Icon1.png" style="width:40px; height:auto; padding-right:0.5rem;">
@@ -70,7 +85,7 @@
                         <div id="dropdownMenuLink" class="col-8 fs-6 btn dropdown-toggle fw-bold" role="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
                             DANH MỤC
                         </div>
-                        <div class="dropdown-menu p-2 m-2" aria-labelledby="dropdownMenuLink" style="width:inherit;">
+                        <div class="dropdown-menu my-2 px-4" aria-labelledby="dropdownMenuLink" style="width:inherit;">
                             <a class="dropdown-item text-black fw-bold" asp-controller="Categories" asp-action="SchoolYear">
                                 <img src="~/Resources/Img/Icon1.png" style="width:30px; height:auto; padding-right:0.5rem;">
                                 Năm Học
@@ -90,58 +105,6 @@
                         </div>
                     </div>
                 </li>
-                        @* <li class="nav-item text-center">
-                        <div class ="dropdown show">
-                        <a class="row text-dark btn dropdown-toggle fw-bold"
-                               id="dropdownMenuLink"                            
-                               href="#" role="button" 
-                               data-toggle="dropdown" 
-                               aria-haspopup="true" 
-                               aria-expanded="false"
-                               data-bs-toggle="dropdown"
-                               style="width:100%;">
-                            <div class=" col-2">
-                                <img src="~/Resources/Img/Icon1.png"
-                                     style="width:40px;
-                                            height:auto;
-                                            padding-right:0.5rem;">
-                            </div>
-                            <div class="col-8 fs-6" style="text-decoration:none">
-                                DANH MỤC
-                            </div>
-                            </a>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="width:100%; left:2rem">
-                                <a class="dropdown-item text-black fw-bold" 
-                                   asp-controller="Categories" 
-                                   asp-action="SchoolYear">
-                                   <img src="~/Resources/Img/Icon1.png"
-                                     style="width:30px;height:auto;padding-right:0.5rem;">
-                                   Năm Học
-                               </a>
-                                <a class="dropdown-item text-black fw-bold"
-                                   asp-controller="Categories"
-                                   asp-action="SemesterPlan">
-                                   <img src="~/Resources/Img/Icon1.png"
-                                        style="width:30px;height:auto;padding-right:0.5rem;">
-                                   Kế Hoạch Học Kỳ
-                               </a>
-                                <a class="dropdown-item text-black fw-bold"
-                                   asp-controller="Categories"
-                                   asp-action="EndSemesterReport">
-                                   <img src="~/Resources/Img/Icon1.png"
-                                        style="width:30px;height:auto;padding-right:0.5rem;">
-                                   Báo Cáo Cuối Kì
-                               </a>
-                               <a class="dropdown-item text-black fw-bold"
-                                   asp-controller="Categories"
-                                   asp-action="Statistics">
-                                   <img src="~/Resources/Img/Icon1.png"
-                                        style="width:30px;height:auto;padding-right:0.5rem;">
-                                   Thống Kê
-                               </a>
-                            </div>
-                        </div>
-                    </li>    *@                
                 </ul>
             </div>
             <!--Content of page-->

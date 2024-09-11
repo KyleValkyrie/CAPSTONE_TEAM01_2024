@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    ViewData["CategoryVisibility"] = (ViewData["CategoryVisibility"] == null) ? "none" : ViewData["CategoryVisibility"];
+    
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -45,68 +49,100 @@
     <!--Content of pages-->
     <div class="container-fluid d-flex flex-collumn" id="Content_Display">
             <!--Side Navbar-->
-        <div class ="p-3 box-shadow" id="SideNav">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item text-center p-2 m-2">
-                        <a class=" row d-flexnav-link  text-dark" 
-                           asp-area="" asp-controller="Home" asp-action="HomePage"
-                           style="text-decoration:none">
-                            <div class=" col-2">
-                                <img src="~/Resources/Img/Icon3.png" 
-                                     style="width:40px;
-                                            height:auto;
-                                            padding-right:0.5rem;">
-                            </div>
+        <div class ="p-1 box-shadow" id="SideNav">
+            <ul class="navbar-nav">
+                <li class="nav-item text-start m-1">
+                    <a class="row d-flex nav-link text-dark justify-content-center align-items-center"
+                       asp-area="" asp-controller="Home" asp-action="HomePage"
+                       style="text-decoration:none">
+                        <div class="col-2">
+                            <img src="~/Resources/Img/Icon3.png"
+                                 style="width:40px; height:auto;">
+                        </div>
                         <div class="col-8 fs-6">
-                                TRANG CHỦ
-                            </div>
-                        </a>
-                    </li>
-                <li class="nav-item text-center p-2 m-2">
-                    <a class=" row d-flexnav-link  text-dark"
+                            TRANG CHỦ
+                        </div>
+                    </a>
+                </li>
+                <li class="nav-item text-start m-1">
+                    <a class="row d-flex nav-link text-dark justify-content-center align-items-center"
                        asp-area="" asp-controller="ProfileManager" asp-action="ProfileManager"
                        style="text-decoration:none">
-                        <div class=" col-2">
+                        <div class="col-2">
                             <img src="~/Resources/Img/Icon2.png"
-                                 style="width:40px;
-                                            height:auto;
-                                            padding-right:0.5rem;">
+                                 style="width:40px; height:auto;">
                         </div>
                         <div class="col-8 fs-6">
                             QUẢN LÝ TÀI KHOẢN
                         </div>
                     </a>
                 </li>
-                <li class="nav-item text-center p-2 m-2">
-                    <div class="row d-flex nav-link text-dark" style="text-decoration:none">
+                <li class="nav-item text-start m-1">
+                    <div class="row d-flex nav-link text-dark justify-content-center align-items-center"
+                         style="text-decoration:none">
                         <div class="col-2">
-                            <img src="~/Resources/Img/Icon1.png" style="width:40px; height:auto; padding-right:0.5rem;">
+                            <img src="~/Resources/Img/Icon1.png"
+                                 style="width:40px; height:auto;">
                         </div>
-                        <div id="dropdownMenuLink" class="col-8 fs-6 btn dropdown-toggle fw-bold" role="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
+                        <div class="col-8 fs-6 btn menu-btn fw-bold text-dark text-start"
+                             onclick="toggleCategory(document.querySelector('#Category_Content'))">
                             DANH MỤC
                         </div>
-                        <div class="dropdown-menu my-2 px-4" aria-labelledby="dropdownMenuLink" style="width:inherit;">
-                            <a class="dropdown-item text-black fw-bold" asp-controller="Categories" asp-action="SchoolYear">
-                                <img src="~/Resources/Img/Icon1.png" style="width:30px; height:auto; padding-right:0.5rem;">
-                                Năm Học
+                        <!-- Show More Menu -->
+                        <div id="Category_Content"
+                             class="menu-content ms-auto"
+                             style="display:@(ViewData["CategoryVisibility"]);width:90%">
+                            <a class="row d-flex nav-link text-dark m-1 justify-content-center align-items-center m-0 p-0"
+                               asp-area="" asp-controller="Categories" asp-action="SchoolYear"
+                               style="text-decoration:none;">
+                                <div class="col-2">
+                                    <img src="~/Resources/Img/Icon1.png"
+                                         style="width:40px; height:auto;">
+                                </div>
+                                <div class="col-10">
+                                    Năm Học
+                                </div>
                             </a>
-                            <a class="dropdown-item text-black fw-bold" asp-controller="Categories" asp-action="SemesterPlan">
-                                <img src="~/Resources/Img/Icon1.png" style="width:30px; height:auto; padding-right:0.5rem;">
-                                Kế Hoạch Học Kỳ
+                            <a class="row d-flex nav-link text-dark m-1 justify-content-center align-items-center m-0 p-0"
+                               asp-area="" asp-controller="Categories" asp-action="SemesterPlan"
+                               style="text-decoration:none">
+                                <div class="col-2">
+                                    <img src="~/Resources/Img/Icon1.png"
+                                         style="width:40px; height:auto;">
+                                </div>
+                                <div class="col-10">
+                                    Kế Hoạch Học Kỳ
+                                </div>
                             </a>
-                            <a class="dropdown-item text-black fw-bold" asp-controller="Categories" asp-action="EndSemesterReport">
-                                <img src="~/Resources/Img/Icon1.png" style="width:30px; height:auto; padding-right:0.5rem;">
-                                Báo Cáo Cuối Kì
-                            </a>
-                            <a class="dropdown-item text-black fw-bold" asp-controller="Categories" asp-action="Statistics">
-                                <img src="~/Resources/Img/Icon1.png" style="width:30px; height:auto; padding-right:0.5rem;">
-                                Thống Kê
+                            <a class="row d-flex nav-link text-dark m-1 justify-content-center align-items-center m-0 p-0"
+                               asp-area="" asp-controller="Categories" asp-action="EndSemesterReport"
+                               style="text-decoration:none">
+                                <div class="col-2">
+                                    <img src="~/Resources/Img/Icon1.png"
+                                         style="width:40px; height:auto;">
+                                </div>
+                                <div class="col-10">
+                                    Báo Cáo Cuối Kì
+                                </div>
                             </a>
                         </div>
                     </div>
                 </li>
-                </ul>
-            </div>
+                <li class="nav-item text-start m-1">
+                    <a class="row d-flex nav-link text-dark justify-content-center align-items-center"
+                       asp-area="" asp-controller="Home" asp-action="HomePage"
+                       style="text-decoration:none">
+                        <div class="col-2">
+                            <img src="~/Resources/Img/Icon4.png"
+                                 style="width:40px; height:auto;">
+                        </div>
+                        <div class="col-8 fs-6">
+                            THỐNG KÊ
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
             <!--Content of page-->
             <div id="Content_Panel">
                 <main role="main">
@@ -114,8 +150,7 @@
                 </main>
             </div>
     </div>
-        
-
+       
     <!--Footer-->
     <footer class="border-top text-muted">
         <div class="container-fluid" id="Login_Footer">
@@ -128,6 +163,52 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // var subMenus = document.querySelectorAll('div#Category_Content a');
+
+        // for (let subMenu of subMenus) {
+        //     subMenu.addEventListener('click', (event) => {
+        //         event.preventDefault();
+        //         console.log(event.target);
+        //     });
+        // }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get the current URL path
+            var path = window.location.pathname;
+            var page = path.split("/").pop();
+
+            // Define a mapping between pages and nav item IDs
+            var pageMap = {
+                "index.html": "home",
+                "account.html": "account",
+                "category.html": "category",
+                "statistics.html": "statistics"
+            };
+
+            // Get the corresponding nav item ID
+            var navItemId = pageMap[page] || "home"; // Default to "home" if page not found
+
+            // Add the "selected" class to the corresponding nav item
+            // document.getElementById(navItemId).classList.add("selected");
+        });
+
+        function toggleCategory(x)
+        {
+
+            if (x.style.display == "none") {
+                x.style.display = "block";
+                @ViewData["CategoryVisibility"] = "block";
+            }
+            else {
+                x.style.display = "none";
+                @ViewData["CategoryVisibility"] = "block";
+            }
+        }
+
+
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

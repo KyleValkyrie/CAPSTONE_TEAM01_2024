@@ -70,7 +70,8 @@ button.accept-policy {
     padding: 0 !important;
     margin: 0 !important;
 }
-#Login_Footer {
+#Main_Footer {
+    height: inherit !important;
     padding-top: 0.5rem !important;
     padding-left: 3rem !important;
     padding-right: 3rem !important;
@@ -80,5 +81,4 @@ button.accept-policy {
     font-size:1rem;
     font-weight:bold;
 }
-
 

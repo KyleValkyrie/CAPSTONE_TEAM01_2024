@@ -1,16 +1,13 @@
-﻿@{
-    ViewData["CategoryVisibility"] = (ViewData["CategoryVisibility"] == null) ? "none" : ViewData["CategoryVisibility"];
-    
-}
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no"  />
     <title>@ViewData["Title"] - CAPSTONE_TEAM01_2024</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    
     <link rel="stylesheet" href="~/CAPSTONE_TEAM01_2024.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 </head>
 <body>
     <header>
@@ -31,16 +28,18 @@
                         <div class="image">
                             <img src="~/Resources/Img/user2-160x160.jpg" class="rounded-circle elevation-2" alt="User Image" style="width: 50px; height: auto;">
                         </div>
-                        <div class="info">
+                        <div class="info" style="padding-right:1rem">
                             <a class="text-white d-block" href="#">@User.Identity!.Name</a>
+                        </div>
+                        <div>
                             <form class="form-inline" asp-action="logout" asp-controller="users">
-                                <button type="submit" 
+                                <button type="submit"
                                         class="nav-link btn btn-link btn-dark text-white float-right"
                                         style="height:50%;"
                                         id="logoutButton">
-                                Logout
-                            </button>
-                        </form>
+                                    Logout
+                                </button>
+                            </form>
                         </div>
                     </li>
                 </ul>
@@ -86,7 +85,13 @@
                                  style="width:40px; height:auto;">
                         </div>
                         <div class="col-8 fs-6 btn menu-btn fw-bold text-dark text-start">                                                     
-                            DANH MỤC
+                            DANH MỤC 
+                            <div id="Dropdown_down"
+                                 style="display:inline-block; float:right">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                                <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+                                </svg>
+                            </div>
                         </div>
                         <!-- Show More Menu -->
                         <div id="Category_Content"
@@ -164,39 +169,6 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
-        // var subMenus = document.querySelectorAll('div#Category_Content a');
-
-        // for (let subMenu of subMenus) {
-        //     subMenu.addEventListener('click', (event) => {
-        //         event.preventDefault();
-        //         console.log(event.target);
-        //     });
-        // }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            // Get the current URL path
-            var path = window.location.pathname;
-            var page = path.split("/").pop();
-
-            // Define a mapping between pages and nav item IDs
-            var pageMap = {
-                "index.html": "home",
-                "account.html": "account",
-                "category.html": "category",
-                "statistics.html": "statistics"
-            };
-
-            // Get the corresponding nav item ID
-            var navItemId = pageMap[page] || "home"; // Default to "home" if page not found
-
-            // Add the "selected" class to the corresponding nav item
-            // document.getElementById(navItemId).classList.add("selected");
-        });
-
-
-
-    </script>
-    <script>
         //persistent drop down
         document.addEventListener("DOMContentLoaded", function () {
             const categoryContent = document.getElementById("Category_Content");
@@ -218,20 +190,20 @@
                     sessionStorage.setItem("CategoryVisibility", "none");
                 }
             });
+
+            var url = window.location.href;
+            var key = url.substring(url.lastIndexOf('/'), url.length);
+
+            var navLinks = document.querySelectorAll('#Content_Display #SideNav a');
+            var old = Array.from(navLinks).find(link => link.getAttribute('style') != '');
+            if (old != null)
+                old.setAttribute('style', '');
+
+            var current = Array.from(navLinks).find(link => link.href.includes(key));
+            current.setAttribute('style', 'border: 5px solid #d72235;');
+
         });
 
-        //toggle visibility for category dropdown
-        function toggleCategory(x) {
-
-            if (x.style.display == "none") {
-                x.style.display = "block";
-        @ViewData["CategoryVisibility"] = "block";
-            }
-            else {
-                x.style.display = "none";
-        @ViewData["CategoryVisibility"] = "block";
-            }
-        }
         //clear session data when logout
         document.addEventListener("DOMContentLoaded", function () {
             const logoutButton = document.getElementById("logoutButton");
@@ -242,7 +214,6 @@
                 });
             }
         });
-
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

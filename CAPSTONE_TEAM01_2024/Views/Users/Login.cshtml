@@ -24,8 +24,7 @@
     </div>
     <a id="Login_Button" class="button d-flex-column justify-content-center align-items-center text-center"
        asp-controller="Users" asp-action="ExternalLogin" asp-route-provider="Microsoft"
-        id="Login_Button"
-        style="width: 400px !important;
+       style="width: 400px !important;
                height: 400px !important;
                background-color: rgba(128,128,128,0.5);
                border: 5px solid gray;
@@ -36,7 +35,7 @@
         onmouseout="Unhovered(this)">
             <h1 class="fs-1 fw-bold text-light">ĐĂNG NHẬP</h1>
             <img src="~/Resources/Img/logoVL.png" style="width:50%; height:auto" />
-            <h2 class="fs-4 text-light">Sử dụng tài khoản Email VLU</h2>
+            <h2 class="fs-4 text-light" id="instruction">Sử dụng tài khoản Email VLU</h2>
     </a>
     <div>
         <h3 class="fs-5 text-light fw-bold p-4 m-4">&copy; 2024 - Bản quyền thuộc khoa Công Nghệ Thông Tin, trường đại học Văn Lang</h3>

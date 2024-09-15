@@ -49,7 +49,7 @@
     <!--Content of pages-->
     <div class="container-fluid d-flex flex-collumn" id="Content_Display">
             <!--Side Navbar-->
-        <div class ="p-1 box-shadow" id="SideNav">
+        <div class ="p-1 box-shadow" id="SideNav" style="border-right: 3px solid crimson;">
             <ul class="navbar-nav">
                 <li class="nav-item text-start m-1">
                     <a class="row d-flex nav-link text-dark justify-content-center align-items-center"
@@ -149,7 +149,7 @@
             </ul>
         </div>
             <!--Content of page-->
-            <div id="Content_Panel" style="z-index:1;">
+            <div id="Content_Panel" style="z-index:1; overflow:auto">
                 <main role="main">
                     @RenderBody()
                 </main>

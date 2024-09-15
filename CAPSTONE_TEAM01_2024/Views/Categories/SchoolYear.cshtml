@@ -4,21 +4,69 @@
 }
 <!-- Page content -->
 
-<div class=" containeruser p-3">
+<div class="containeruser p-3">
     <div class="controlheader ms-auto">
         <nav class="navbar">
-            <form class="">
-                <div class="inputgroup ">
-                    <input type="text" class="form-control" placeholder="Tìm kiếm" aria-label="Username" aria-describedby="basic-addodn1">
-                    <button class="search"><i class="fa-solid fa-magnifying-glass" style="color:#495057;"></i></button>
+            <div class="row w-100">
+                <div class="col-md-8 d-flex">
+                    <form class="d-flex w-100">
+                        <div class="input-group w-100">
+                            <input type="text" class="form-control" placeholder="Tìm kiếm" aria-label="Username" aria-describedby="basic-addon1">
+                            <button class="btn btn-primary" type="button"><i class="fa-solid fa-magnifying-glass" style="color:#495057;"></i> Tìm</button>
+                        </div>
+                    </form>
                 </div>
-            </form>
-            <button class="btn  btnadd" type="button" data-bs-toggle="modal" data-bs-target="#AddModal"><i class="fa-solid fa-plus pe-1"></i>Thêm Mới</button>
+                <div class="col-md-4 d-flex justify-content-end">
+                    <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#AddModal"><i class="fa-solid fa-plus pe-1"></i> Thêm Mới</button>
+                </div>
+            </div>
         </nav>
     </div>
+    <!-- Table -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col" style="width:10%">#</th>
+                    <th scope="col" style="width:30%">Học Kì</th>
+                    <th scope="col" style="width:30%">Năm Học</th>
+                    <th scope="col" style="width:30%">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td>221</td>
+                    <td id="phone-user">2022-2023</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#EditModal"><i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i> Cập Nhật</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteModal"><i class="fa-solid fa-trash" style="padding-right:2px;"></i> Xóa</button>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td>232</td>
+                    <td id="phone-user">2023-2024</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#EditModal"><i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i> Cập Nhật</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteModal"><i class="fa-solid fa-trash" style="padding-right:2px;"></i> Xóa</button>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td>243</td>
+                    <td id="phone-user">2024-2025</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#EditModal"><i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i> Cập Nhật</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteModal"><i class="fa-solid fa-trash" style="padding-right:2px;"></i> Xóa</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     <!-- Pagination -->
-    <div class="controler-pagination">
-        <nav aria-label="Page navigation example" style="float:right">
+    <div class="d-flex justify-content-end mt-3">
+        <nav aria-label="Page navigation example">
             <ul class="pagination">
                 <li class="page-item">
                     <a class="page-link" href="#" aria-label="Previous">
@@ -37,47 +85,5 @@
                 </li>
             </ul>
         </nav>
-    </div>
-    <!-- Table -->
-    <div class="   " style="overflow-x: auto;">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Học Kì</th>
-                    <th scope="col">Năm Học</th>
-                    <th scope="col">Thao Tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>221</td>
-                    <td id="phone-user">2022-2023</td>
-                    <td>
-                        <button type="button" class="btn btn-outline-primary  btn-sm" data-bs-toggle="modal" data-bs-target="#EditModal"><i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i>Cập Nhật</button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteModal"><i class="fa-solid fa-trash" style="padding-right:2px"></i>Xóa</button>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>232</td>
-                    <td id="phone-user">2023-2024</td>
-                    <td>
-                        <button type="button" class="btn btn-outline-primary  btn-sm" data-bs-toggle="modal" data-bs-target="#EditModal"><i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i>Cập Nhật</button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteModal"><i class="fa-solid fa-trash" style="padding-right:2px"></i>Xóa</button>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td> 243</td>           
-                    <td id="phone-user">2024-2025</td>
-                    <td>
-                        <button type="button" class="btn btn-outline-primary  btn-sm" data-bs-toggle="modal" data-bs-target="#EditModal"><i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i>Cập Nhật</button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteModal"><i class="fa-solid fa-trash" style="padding-right:2px"></i>Xóa</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 </div>

@@ -51,7 +51,21 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             // Redirect to the Page to see update
             return RedirectToAction("SchoolYear");
         }
+        //Edit Academic Year
+        [HttpPost]
+        public async Task<IActionResult> EditAcademicYear(int id, int year, int semester)
+        {
+            var academicPeriod = await _context.AcademicPeriods.FindAsync(id);
+            if (academicPeriod != null)
+            {
+                academicPeriod.Year = year;
+                academicPeriod.Semester = semester;
+                await _context.SaveChangesAsync();
+            }
 
+            return RedirectToAction("SchoolYear");
+        }
+        //Render SchoolYear
         public async Task<IActionResult> SchoolYear()
         {
             ViewData["page"] = "SchoolYear";

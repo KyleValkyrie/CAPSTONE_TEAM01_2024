@@ -214,7 +214,7 @@
                 });
             }
         });
-
+//For Adding in SchoolYear
         // Get the modal
         var modal = document.getElementById("AddModal");
 
@@ -234,6 +234,70 @@
         window.onclick = function (event) {
             if (event.target == modal) {
                 closeModal();
+            }
+        }
+//For Delete Confirmation in SchoolYear
+        // Get the modal
+        var confirmModal = document.getElementById("confirmDeleteModal");
+        var deleteId = 0;
+
+        // Function to open the confirmation modal
+        function openConfirmModal(id) {
+            deleteId = id;
+            confirmModal.style.display = "block";
+        }
+
+        // Function to close the confirmation modal
+        function closeConfirmModal() {
+            confirmModal.style.display = "none";
+        }
+
+        // Function to confirm deletion
+        function confirmDelete() {
+            // Create a form to submit the deletion request
+            var form = document.createElement("form");
+            form.method = "post";
+            form.action = "/Categories/DeleteAcademicYear";
+
+            // Add the id input to the form
+            var input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "id";
+            input.value = deleteId;
+            form.appendChild(input);
+
+            // Append the form to the body and submit it
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == confirmModal) {
+                closeConfirmModal();
+            }
+        }
+//For Edit in SchoolYear
+        // Get the edit modal
+        var editModal = document.getElementById("editModal");
+
+        // Function to open the edit modal
+        function openEditModal(id, year, semester) {
+            document.getElementById("editId").value = id;
+            document.getElementById("editYear").value = year;
+            document.getElementById("editSemester").value = semester;
+            editModal.style.display = "block";
+        }
+
+        // Function to close the edit modal
+        function closeEditModal() {
+            editModal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == editModal) {
+                closeEditModal();
             }
         }
     </script>

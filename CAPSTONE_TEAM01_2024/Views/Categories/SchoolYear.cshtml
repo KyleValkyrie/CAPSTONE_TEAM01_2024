@@ -1,21 +1,38 @@
-﻿@{
+﻿@using Newtonsoft.Json.Linq
+@{
     ViewData["Title"] = "Profile Manager Page";
     ViewData["CategoryVisibility"] = "block";
 }
+<script type="text/javascript">
+    document.querySelector("#SearchField").addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            document.querySelector('#SearchButton').click();
+        }
+    })
+</script>
 <!-- Page content -->
 <div class="containeruser p-3">
     <div class="controlheader ms-auto">
         <nav class="navbar">
             <div class="row w-100">
-                <div class="col-md-8 d-flex">
+                <div class="col-md-6 d-flex">
                     <form class="d-flex w-100">
                         <div class="input-group w-100">
-                            <input type="text" class="form-control" placeholder="Tìm kiếm" aria-label="Username" aria-describedby="basic-addon1">
-                            <button class="btn btn-info" type="button" style="z-index:0;"> Tìm</button>
+                            <input id="SearchField" type="text" class="form-control" placeholder="Nhập năm học cần tìm">
+                            <input id="SearchButton" class="btn btn-info" type="button" style="z-index:0;" value="Tim" onclick="SetViewData()" />
                         </div>
                     </form>
+                    <div style="margin-left:1rem;">
+                        <form asp-controller="Categories" asp-action="SchoolYear">
+                            <button class="btn btn-secondary"
+                                    type="submit"
+                                    style="white-space: nowrap;">
+                                Hủy Tìm Kiếm
+                            </button>
+                        </form>
+                    </div>
                 </div>
-                <div class="col-md-4 d-flex justify-content-end">
+                <div class="col-md-6 d-flex justify-content-end">
                     <button class="btn btn-success" 
                             type="button" 
                             onclick="openModal()">
@@ -27,7 +44,7 @@
     </div>
     <!-- Table -->
     <div class="table-responsive">
-        <table class="table table-striped">
+        <table id="queryResults" class="table table-striped">
             <thead>
                 <tr>
                     <th scope="col" style="width:10%">#</th>
@@ -37,19 +54,20 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var period in Model)
+
+                @foreach (AcademicPeriod period in Model)
                 {
                     <tr>
                         <th scope="row">@period.Id</th>
                         <td>@(period.Year.ToString().Substring(2) + period.Semester)</td>
-                        <td id="phone-user">@(period.Year + "-" + (period.Year + 1))</td>
+                        <td>@(period.Year + "-" + (period.Year + 1))</td>
                         <td>
                             <button type="button" 
                                     class="btn btn-outline-primary btn-sm"
                                     onclick="openEditModal(@period.Id, @period.Year, @period.Semester)">
-                                <i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i> Cập Nhật</button>
-                                <button class="btn btn-outline-danger btn-sm"
-                                        onclick="openConfirmModal(@period.Id)">
+                                <i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i> Cập Nhật</button><button class="btn btn-outline-danger btn-sm"
+                                        onclick="openConfirmModal(@period.Id)"
+                                             style="float:right;;">
                                     Xóa
                                 </button>
                         </td>

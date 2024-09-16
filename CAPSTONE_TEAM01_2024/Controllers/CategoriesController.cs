@@ -1,6 +1,8 @@
 ﻿using CAPSTONE_TEAM01_2024.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
@@ -70,9 +72,33 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         {
             ViewData["page"] = "SchoolYear";
             var academicPeriods = await _context.AcademicPeriods.ToListAsync();
+            //var results = HttpContext.Session.GetString("QueryResults");
+            //if (results != null)
+            //{
+            //    academicPeriods = JsonConvert.DeserializeObject<List<AcademicPeriod>>(results);
+            //    ModelState.Clear();
+            //}
+
             return View(academicPeriods);
         }
-//SemesterPlan actions
+
+        [HttpPost]
+        public JsonResult SetViewData(string value)
+        {
+            //physics 1
+            int parsedValue;
+            bool successfulParse = int.TryParse(value, out parsedValue);
+            string academicPeriod = string.Empty;
+            if (successfulParse)
+            {
+                var results = from record in _context.AcademicPeriods where EF.Functions.Like((string)(object)record.Year, $"%{parsedValue}%") select record;
+                //HttpContext.Session.SetString("QueryResults", JsonConvert.SerializeObject(academicPeriod));
+                academicPeriod = JsonConvert.SerializeObject(results);
+            }
+            return Json(academicPeriod);
+            //return RedirectToAction("SchoolYear");
+        }
+        //SemesterPlan actions
         public IActionResult SemesterPlan()
         {
             ViewData["page"] = "SemesterPlan";

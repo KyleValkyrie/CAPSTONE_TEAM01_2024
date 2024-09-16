@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Enable Controllers in project
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddSession();
 
 // Enable Microsoft Authentication
 builder.Services.AddAuthentication().AddMicrosoftAccount(options=>
@@ -56,6 +57,7 @@ app.UseRouting();
 // Authentication/Authorization
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="~/CAPSTONE_TEAM01_2024.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 </head>
 <body>
     <header>
@@ -192,7 +193,16 @@
             });
 
             var url = window.location.href;
-            var key = url.substring(url.lastIndexOf('/'), url.length);
+            var key = "";
+            if(url.includes('?'))
+            {
+                key = url.substring(url.lastIndexOf('/'), url.indexOf('?'));
+            }
+            else
+            {
+                key = url.substring(url.lastIndexOf('/'), url.length);
+            }
+
 
             var navLinks = document.querySelectorAll('#Content_Display #SideNav a');
             var old = Array.from(navLinks).find(link => link.getAttribute('style') != '');
@@ -299,6 +309,75 @@
             if (event.target == editModal) {
                 closeEditModal();
             }
+        }
+
+
+        document.querySelector("#SearchField").addEventListener('keypress', (event) => {
+            if (window.location.href.includes('SchoolYear') && event.key === 'Enter') {
+                document.querySelector('#SearchButton').click();
+            }
+        })
+//For Searching SchoolYear
+        //Get the text field
+        function SetViewData()
+        {
+            var url = window.location.href;
+            var inputField = document.getElementById("SearchField");
+            var searchQuery = inputField.value;
+            console.log(searchQuery);
+            var resultsTableBody = document.querySelector("#queryResults tbody");
+            var results = resultsTableBody.querySelectorAll("tr");
+            for (var result of results) {
+                resultsTableBody.removeChild(result);
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/Categories/SetViewData",
+                data: {
+                    value: searchQuery
+                },
+                dataType: "json",
+                success: function (results) {
+                    var data = JSON.parse(results);
+                    console.log(`length: ${data.length}\n ${data}`);
+                    for (var record of data) { 
+                        console.log(record);
+                        var row = document.createElement("tr");
+                        var rowHead = document.createElement("th");
+                        rowHead.setAttribute("scope", "row");
+                        rowHead.innerText = record.Id;
+                        row.appendChild(rowHead);
+                        
+                        var cell = document.createElement("td");
+                        cell.innerText = `${record.Year.toString().substring(2)}${record.Semester}`;
+                        row.appendChild(cell);
+                        
+                        cell = document.createElement("td");
+                        cell.innerText = `${record.Year} - ${parseInt(record.Year) + 1}`;
+                        row.appendChild(cell);
+                        cell = document.createElement("td");
+                        
+                        var button = document.createElement("button");
+                        button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+                        button.setAttribute('onclick', `openEditModal(${record.Id}, ${record.Year}, ${record.Semester})`);
+                        button.innerHTML = '<i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i> Cập Nhật';
+                        cell.appendChild(button);
+                        row.appendChild(cell);
+
+                        button = document.createElement("button");
+                        button.classList.add('btn', 'btn-outline-danger', 'btn-sm');
+                        button.setAttribute('onclick', `openConfirmModal(${record.Id})`);
+                        button.setAttribute('style', 'float:right;')
+                        button.textContent = "Xóa";
+                        cell.appendChild(button);
+                        row.appendChild(cell);
+
+                        resultsTableBody.appendChild(row);
+                    }
+                }
+            });
+
         }
     </script>
 

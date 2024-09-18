@@ -21,7 +21,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             ViewData["page"] = "EndSemesterReport";
             return View();
         }
-//SchoolYear actions
+        //SchoolYear actions
         //Add new Academic Year
         [HttpPost]
         public async Task<IActionResult> AddAcademicYear(int year, int semester)
@@ -34,11 +34,26 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             };
 
             // Add the new object to the database
-            _context.AcademicPeriods.Add(academicPeriod);
-            await _context.SaveChangesAsync();
+            bool isFound = _context.AcademicPeriods
+                     .Where(r => r.Year == academicPeriod.Year && r.Semester == academicPeriod.Semester)
+                     .Any();
+            if (!isFound) //Can add
+            {
+                _context.AcademicPeriods.Add(academicPeriod);
+                await _context.SaveChangesAsync();
 
-            // Redirect to the Page to see update
-            return RedirectToAction("SchoolYear");
+                TempData["Message"] = "Academic period added successfully!";
+                TempData["MessageType"] = "success";
+
+                // Redirect to the Page to see update
+                return RedirectToAction("SchoolYear");
+            }
+            else
+            {
+                TempData["Message"] = "Academic period already exists!";
+                TempData["MessageType"] = "danger";
+                return RedirectToAction("SchoolYear");
+            }
         }
         //Delete Academic Year
         [HttpPost]

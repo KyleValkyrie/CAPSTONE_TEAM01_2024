@@ -1,4 +1,10 @@
 ﻿@using Newtonsoft.Json.Linq
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-@TempData["MessageType"]">
+        @TempData["Message"]
+    </div>
+}
 @{
     ViewData["Title"] = "Profile Manager Page";
     ViewData["CategoryVisibility"] = "block";

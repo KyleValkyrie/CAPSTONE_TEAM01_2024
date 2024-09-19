@@ -9,13 +9,6 @@
     ViewData["Title"] = "Profile Manager Page";
     ViewData["CategoryVisibility"] = "block";
 }
-<script type="text/javascript">
-    document.querySelector("#SearchField").addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            document.querySelector('#SearchButton').click();
-        }
-    })
-</script>
 <!-- Page content -->
 <div class="containeruser p-3">
     <div class="controlheader ms-auto">
@@ -60,11 +53,12 @@
                 </tr>
             </thead>
             <tbody>
-
+                @{int number = 0;}
                 @foreach (AcademicPeriod period in Model)
                 {
+                    number++;
                     <tr>
-                        <th scope="row">@period.Id</th>
+                        <th scope="row">@number</th>
                         <td>@(period.Year.ToString().Substring(2) + period.Semester)</td>
                         <td>@(period.Year + "-" + (period.Year + 1))</td>
                         <td>

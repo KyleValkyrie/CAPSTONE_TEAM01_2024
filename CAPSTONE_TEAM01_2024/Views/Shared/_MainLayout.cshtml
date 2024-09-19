@@ -50,7 +50,7 @@
     <!--Content of pages-->
     <div class="container-fluid d-flex flex-collumn" id="Content_Display">
             <!--Side Navbar-->
-        <div class ="p-1 box-shadow" id="SideNav" style="border-right: 3px solid crimson;">
+        <div class="p-1 box-shadow" id="SideNav" style="border-right: 5px solid #d72235;">
             <ul class="navbar-nav">
                 <li class="nav-item text-start m-1">
                     <a class="row d-flex nav-link text-dark justify-content-center align-items-center"
@@ -210,8 +210,23 @@
                 old.setAttribute('style', '');
 
             var current = Array.from(navLinks).find(link => link.href.includes(key));
-            current.setAttribute('style', 'border: 5px solid #d72235;');
+            if (key.includes("ClassList")) {
+                current = Array.from(navLinks).find(link => link.href.includes("SchoolYear"));
+            }
 
+            if (current) {
+                current.setAttribute('style', 'border: 5px solid #d72235;');
+            }
+            
+            document.querySelector("SearchButton").addEventListener('click', (event) => {
+                event.preventDefault();
+            })
+
+            document.querySelector("#SearchField").addEventListener('keypress', (event) => {
+                if (window.location.href.includes('SchoolYear') && event.key === 'Enter') {
+                    document.querySelector('#SearchButton').click();
+                }
+            })
         });
 
         //clear session data when logout
@@ -310,13 +325,6 @@
                 closeEditModal();
             }
         }
-
-
-        document.querySelector("#SearchField").addEventListener('keypress', (event) => {
-            if (window.location.href.includes('SchoolYear') && event.key === 'Enter') {
-                document.querySelector('#SearchButton').click();
-            }
-        })
 //For Searching SchoolYear
         //Get the text field
         function SetViewData()
@@ -341,12 +349,14 @@
                 success: function (results) {
                     var data = JSON.parse(results);
                     console.log(`length: ${data.length}\n ${data}`);
+                    let number = 0;
                     for (var record of data) { 
+                        number++;
                         console.log(record);
                         var row = document.createElement("tr");
                         var rowHead = document.createElement("th");
                         rowHead.setAttribute("scope", "row");
-                        rowHead.innerText = record.Id;
+                        rowHead.innerText = number;
                         row.appendChild(rowHead);
                         
                         var cell = document.createElement("td");
@@ -379,6 +389,7 @@
             });
 
         }
+//For ClassList view
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

@@ -42,7 +42,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 _context.AcademicPeriods.Add(academicPeriod);
                 await _context.SaveChangesAsync();
 
-                TempData["Message"] = "Academic period added successfully!";
+                TempData["Message"] = "Thêm năm học thành công!";
                 TempData["MessageType"] = "success";
 
                 // Redirect to the Page to see update
@@ -50,7 +50,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             }
             else
             {
-                TempData["Message"] = "Academic period already exists!";
+                TempData["Message"] = "Năm học và học kì đã tồn tại!";
                 TempData["MessageType"] = "danger";
                 return RedirectToAction("SchoolYear");
             }

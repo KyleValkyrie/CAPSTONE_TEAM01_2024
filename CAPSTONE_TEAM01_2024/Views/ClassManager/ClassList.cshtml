@@ -1,13 +1,23 @@
 ﻿@{
     Layout = "_MainLayout";
 }
+@if (TempData["MessageClassOverview"] != null)
+{
+    <div class="alert alert-@TempData["MessageType"]">
+        @TempData["MessageClassOverview"]
+    </div>
+}
+@model CAPSTONE_TEAM01_2024.ViewModels.ClassListViewModel
+
 <div class="content-wrapper" style="min-height: 912.2px;">
     <!-- Content Header (Page header) -->
     <header class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Danh Sách Lớp</h1>
+                    <h1 class="m-0">Danh Sách Lớp </h1>
+                    <h2 class="m-0">Niên Khóa @(Model.AcademicPeriod.Year + "-" + (Model.AcademicPeriod.Year + 1))</h2>
+                    <h3 class="m-0">Học Kỳ @(Model.AcademicPeriod.Year.ToString().Substring(2) + Model.AcademicPeriod.Semester)</h3>
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
@@ -49,21 +59,26 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="table-row" onclick="window.location.href='class-details-1.html'">
-                                <th scope="row" class="text-center">1</th>
-                                <td class="text-center">PM02</td>
-                                <td class="text-center">Nguyễn Trọng Tài</td>
-                                <td class="text-center">50</td>
-                                <td class="text-center">31</td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-outline-primary btn-sm" aria-label="Edit class details" onclick="openEditModal('1', 'PM02', 'Nguyễn Trọng Tài', 50, '31')">
-                                        <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập Nhật
-                                    </button>
-                                    <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteModal" aria-label="Delete class" onclick="openDeleteModal('1')">
-                                        <i class="fa-solid fa-trash custom-icon"></i> Xóa
-                                    </button>
-                                </td>
-                            </tr>
+                            @{int number = 0;}
+                            @foreach (Class classes in Model.Classes)
+                            {
+                                number++;
+                                <tr class="table-row">
+                                    <th scope="row" class="text-center">@number</th>
+                                    <td class="text-center">@classes.ClassName</td>
+                                    <td class="text-center">@classes.Advisor</td>
+                                    <td class="text-center">@classes.StudentCount</td>
+                                    <td class="text-center">@classes.EnrollmentNumber</td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-outline-primary btn-sm" aria-label="Edit class details" onclick="openEditModal('1', '@classes.ClassName', '@classes.Advisor', @classes.StudentCount, @classes.EnrollmentNumber)">
+                                            <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập Nhật
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteModal" aria-label="Delete class" onclick="openDeleteModal('1')">
+                                            <i class="fa-solid fa-trash custom-icon"></i> Xóa
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
                             <!-- Additional rows can go here -->
                         </tbody>
                     </table>
@@ -144,29 +159,31 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="addClassForm">
+                <form id="addClassForm"
+                      asp-controller="ClassManager" asp-action="AddClass" method="post">
+                    <input type="hidden" name="academicPeriodId" value="@Model.AcademicPeriod.Id" />
                     <div class="mb-3">
                         <label for="newClassCode" class="form-label">Mã Lớp</label>
-                        <input type="text" class="form-control" id="newClassCode" placeholder="Nhập mã lớp">
+                        <input type="text" class="form-control" id="newClassCode" name="className" placeholder="Nhập mã lớp">
                     </div>
                     <div class="mb-3">
                         <label for="newAdvisor" class="form-label">Cố Vấn Học Tập</label>
-                        <input type="text" class="form-control" id="newAdvisor" placeholder="Nhập tên cố vấn">
+                        <input type="text" class="form-control" id="newAdvisor" name="advisor" placeholder="Nhập tên cố vấn">
                     </div>
                     <div class="mb-3">
                         <label for="newNumberOfStudents" class="form-label">Số lượng SV</label>
-                        <input type="number" class="form-control" id="newNumberOfStudents" placeholder="Nhập số lượng sinh viên">
+                        <input type="number" class="form-control" id="newNumberOfStudents" name="studentCount" placeholder="Nhập số lượng sinh viên">
                     </div>
                     <div class="mb-3">
                         <label for="newCourse" class="form-label">Khóa</label>
-                        <input type="text" class="form-control" id="newCourse" placeholder="Nhập khóa">
+                        <input type="text" class="form-control" id="newCourse" name="enrollmentNumber" placeholder="Nhập khóa">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Thêm</button>
                     </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-primary" onclick="addClass()">Thêm</button>
-            </div>
+            </div>        
         </div>
     </div>
 </div>

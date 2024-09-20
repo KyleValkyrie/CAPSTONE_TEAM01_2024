@@ -15,13 +15,13 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         {
             _context = context;
         }
-        //EndSemesterReport actions
+//EndSemesterReport actions
         public IActionResult EndSemesterReport()
         {
             ViewData["page"] = "EndSemesterReport";
             return View();
         }
-        //SchoolYear actions
+//SchoolYear actions
         //Add new Academic Year
         [HttpPost]
         public async Task<IActionResult> AddAcademicYear(int year, int semester)
@@ -32,7 +32,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 Year = year,
                 Semester = semester
             };
-
             // Add the new object to the database
             bool isFound = _context.AcademicPeriods
                      .Where(r => r.Year == academicPeriod.Year && r.Semester == academicPeriod.Semester)
@@ -42,7 +41,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 _context.AcademicPeriods.Add(academicPeriod);
                 await _context.SaveChangesAsync();
 
-                TempData["Message"] = "Thêm năm học thành công!";
+                TempData["MessageYear"] = "Thêm năm học thành công!";
                 TempData["MessageType"] = "success";
 
                 // Redirect to the Page to see update
@@ -50,7 +49,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             }
             else
             {
-                TempData["Message"] = "Năm học và học kì đã tồn tại!";
+                TempData["MessageYear"] = "Năm học và học kì đã tồn tại!";
                 TempData["MessageType"] = "danger";
                 return RedirectToAction("SchoolYear");
             }
@@ -113,7 +112,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return Json(academicPeriod);
             //return RedirectToAction("SchoolYear");
         }
-        //SemesterPlan actions
+//SemesterPlan actions
         public IActionResult SemesterPlan()
         {
             ViewData["page"] = "SemesterPlan";

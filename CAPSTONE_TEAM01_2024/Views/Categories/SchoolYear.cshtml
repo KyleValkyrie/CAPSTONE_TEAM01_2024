@@ -1,8 +1,8 @@
 ﻿@using Newtonsoft.Json.Linq
-@if (TempData["Message"] != null)
+@if (TempData["MessageYear"] != null)
 {
     <div class="alert alert-@TempData["MessageType"]">
-        @TempData["Message"]
+        @TempData["MessageYear"]
     </div>
 }
 @{
@@ -57,7 +57,10 @@
                 @foreach (AcademicPeriod period in Model)
                 {
                     number++;
-                    <tr>
+                    <tr onclick="window.location.href='/ClassManager/ClassList/@period.Id'"
+                        style="cursor: pointer; background-color: white;"
+                        onmouseover="this.style.backgroundColor='#c7c1c1 '; this.style.color='white';"
+                        onmouseout="this.style.backgroundColor='white'; this.style.color='black';">
                         <th scope="row">@number</th>
                         <td>@(period.Year.ToString().Substring(2) + period.Semester)</td>
                         <td>@(period.Year + "-" + (period.Year + 1))</td>
@@ -67,7 +70,7 @@
                                     onclick="openEditModal(@period.Id, @period.Year, @period.Semester)">
                                 <i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i> Cập Nhật</button><button class="btn btn-outline-danger btn-sm"
                                         onclick="openConfirmModal(@period.Id)"
-                                             style="float:right;;">
+                                             style="float:right;">
                                     Xóa
                                 </button>
                         </td>

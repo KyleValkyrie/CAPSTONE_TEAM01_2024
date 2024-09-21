@@ -217,16 +217,6 @@
             if (current) {
                 current.setAttribute('style', 'border: 5px solid #d72235;');
             }
-            
-            document.querySelector("SearchButton").addEventListener('click', (event) => {
-                event.preventDefault();
-            })
-
-            document.querySelector("#SearchField").addEventListener('keypress', (event) => {
-                if (window.location.href.includes('SchoolYear') && event.key === 'Enter') {
-                    document.querySelector('#SearchButton').click();
-                }
-            })
         });
 
         //clear session data when logout
@@ -329,7 +319,7 @@
         function filterTable() 
         {
             // Get the search input value
-            var input = document.getElementById('SearchField').value.toLowerCase();
+            var input = document.getElementById('SchoolYearSearchField').value.toLowerCase();
             // Get the table and its rows
             var table = document.getElementById('queryResults');
             var rows = table.getElementsByTagName('tr');
@@ -349,17 +339,9 @@
         }
         // Function to clear the search field and reset the table
         function clearSearch() {
-            document.getElementById('SearchField').value = '';
+            document.getElementById('SchoolYearSearchField').value = '';
             filterTable();
         }
-
-        // Optional: Add event listener for Enter key press
-        document.getElementById('SearchField').addEventListener('keypress', function (event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                filterTable();
-            }
-        });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

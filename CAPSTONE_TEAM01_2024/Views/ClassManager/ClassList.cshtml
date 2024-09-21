@@ -36,7 +36,7 @@
                 <div class="card-header">
                     <div class="row text-center">
                         <div class="col-auto">
-                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ClassListAddClassModal">
+                            <button type="button" class="btn btn-success" onclick="openClassListAddClassModal()">
                                 <i class="bi bi-plus custom-icon"></i> Thêm Lớp
                             </button>
                         </div>
@@ -79,7 +79,7 @@
                                         <button type="button" class="btn btn-outline-primary btn-sm" aria-label="Edit class details" onclick="openClassListEditModal(@classes.ClassId, '@classes.ClassName', '@classes.Advisor', @classes.StudentCount, @classes.EnrollmentNumber, @classes.AcademicPeriodId)">
                                             <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập Nhật
                                         </button>
-                                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteModal" aria-label="Delete class" onclick="openDeleteModal('1')">
+                                        <button type="button" class="btn btn-outline-danger btn-sm" aria-label="Delete class" onclick="openClassListDeleteModal(@classes.ClassId)">
                                             <i class="fa-solid fa-trash custom-icon"></i> Xóa
                                         </button>
                                     </td>
@@ -97,100 +97,159 @@
 </div>
 
 <!-- Edit Modal -->
-<div class="modal fade" id="ClassListEditModal" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true" data-bs-backdrop="false">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="ClassListEditModalLabel">Chỉnh Sửa Thông Tin Lớp</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div id="ClassListEditModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:30%; position:relative; border-radius:10px;">
+        <h2 style="text-align:center; margin-bottom:20px;">Chỉnh Sửa Thông Tin Lớp</h2>
+        <form id="ClassListEditClassForm" method="post" asp-controller="ClassManager" asp-action="EditClassListItem">
+            <div class="mb-3">
+                <label for="classId" class="form-label">ID Lớp</label>
+                <input type="text" class="form-control" id="classId" name="classId" readonly>
             </div>
-            <div class="modal-body">
-                <form id="ClassListEditClassForm" method="post" asp-controller="ClassManager" asp-action="EditClassListItem">
-                    <div class="mb-3">
-                        <label for="classId" class="form-label">ID Lớp</label>
-                        <input type="text" class="form-control" id="classId" name="classId" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label for="classCode" class="form-label">Mã Lớp</label>
-                        <input type="text" class="form-control" id="classCode" name="className" placeholder="Nhập mã lớp">
-                    </div>
-                    <div class="mb-3">
-                        <label for="advisor" class="form-label">Cố Vấn Học Tập</label>
-                        <input type="text" class="form-control" id="advisor" name="advisor" placeholder="Nhập tên cố vấn">
-                    </div>
-                    <div class="mb-3">
-                        <label for="numberOfStudents" class="form-label">Số lượng SV</label>
-                        <input type="number" class="form-control" id="numberOfStudents" name="studentCount" placeholder="Nhập số lượng sinh viên">
-                    </div>
-                    <div class="mb-3">
-                        <label for="course" class="form-label">Khóa</label>
-                        <input type="number" class="form-control" id="course" name="enrollmentNumber" placeholder="Nhập khóa">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        <button type="submit" class="btn btn-primary" >Lưu Thay Đổi</button>
-                    </div>
-                    <input type="hidden" id="academicPeriodId" name="academicPeriodId" readonly>
-                </form>
+            <div class="mb-3">
+                <label for="classCode" class="form-label">Mã Lớp</label>
+                <input type="text" class="form-control" id="classCode" name="className" placeholder="Nhập mã lớp">
             </div>
-        </div>
+            <div class="mb-3">
+                <label for="advisor" class="form-label">Cố Vấn Học Tập</label>
+                <input type="text" class="form-control" id="advisor" name="advisor" placeholder="Nhập tên cố vấn">
+            </div>
+            <div class="mb-3">
+                <label for="numberOfStudents" class="form-label">Số lượng SV</label>
+                <input type="number" class="form-control" id="numberOfStudents" name="studentCount" placeholder="Nhập số lượng sinh viên">
+            </div>
+            <div class="mb-3">
+                <label for="course" class="form-label">Khóa</label>
+                <input type="number" class="form-control" id="course" name="enrollmentNumber" placeholder="Nhập khóa">
+            </div>
+            <div style="text-align:right;">
+                <button type="button" class="btn btn-outline-secondary" style="padding:10px 20px; margin-right:10px;" onclick="closeClassListEditModal()">Đóng</button>
+                <button type="submit" class="btn btn-outline-primary" style="padding:10px 20px;">Lưu Thay Đổi</button>
+            </div>
+            <input type="hidden" id="academicPeriodId" name="academicPeriodId" readonly>
+        </form>
     </div>
 </div>
 
 <!-- Delete Modal -->
-<div class="modal fade" id="ClassListDeleteModal" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true" data-bs-backdrop="false">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="DeleteModalLabel">Xóa Lớp</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Bạn có chắc chắn muốn xóa lớp này không?</p>
-                <input type="hidden" id="deleteClassId">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-danger" onclick="deleteClass()">Xóa</button>
-            </div>
+<div id="ClassListDeleteModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:30%; position:relative; border-radius:10px;">
+        <h2 style="text-align:center; margin-bottom:20px;">Xóa Lớp</h2>
+        <div class="modal-body">
+            <p>Bạn có chắc chắn muốn xóa lớp này không?</p>
+            <input type="hidden" id="deleteClassId">
+        </div>
+        <div style="text-align:right;">
+            <button type="button" class="btn btn-outline-secondary" style="padding:10px 20px; margin-right:10px;" onclick="closeClassListDeleteModal()">Đóng</button>
+            <button type="button" class="btn btn-outline-danger" style="padding:10px 20px;" onclick="confirmClassListDelete()">Xóa</button>
         </div>
     </div>
 </div>
 
 <!-- Add Modal -->
-<div class="modal fade" id="ClassListAddClassModal" tabindex="-1" aria-labelledby="AddClassModalLabel" aria-hidden="true" data-bs-backdrop="false">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="AddClassModalLabel">Thêm Lớp Mới</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div id="ClassListAddClassModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:30%; position:relative; border-radius:10px;">
+        <h2 style="text-align:center; margin-bottom:20px;">Thêm Lớp Mới</h2>
+        <form id="addClassForm" asp-controller="ClassManager" asp-action="AddClass" method="post">
+            <input type="hidden" name="academicPeriodId" value="@Model.AcademicPeriod.Id" />
+            <div style="margin-bottom:15px;">
+                <label for="newClassCode" style="display:block; margin-bottom:5px;">Mã Lớp</label>
+                <input type="text" id="newClassCode" name="className" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px;" placeholder="Nhập mã lớp">
             </div>
-            <div class="modal-body">
-                <form id="addClassForm"
-                      asp-controller="ClassManager" asp-action="AddClass" method="post">
-                    <input type="hidden" name="academicPeriodId" value="@Model.AcademicPeriod.Id" />
-                    <div class="mb-3">
-                        <label for="newClassCode" class="form-label">Mã Lớp</label>
-                        <input type="text" class="form-control" id="newClassCode" name="className" placeholder="Nhập mã lớp">
-                    </div>
-                    <div class="mb-3">
-                        <label for="newAdvisor" class="form-label">Cố Vấn Học Tập</label>
-                        <input type="text" class="form-control" id="newAdvisor" name="advisor" placeholder="Nhập tên cố vấn">
-                    </div>
-                    <div class="mb-3">
-                        <label for="newNumberOfStudents" class="form-label">Số lượng SV</label>
-                        <input type="number" class="form-control" id="newNumberOfStudents" name="studentCount" placeholder="Nhập số lượng sinh viên">
-                    </div>
-                    <div class="mb-3">
-                        <label for="newCourse" class="form-label">Khóa</label>
-                        <input type="text" class="form-control" id="newCourse" name="enrollmentNumber" placeholder="Nhập khóa">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        <button type="submit" class="btn btn-primary">Thêm</button>
-                    </div>
-                </form>
-            </div>        
-        </div>
+            <div style="margin-bottom:15px;">
+                <label for="newAdvisor" style="display:block; margin-bottom:5px;">Cố Vấn Học Tập</label>
+                <input type="text" id="newAdvisor" name="advisor" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px;" placeholder="Nhập tên cố vấn">
+            </div>
+            <div style="margin-bottom:15px;">
+                <label for="newNumberOfStudents" style="display:block; margin-bottom:5px;">Số lượng SV</label>
+                <input type="number" id="newNumberOfStudents" name="studentCount" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px;" placeholder="Nhập số lượng sinh viên">
+            </div>
+            <div style="margin-bottom:15px;">
+                <label for="newCourse" style="display:block; margin-bottom:5px;">Khóa</label>
+                <input type="text" id="newCourse" name="enrollmentNumber" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px;" placeholder="Nhập khóa">
+            </div>
+            <div style="text-align:right;">
+                <button type="button" class="btn btn-outline-secondary" style="padding:10px 20px; margin-right:10px;" onclick="closeClassListAddClassModal()">Đóng</button>
+                <button type="submit" class="btn btn-outline-primary" style="padding:10px 20px;">Thêm</button>
+            </div>
+        </form>
     </div>
 </div>
+
+<script>
+    //For Edit in ClassList
+        function openClassListEditModal(classId, className, advisor, studentCount, enrollmentNumber, academicPeriodId) {
+            // Set the values in the modal
+            document.getElementById('classId').value = classId;
+            document.getElementById('classCode').value = className;
+            document.getElementById('advisor').value = advisor;
+            document.getElementById('numberOfStudents').value = studentCount;
+            document.getElementById('course').value = enrollmentNumber;
+            document.getElementById('academicPeriodId').value = academicPeriodId;
+
+            // Show the modal
+            document.getElementById('ClassListEditModal').style.display = 'block';
+        }
+
+        function closeClassListEditModal() {
+            // Hide the modal
+            document.getElementById('ClassListEditModal').style.display = 'none';
+        }
+
+        // Close the modal when clicking outside of it
+        window.onclick = function (event) {
+            var ClassListEditModal = document.getElementById('ClassListEditModal');
+            if (event.target == ClassListEditModal) {
+                closeClassListEditModal();
+            }
+        }
+
+//For Add in ClassList
+        function openClassListAddClassModal() {
+            document.getElementById('ClassListAddClassModal').style.display = 'block';
+        }
+
+        function closeClassListAddClassModal() {
+            document.getElementById('ClassListAddClassModal').style.display = 'none';
+        }
+
+        // Close the modal when clicking outside of it
+        window.onclick = function (event) {
+            var ClassListAddClassModal = document.getElementById('ClassListAddClassModal');
+            if (event.target == ClassListAddClassModal) {
+                closeClassListAddClassModal();
+            }
+        }
+
+//For Delete in ClassList
+        var ClassListDeleteModal = document.getElementById("ClassListDeleteModal");
+        var deleteClassId = 0;
+
+        function openClassListDeleteModal(id) {
+            deleteClassId = id;
+            ClassListDeleteModal.style.display = "block";
+        }
+
+        function closeClassListDeleteModal() {
+            ClassListDeleteModal.style.display = "none";
+        }
+
+        function confirmClassListDelete() {
+            var form = document.createElement("form");
+            form.method = "post";
+            form.action = "/ClassManager/DeleteClassListItem";
+
+            var input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "id";
+            input.value = deleteClassId;
+            form.appendChild(input);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        var modalContent = document.querySelector("#ClassListDeleteModal .modal-content");
+        modalContent.addEventListener('click', function (event) {
+            event.stopPropagation();
+        });
+</script>

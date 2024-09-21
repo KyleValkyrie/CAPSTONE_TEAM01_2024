@@ -14,7 +14,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             _context = context;
         }
 //for ClassList view
-        //Add new Class
+        //Add new ClassList Item
         [HttpPost]
         public async Task<IActionResult> AddClass(int classId, string className, string advisor, int studentCount, int enrollmentNumber, int academicPeriodId)
         {
@@ -72,6 +72,20 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             }
 
             return RedirectToAction("ClassList", new { id = academicPeriodId }); // Redirect to the list view after saving
+        }
+        //Delete ClassList Item
+        [HttpPost]
+        public async Task<IActionResult> DeleteClassListItem(int id)
+        {
+            var classItem = await _context.Classes.FindAsync(id);
+            var redirectID = classItem.AcademicPeriodId;
+            if (classItem != null)
+            {
+                _context.Classes.Remove(classItem);
+                await _context.SaveChangesAsync();
+            }
+            // Redirect to the Page to see update
+            return RedirectToAction("ClassList", new { id = redirectID });
         }
         //render ClassList table in view
         public async Task<IActionResult> ClassList(int id)

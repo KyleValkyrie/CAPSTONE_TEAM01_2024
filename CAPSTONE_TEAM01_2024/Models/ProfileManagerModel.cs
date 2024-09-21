@@ -16,8 +16,9 @@ namespace CAPSTONE_TEAM01_2024.Models
         [Required(ErrorMessage = "Tên Đầy ĐỦ không được để trống")]
         public string? TenDayDu { get; set; }
 
+        
         [Required(ErrorMessage = "Số Điện Thoại không được để trống")]
-
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "Phone number must be exactly 10 digits.")]
         public int SoDienThoai { get; set; }
 
         [Required(ErrorMessage = "Vai Trò không được để trống")]

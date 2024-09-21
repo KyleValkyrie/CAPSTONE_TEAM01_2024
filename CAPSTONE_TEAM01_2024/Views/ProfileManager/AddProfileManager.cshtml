@@ -7,7 +7,7 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				<form asp-action="Create" method="post">
+				<form asp-action="Create" method="post" asp->
 					<div class="mb-3">
 						<label asp-for="Email" for="addEmail" class="form-label">Email</label>
 						<input asp-for="Email" type ="email" class="form-control" id="addEmail" required>
@@ -23,6 +23,7 @@
 					<div class="mb-3">
 						<label asp-for="SoDienThoai" for="addPhone" class="form-label">Số điện thoại</label>
 						<input asp-for="SoDienThoai" type="text" class="form-control" id="addPhone" required>
+						<span asp-validation-for="SoDienThoai" class="text-danger"></span>
 					</div>
 					<div class="mb-3">
 						<label asp-for="VaiTro" for="addRole" class="form-label">Vai trò</label>

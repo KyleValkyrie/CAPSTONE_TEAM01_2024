@@ -1,7 +1,7 @@
 ﻿using CAPSTONE_TEAM01_2024.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using System.ComponentModel.DataAnnotations;
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
     public class ProfileManagerController: Controller
@@ -12,6 +12,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         {
             _context = context;
         }
+     
         public IActionResult Index_ProfileManager()
         {
             var listprofilemanager = _context.ProfileManagers.ToList();
@@ -19,10 +20,37 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return View(listprofilemanager);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Index_ProfileManager(string searchTerm )
+        {
+            ViewData["page"] = "Index_ProfileManager";
+            ViewData["Getemployeedetails"] = searchTerm;
+            var emquery = from x in _context.ProfileManagers select x; 
+            if(!String.IsNullOrEmpty(searchTerm))
+            {
+                if(int.TryParse(searchTerm, out int searchInt))
+                {
+                    emquery = emquery.Where(x => x.SoDienThoai == searchInt);
+                }
+                else
+                {
+                    emquery = emquery.Where(x => x.Email.Contains(searchTerm) || x.MaSo.Contains(searchTerm) || x.TenDayDu.Contains(searchTerm) || x.VaiTro.Contains(searchTerm));
+                }
+               
+            }
+            if(!emquery.Any())
+            {
+                ViewBag.Message = "Không Tìm Thấy Kết Quả !";
+            } 
+            
+            return View(await emquery.AsNoTracking().ToListAsync());
+        }
+        //
         //IsUnique Database for Year & Semester 
-      
         // => Create New  ProfileManager
         // Display ModalPopup AddProfileManager
+        
         public IActionResult Create()
         {
             ProfileManagerModel model = new ProfileManagerModel(); 
@@ -40,13 +68,13 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 _context.ProfileManagers.Add(model);
                 _context.SaveChanges();
 
-                TempData["Message"] = "Thêm người dùng thành công!";
+                TempData["Message"] = "Thêm Tài Khoản Thành Công !";
                 TempData["MessageType"] = "success";
                 return RedirectToAction("Index_ProfileManager", "ProfileManager");
             }
             else
             {
-                TempData["Message"] = "Email hoặc Mã Số hoặc Số Điện Thoại Đã Tồn Tại";
+                TempData["Message"] = "Email hoặc Mã Số hoặc Số Điện Thoại Đã Tồn Tại !";
                 TempData["MessageType"] = "danger";
                 return RedirectToAction("Index_ProfileManager", "ProfileManager");
             }

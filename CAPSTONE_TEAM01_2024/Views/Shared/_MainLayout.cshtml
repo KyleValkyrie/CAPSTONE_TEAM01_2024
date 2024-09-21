@@ -229,95 +229,90 @@
                 });
             }
         });
-//For Adding in SchoolYear
-        // Get the modal
-        var modal = document.getElementById("SchoolYearAddModal");
-
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
-
-        // Function to open the modal
-        function openModal() {
-            modal.style.display = "block";
-        }
-
-        // Function to close the modal
-        function closeModal() {
-            modal.style.display = "none";
-        }
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function (event) {
-            if (event.target == modal) {
-                closeModal();
-            }
-        }
-//For Delete Confirmation in SchoolYear
-        // Get the modal
-        var confirmModal = document.getElementById("SchoolYearConfirmDeleteModal");
+        // For Delete Confirmation in SchoolYear
+        var SchoolYearConfirmDeleteModal = document.getElementById("SchoolYearConfirmDeleteModal");
         var deleteId = 0;
 
-        // Function to open the confirmation modal
-        function openConfirmModal(id) {
+        function openSchoolYearConfirmModal(id) {
             deleteId = id;
-            confirmModal.style.display = "block";
+            SchoolYearConfirmDeleteModal.style.display = "block";
         }
 
-        // Function to close the confirmation modal
-        function closeConfirmModal() {
-            confirmModal.style.display = "none";
+        function closeSchoolYearConfirmModal() {
+            SchoolYearConfirmDeleteModal.style.display = "none";
         }
 
-        // Function to confirm deletion
-        function confirmDelete() {
-            // Create a form to submit the deletion request
+        function confirmSchoolYearDelete() {
             var form = document.createElement("form");
             form.method = "post";
             form.action = "/Categories/DeleteAcademicYear";
 
-            // Add the id input to the form
             var input = document.createElement("input");
             input.type = "hidden";
             input.name = "id";
             input.value = deleteId;
             form.appendChild(input);
 
-            // Append the form to the body and submit it
             document.body.appendChild(form);
             form.submit();
         }
 
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function (event) {
-            if (event.target == confirmModal) {
-                closeConfirmModal();
+        window.addEventListener('click', function (event) {
+            if (event.target == SchoolYearConfirmDeleteModal) {
+                closeSchoolYearConfirmModal();
             }
-        }
-//For Edit in SchoolYear
-        // Get the edit modal
-        var editModal = document.getElementById("SchoolYearEditModal");
+        });
 
-        // Function to open the edit modal
-        function openEditModal(id, year, semester) {
-            document.getElementById("editId").value = id;
-            document.getElementById("editYear").value = year;
-            document.getElementById("editSemester").value = semester;
-            editModal.style.display = "block";
+        var modalContent = document.querySelector("#SchoolYearConfirmDeleteModal .modal-content");
+        modalContent.addEventListener('click', function (event) {
+            event.stopPropagation();
+        });
+
+        // For Edit in SchoolYear
+        var SchoolYearEditModal = document.getElementById("SchoolYearEditModal");
+
+        function openSchoolYearEditModal(id, year, semester) {
+            document.getElementById("SchoolYearEditId").value = id;
+            document.getElementById("SchoolYearEditYear").value = year;
+            document.getElementById("SchoolYearEditSemester").value = semester;
+            SchoolYearEditModal.style.display = "block";
         }
 
-        // Function to close the edit modal
-        function closeEditModal() {
-            editModal.style.display = "none";
+        function closeSchoolYearEditModal() {
+            SchoolYearEditModal.style.display = "none";
         }
 
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function (event) {
-            if (event.target == editModal) {
-                closeEditModal();
+        window.addEventListener('click', function (event) {
+            if (event.target == SchoolYearEditModal) {
+                closeSchoolYearEditModal();
             }
+        });
+
+        // For Adding in SchoolYear
+        var SchoolYearAddModal = document.getElementById("SchoolYearAddModal");
+
+        function openSchoolYearAddModal() {
+            SchoolYearAddModal.style.display = "block";
         }
+
+        function closeSchoolYearAddModal() {
+            SchoolYearAddModal.style.display = "none";
+        }
+
+        window.addEventListener('click', function (event) {
+            if (event.target == SchoolYearAddModal) {
+                closeSchoolYearAddModal();
+            }
+        });
+
+        // Get the <span> element that closes the add modal
+        var span = document.getElementsByClassName("close")[0];
+        span.addEventListener('click', function () {
+            closeSchoolYearAddModal();
+        });
+
 //For Searching SchoolYear
-        function filterTable() 
-        {
+        function filterSchoolYearTable() {
             // Get the search input value
             var input = document.getElementById('SchoolYearSearchField').value.toLowerCase();
             // Get the table and its rows
@@ -338,10 +333,25 @@
             }
         }
         // Function to clear the search field and reset the table
-        function clearSearch() {
+        function clearSchoolYearSearch() {
             document.getElementById('SchoolYearSearchField').value = '';
             filterTable();
         }
+//For Edit in ClassList
+        function openClassListEditModal(classId, className, advisor, studentCount, enrollmentNumber, academicPeriodId) {
+            // Set the values in the modal
+            document.getElementById('classId').value = classId;
+            document.getElementById('classCode').value = className;
+            document.getElementById('advisor').value = advisor;
+            document.getElementById('numberOfStudents').value = studentCount;
+            document.getElementById('course').value = enrollmentNumber;
+            document.getElementById('academicPeriodId').value = academicPeriodId;
+
+            // Show the modal without backdrop
+            var ClassListEditModal = new bootstrap.Modal(document.getElementById('ClassListEditModal'));
+            ClassListEditModal.show();
+        }
+
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

@@ -41,16 +41,16 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 _context.AcademicPeriods.Add(academicPeriod);
                 await _context.SaveChangesAsync();
 
-                TempData["MessageYear"] = "Thêm năm học thành công!";
-                TempData["MessageType"] = "success";
+                TempData["MessageAddYear"] = "Thêm năm học thành công!";
+                TempData["MessageAddType"] = "success";
 
                 // Redirect to the Page to see update
                 return RedirectToAction("SchoolYear");
             }
             else
             {
-                TempData["MessageYear"] = "Năm học và học kì đã tồn tại!";
-                TempData["MessageType"] = "danger";
+                TempData["MessageAddYear"] = "Năm học và học kì đã tồn tại!";
+                TempData["MessageAddType"] = "danger";
                 return RedirectToAction("SchoolYear");
             }
         }
@@ -72,45 +72,31 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         public async Task<IActionResult> EditAcademicYear(int id, int year, int semester)
         {
             var academicPeriod = await _context.AcademicPeriods.FindAsync(id);
-            if (academicPeriod != null)
+            // Check if another record with the same year and semester exists
+            var existingPeriod = await _context.AcademicPeriods
+                .FirstOrDefaultAsync(ap => ap.Year == year && ap.Semester == semester && ap.Id != id);
+            if (academicPeriod != null && existingPeriod==null) 
             {
+                TempData["MessageEditYear"] = "Cập nhật thành công!";
+                TempData["MessageEditType"] = "success";
                 academicPeriod.Year = year;
                 academicPeriod.Semester = semester;
                 await _context.SaveChangesAsync();
+                return RedirectToAction("SchoolYear");
             }
-
-            return RedirectToAction("SchoolYear");
+            else
+            {
+                TempData["MessageEditYear"] = "Trùng thời gian, cập nhật đã bị hủy!";
+                TempData["MessageEditType"] = "danger";
+                return RedirectToAction("SchoolYear");
+            }
         }
         //Render SchoolYear
         public async Task<IActionResult> SchoolYear()
         {
             ViewData["page"] = "SchoolYear";
             var academicPeriods = await _context.AcademicPeriods.ToListAsync();
-            //var results = HttpContext.Session.GetString("QueryResults");
-            //if (results != null)
-            //{
-            //    academicPeriods = JsonConvert.DeserializeObject<List<AcademicPeriod>>(results);
-            //    ModelState.Clear();
-            //}
-
             return View(academicPeriods);
-        }
-
-        [HttpPost]
-        public JsonResult SetViewData(string value)
-        {
-            //physics 1
-            int parsedValue;
-            bool successfulParse = int.TryParse(value, out parsedValue);
-            string academicPeriod = string.Empty;
-            if (successfulParse)
-            {
-                var results = from record in _context.AcademicPeriods where EF.Functions.Like((string)(object)record.Year, $"%{parsedValue}%") select record;
-                //HttpContext.Session.SetString("QueryResults", JsonConvert.SerializeObject(academicPeriod));
-                academicPeriod = JsonConvert.SerializeObject(results);
-            }
-            return Json(academicPeriod);
-            //return RedirectToAction("SchoolYear");
         }
 //SemesterPlan actions
         public IActionResult SemesterPlan()

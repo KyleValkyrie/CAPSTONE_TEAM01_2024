@@ -7,6 +7,12 @@
         @TempData["MessageClassOverview"]
     </div>
 }
+@if (TempData["MessageEditClass"] != null)
+{
+    <div class="alert alert-@TempData["MessageEditClassType"]">
+        @TempData["MessageEditClass"]
+    </div>
+}
 @model CAPSTONE_TEAM01_2024.ViewModels.ClassListViewModel
 
 <div class="content-wrapper" style="min-height: 912.2px;">
@@ -30,7 +36,7 @@
                 <div class="card-header">
                     <div class="row text-center">
                         <div class="col-auto">
-                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddClassModal">
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ClassListAddClassModal">
                                 <i class="bi bi-plus custom-icon"></i> Thêm Lớp
                             </button>
                         </div>
@@ -70,7 +76,7 @@
                                     <td class="text-center">@classes.StudentCount</td>
                                     <td class="text-center">@classes.EnrollmentNumber</td>
                                     <td class="text-center">
-                                        <button type="button" class="btn btn-outline-primary btn-sm" aria-label="Edit class details" onclick="openEditModal('1', '@classes.ClassName', '@classes.Advisor', @classes.StudentCount, @classes.EnrollmentNumber)">
+                                        <button type="button" class="btn btn-outline-primary btn-sm" aria-label="Edit class details" onclick="openClassListEditModal(@classes.ClassId, '@classes.ClassName', '@classes.Advisor', @classes.StudentCount, @classes.EnrollmentNumber, @classes.AcademicPeriodId)">
                                             <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập Nhật
                                         </button>
                                         <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteModal" aria-label="Delete class" onclick="openDeleteModal('1')">
@@ -91,47 +97,48 @@
 </div>
 
 <!-- Edit Modal -->
-<div class="modal fade" id="EditModal" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true" data-bs-backdrop="false">
+<div class="modal fade" id="ClassListEditModal" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true" data-bs-backdrop="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="EditModalLabel">Chỉnh Sửa Thông Tin Lớp</h5>
+                <h5 class="modal-title" id="ClassListEditModalLabel">Chỉnh Sửa Thông Tin Lớp</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="editClassForm">
+                <form id="ClassListEditClassForm" method="post" asp-controller="ClassManager" asp-action="EditClassListItem">
                     <div class="mb-3">
                         <label for="classId" class="form-label">ID Lớp</label>
-                        <input type="text" class="form-control" id="classId" readonly>
+                        <input type="text" class="form-control" id="classId" name="classId" readonly>
                     </div>
                     <div class="mb-3">
                         <label for="classCode" class="form-label">Mã Lớp</label>
-                        <input type="text" class="form-control" id="classCode" placeholder="Nhập mã lớp">
+                        <input type="text" class="form-control" id="classCode" name="className" placeholder="Nhập mã lớp">
                     </div>
                     <div class="mb-3">
                         <label for="advisor" class="form-label">Cố Vấn Học Tập</label>
-                        <input type="text" class="form-control" id="advisor" placeholder="Nhập tên cố vấn">
+                        <input type="text" class="form-control" id="advisor" name="advisor" placeholder="Nhập tên cố vấn">
                     </div>
                     <div class="mb-3">
                         <label for="numberOfStudents" class="form-label">Số lượng SV</label>
-                        <input type="number" class="form-control" id="numberOfStudents" placeholder="Nhập số lượng sinh viên">
+                        <input type="number" class="form-control" id="numberOfStudents" name="studentCount" placeholder="Nhập số lượng sinh viên">
                     </div>
                     <div class="mb-3">
                         <label for="course" class="form-label">Khóa</label>
-                        <input type="text" class="form-control" id="course" placeholder="Nhập khóa">
+                        <input type="number" class="form-control" id="course" name="enrollmentNumber" placeholder="Nhập khóa">
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary" >Lưu Thay Đổi</button>
+                    </div>
+                    <input type="hidden" id="academicPeriodId" name="academicPeriodId" readonly>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-primary" onclick="saveChanges()">Lưu Thay Đổi</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Delete Modal -->
-<div class="modal fade" id="DeleteModal" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true" data-bs-backdrop="false">
+<div class="modal fade" id="ClassListDeleteModal" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true" data-bs-backdrop="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -151,7 +158,7 @@
 </div>
 
 <!-- Add Modal -->
-<div class="modal fade" id="AddClassModal" tabindex="-1" aria-labelledby="AddClassModalLabel" aria-hidden="true" data-bs-backdrop="false">
+<div class="modal fade" id="ClassListAddClassModal" tabindex="-1" aria-labelledby="AddClassModalLabel" aria-hidden="true" data-bs-backdrop="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -187,29 +194,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    function openEditModal(id, classCode, advisor, numberOfStudents, course) {
-        document.getElementById('classId').value = id;
-        document.getElementById('classCode').value = classCode;
-        document.getElementById('advisor').value = advisor;
-        document.getElementById('numberOfStudents').value = numberOfStudents;
-        document.getElementById('course').value = course;
-    }
-
-    function saveChanges() {
-        // Get data from form
-        const classId = document.getElementById('classId').value;
-        const classCode = document.getElementById('classCode').value;
-        const advisor = document.getElementById('advisor').value;
-        const numberOfStudents = document.getElementById('numberOfStudents').value;
-        const course = document.getElementById('course').value;
-
-        // Perform save operation (e.g., AJAX request)
-        console.log(`Saving changes for ID ${classId}: ${classCode}, ${advisor}, ${numberOfStudents}, ${course}`);
-
-        // Hide the modal
-        const editModal = bootstrap.Modal.getInstance(document.getElementById('EditModal'));
-        editModal.hide();
-    }
-</script>

@@ -1,8 +1,14 @@
 ﻿@using Newtonsoft.Json.Linq
-@if (TempData["MessageYear"] != null)
+@if (TempData["MessageAddYear"] != null)
 {
-    <div class="alert alert-@TempData["MessageType"]">
-        @TempData["MessageYear"]
+    <div class="alert alert-@TempData["MessageAddType"]">
+        @TempData["MessageAddYear"]
+    </div>
+}
+@if (TempData["MessageEditYear"] != null)
+{
+    <div class="alert alert-@TempData["MessageEditType"]">
+        @TempData["MessageEditYear"]
     </div>
 }
 @{
@@ -16,11 +22,11 @@
             <div class="row w-100">
                 <div class="col-md-6 d-flex">
                         <div class="input-group w-100">
-                            <input id="SchoolYearSearchField" type="text" class="form-control" placeholder="Nhập năm học cần tìm" oninput="filterTable()">
+                        <input id="SchoolYearSearchField" type="text" class="form-control" placeholder="Nhập năm học cần tìm" oninput="filterSchoolYearTable()">
                             <button class="btn btn-secondary"
                                     type="button"
-                                    style="white-space: nowrap;"
-                                    onclick="clearSearch()">
+                                    style="white-space: nowrap; z-index:1;"
+                                    onclick="clearSchoolYearSearch()">
                                 Hủy Tìm Kiếm
                             </button>
                         </div>
@@ -28,7 +34,7 @@
                 <div class="col-md-6 d-flex justify-content-end">
                     <button class="btn btn-success" 
                             type="button" 
-                            onclick="openModal()">
+                            onclick="openSchoolYearAddModal()">
                         Thêm Mới
                     </button>
                 </div>
@@ -64,13 +70,12 @@
                             <button style="z-index:2;"
                                     type="button"
                                     class="btn btn-outline-primary btn-sm"
-                                    onclick="event.stopPropagation(); openEditModal(@period.Id, @period.Year, @period.Semester)">
+                                    onclick="event.stopPropagation(); openSchoolYearEditModal(@period.Id, @period.Year, @period.Semester)">
                                 <i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i> Cập Nhật
                             </button>
-                            <button style="z-index:2;"
+                            <button style="z-index:2; float:right;"
                                     class="btn btn-outline-danger btn-sm"
-                                    onclick="event.stopPropagation(); openConfirmModal(@period.Id)"
-                                    style="float:right;">
+                                    onclick="event.stopPropagation(); openSchoolYearConfirmModal(@period.Id)">
                                 Xóa
                             </button>
                         </td>
@@ -119,20 +124,20 @@
                     </select>
                 </div>
                 <div style="text-align:right;">
-                    <button type="button" class="btn btn-outline-danger" style="padding:10px 20px; margin-right:10px;" onclick="closeModal()">Hủy</button>
+                    <button type="button" class="btn btn-outline-danger" style="padding:10px 20px; margin-right:10px;" onclick="closeSchoolYearAddModal()">Hủy</button>
                     <button type="submit" class="btn btn-outline-primary" style="padding:10px 20px;">Lưu</button>
                 </div>
             </form>
         </div>
     </div>
-    <!-- Confirmation Modal -->
+    <!-- Confirm Delete Modal -->
     <div id="SchoolYearConfirmDeleteModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
         <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:30%; height:20%; position:relative; border-radius:10px;">
             <h2 style="text-align:center; margin-bottom:20px;">Xóa Năm Học</h2>
             <p style="text-align:center;">Sau khi xóa sẽ không thể khôi phục lại. Xác nhận xóa?</p>
             <div style="text-align:center;">
-                <button type="button" class="btn btn-outline-secondary" style="padding:10px 20px; margin-right:10px;" onclick="closeConfirmModal()">HỦY</button>
-                <button type="button" class="btn btn-outline-danger" style="padding:10px 20px;" onclick="confirmDelete()">XÁC NHẬN</button>
+                <button type="button" class="btn btn-outline-secondary" style="padding:10px 20px; margin-right:10px;" onclick="closeSchoolYearConfirmModal()">HỦY</button>
+                <button type="button" class="btn btn-outline-danger" style="padding:10px 20px;" onclick="confirmSchoolYearDelete()">XÁC NHẬN</button>
             </div>
         </div>
     </div>
@@ -141,21 +146,21 @@
         <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:30%; position:relative; border-radius:10px;">
             <h2 style="text-align:center; margin-bottom:20px;">Chỉnh Sửa Năm Học</h2>
             <form id="editForm" asp-controller="Categories" asp-action="EditAcademicYear" method="post">
-                <input type="hidden" id="editId" name="id" />
+                <input type="hidden" id="SchoolYearEditId" name="id" />
                 <div style="margin-bottom:15px;">
-                    <label for="editYear" style="display:block; margin-bottom:5px;">Năm Học</label>
-                    <input type="number" id="editYear" name="year" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px;" required>
+                    <label for="SchoolYearEditYear" style="display:block; margin-bottom:5px;">Năm Học</label>
+                    <input type="number" id="SchoolYearEditYear" name="year" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px;" required>
                 </div>
                 <div style="margin-bottom:15px;">
-                    <label for="editSemester" style="display:block; margin-bottom:5px;">Học Kỳ</label>
-                    <select id="editSemester" name="semester" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px;" required>
+                    <label for="SchoolYearEditSemester" style="display:block; margin-bottom:5px;">Học Kỳ</label>
+                    <select id="SchoolYearEditSemester" name="semester" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px;" required>
                         <option value="1">1</option>
                         <option value="2">2</option>
                         <option value="3">3</option>
                     </select>
                 </div>
                 <div style="text-align:right;">
-                    <button type="button" class="btn btn-outline-secondary" style="padding:10px 20px; margin-right:10px;" onclick="closeEditModal()">Hủy</button>
+                    <button type="button" class="btn btn-outline-secondary" style="padding:10px 20px; margin-right:10px;" onclick="closeSchoolYearEditModal()">Hủy</button>
                     <button type="submit" class="btn btn-outline-primary" style="padding:10px 20px;">Lưu</button>
                 </div>
             </form>

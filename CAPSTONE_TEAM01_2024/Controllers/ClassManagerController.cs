@@ -13,7 +13,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         {
             _context = context;
         }
-//for Class view
+//for ClassList view
         //Add new Class
         [HttpPost]
         public async Task<IActionResult> AddClass(int classId, string className, string advisor, int studentCount, int enrollmentNumber, int academicPeriodId)
@@ -54,7 +54,26 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("ClassList", new { id = academicPeriodId });
             }
         }
+        //Edit ClassList item
+        [HttpPost]
+        public async Task<IActionResult> EditClassListItem(int classId, string className, string advisor, int studentCount, int enrollmentNumber, int academicPeriodId)
+        {
+            var classItem = await _context.Classes.FindAsync(classId);
+            if (classItem != null)
+            {
+                classItem.ClassName = className;
+                classItem.Advisor = advisor;
+                classItem.StudentCount = studentCount;
+                classItem.EnrollmentNumber = enrollmentNumber;
+                classItem.AcademicPeriodId =academicPeriodId;
+                TempData["MessageEditClass"] = "Cập nhật thành công!";
+                TempData["MessageEditClassType"] = "success";
+                await _context.SaveChangesAsync();
+            }
 
+            return RedirectToAction("ClassList", new { id = academicPeriodId }); // Redirect to the list view after saving
+        }
+        //render ClassList table in view
         public async Task<IActionResult> ClassList(int id)
         {
             // Fetch the academic period data

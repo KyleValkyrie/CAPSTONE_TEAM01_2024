@@ -15,21 +15,15 @@
         <nav class="navbar">
             <div class="row w-100">
                 <div class="col-md-6 d-flex">
-                    <form class="d-flex w-100">
                         <div class="input-group w-100">
-                            <input id="SearchField" type="text" class="form-control" placeholder="Nhập năm học cần tìm">
-                            <input id="SearchButton" class="btn btn-info" type="button" style="z-index:0;" value="Tim" onclick="SetViewData()" />
-                        </div>
-                    </form>
-                    <div style="margin-left:1rem;">
-                        <form asp-controller="Categories" asp-action="SchoolYear">
+                            <input id="SearchField" type="text" class="form-control" placeholder="Nhập năm học cần tìm" oninput="filterTable()">
                             <button class="btn btn-secondary"
-                                    type="submit"
-                                    style="white-space: nowrap;">
+                                    type="button"
+                                    style="white-space: nowrap;"
+                                    onclick="clearSearch()">
                                 Hủy Tìm Kiếm
                             </button>
-                        </form>
-                    </div>
+                        </div>
                 </div>
                 <div class="col-md-6 d-flex justify-content-end">
                     <button class="btn btn-success" 
@@ -53,26 +47,32 @@
                 </tr>
             </thead>
             <tbody>
-                @{int number = 0;}
+                @{
+                    int number = 0;
+                }
                 @foreach (AcademicPeriod period in Model)
                 {
                     number++;
-                    <tr onclick="window.location.href='/ClassManager/ClassList/@period.Id'"
-                        style="cursor: pointer; background-color: white;"
+                    <tr style="cursor: pointer; background-color: white;"
                         onmouseover="this.style.backgroundColor='#c7c1c1 '; this.style.color='white';"
-                        onmouseout="this.style.backgroundColor='white'; this.style.color='black';">
+                        onmouseout="this.style.backgroundColor='white'; this.style.color='black';"
+                        onclick="window.location.href='/ClassManager/ClassList/@period.Id'">
                         <th scope="row">@number</th>
                         <td>@(period.Year.ToString().Substring(2) + period.Semester)</td>
                         <td>@(period.Year + "-" + (period.Year + 1))</td>
                         <td>
-                            <button type="button" 
+                            <button style="z-index:2;"
+                                    type="button"
                                     class="btn btn-outline-primary btn-sm"
-                                    onclick="openEditModal(@period.Id, @period.Year, @period.Semester)">
-                                <i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i> Cập Nhật</button><button class="btn btn-outline-danger btn-sm"
-                                        onclick="openConfirmModal(@period.Id)"
-                                             style="float:right;">
-                                    Xóa
-                                </button>
+                                    onclick="event.stopPropagation(); openEditModal(@period.Id, @period.Year, @period.Semester)">
+                                <i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i> Cập Nhật
+                            </button>
+                            <button style="z-index:2;"
+                                    class="btn btn-outline-danger btn-sm"
+                                    onclick="event.stopPropagation(); openConfirmModal(@period.Id)"
+                                    style="float:right;">
+                                Xóa
+                            </button>
                         </td>
                     </tr>
                 }
@@ -102,7 +102,7 @@
         </nav>
     </div>
     <!-- Add Modal -->
-    <div id="AddModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+    <div id="SchoolYearAddModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
         <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:30%; position:relative; border-radius:10px;">
             <h2 style="text-align:center; margin-bottom:20px;">Thêm Năm Học</h2>
             <form asp-controller="Categories" asp-action="AddAcademicYear" method="post">
@@ -126,7 +126,7 @@
         </div>
     </div>
     <!-- Confirmation Modal -->
-    <div id="confirmDeleteModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+    <div id="SchoolYearConfirmDeleteModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
         <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:30%; height:20%; position:relative; border-radius:10px;">
             <h2 style="text-align:center; margin-bottom:20px;">Xóa Năm Học</h2>
             <p style="text-align:center;">Sau khi xóa sẽ không thể khôi phục lại. Xác nhận xóa?</p>
@@ -137,7 +137,7 @@
         </div>
     </div>
     <!-- Edit Modal -->
-    <div id="editModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+    <div id="SchoolYearEditModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
         <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:30%; position:relative; border-radius:10px;">
             <h2 style="text-align:center; margin-bottom:20px;">Chỉnh Sửa Năm Học</h2>
             <form id="editForm" asp-controller="Categories" asp-action="EditAcademicYear" method="post">

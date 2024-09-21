@@ -241,7 +241,7 @@
         });
 //For Adding in SchoolYear
         // Get the modal
-        var modal = document.getElementById("AddModal");
+        var modal = document.getElementById("SchoolYearAddModal");
 
         // Get the <span> element that closes the modal
         var span = document.getElementsByClassName("close")[0];
@@ -263,7 +263,7 @@
         }
 //For Delete Confirmation in SchoolYear
         // Get the modal
-        var confirmModal = document.getElementById("confirmDeleteModal");
+        var confirmModal = document.getElementById("SchoolYearConfirmDeleteModal");
         var deleteId = 0;
 
         // Function to open the confirmation modal
@@ -304,7 +304,7 @@
         }
 //For Edit in SchoolYear
         // Get the edit modal
-        var editModal = document.getElementById("editModal");
+        var editModal = document.getElementById("SchoolYearEditModal");
 
         // Function to open the edit modal
         function openEditModal(id, year, semester) {
@@ -326,70 +326,40 @@
             }
         }
 //For Searching SchoolYear
-        //Get the text field
-        function SetViewData()
+        function filterTable() 
         {
-            var url = window.location.href;
-            var inputField = document.getElementById("SearchField");
-            var searchQuery = inputField.value;
-            console.log(searchQuery);
-            var resultsTableBody = document.querySelector("#queryResults tbody");
-            var results = resultsTableBody.querySelectorAll("tr");
-            for (var result of results) {
-                resultsTableBody.removeChild(result);
-            }
+            // Get the search input value
+            var input = document.getElementById('SearchField').value.toLowerCase();
+            // Get the table and its rows
+            var table = document.getElementById('queryResults');
+            var rows = table.getElementsByTagName('tr');
 
-            $.ajax({
-                type: "POST",
-                url: "/Categories/SetViewData",
-                data: {
-                    value: searchQuery
-                },
-                dataType: "json",
-                success: function (results) {
-                    var data = JSON.parse(results);
-                    console.log(`length: ${data.length}\n ${data}`);
-                    let number = 0;
-                    for (var record of data) { 
-                        number++;
-                        console.log(record);
-                        var row = document.createElement("tr");
-                        var rowHead = document.createElement("th");
-                        rowHead.setAttribute("scope", "row");
-                        rowHead.innerText = number;
-                        row.appendChild(rowHead);
-                        
-                        var cell = document.createElement("td");
-                        cell.innerText = `${record.Year.toString().substring(2)}${record.Semester}`;
-                        row.appendChild(cell);
-                        
-                        cell = document.createElement("td");
-                        cell.innerText = `${record.Year} - ${parseInt(record.Year) + 1}`;
-                        row.appendChild(cell);
-                        cell = document.createElement("td");
-                        
-                        var button = document.createElement("button");
-                        button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-                        button.setAttribute('onclick', `openEditModal(${record.Id}, ${record.Year}, ${record.Semester})`);
-                        button.innerHTML = '<i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i> Cập Nhật';
-                        cell.appendChild(button);
-                        row.appendChild(cell);
-
-                        button = document.createElement("button");
-                        button.classList.add('btn', 'btn-outline-danger', 'btn-sm');
-                        button.setAttribute('onclick', `openConfirmModal(${record.Id})`);
-                        button.setAttribute('style', 'float:right;')
-                        button.textContent = "Xóa";
-                        cell.appendChild(button);
-                        row.appendChild(cell);
-
-                        resultsTableBody.appendChild(row);
+            // Loop through the rows and hide those that don't match the search query
+            for (var i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
+                var cells = rows[i].getElementsByTagName('td');
+                if (cells.length > 0) {
+                    var year = cells[1].innerText.toLowerCase();
+                    if (year.includes(input)) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
                     }
                 }
-            });
-
+            }
         }
-//For ClassList view
+        // Function to clear the search field and reset the table
+        function clearSearch() {
+            document.getElementById('SearchField').value = '';
+            filterTable();
+        }
+
+        // Optional: Add event listener for Enter key press
+        document.getElementById('SearchField').addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                filterTable();
+            }
+        });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

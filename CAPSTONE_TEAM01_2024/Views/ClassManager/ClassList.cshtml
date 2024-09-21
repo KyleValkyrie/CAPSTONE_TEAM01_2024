@@ -187,3 +187,29 @@
         </div>
     </div>
 </div>
+
+<script>
+    function openEditModal(id, classCode, advisor, numberOfStudents, course) {
+        document.getElementById('classId').value = id;
+        document.getElementById('classCode').value = classCode;
+        document.getElementById('advisor').value = advisor;
+        document.getElementById('numberOfStudents').value = numberOfStudents;
+        document.getElementById('course').value = course;
+    }
+
+    function saveChanges() {
+        // Get data from form
+        const classId = document.getElementById('classId').value;
+        const classCode = document.getElementById('classCode').value;
+        const advisor = document.getElementById('advisor').value;
+        const numberOfStudents = document.getElementById('numberOfStudents').value;
+        const course = document.getElementById('course').value;
+
+        // Perform save operation (e.g., AJAX request)
+        console.log(`Saving changes for ID ${classId}: ${classCode}, ${advisor}, ${numberOfStudents}, ${course}`);
+
+        // Hide the modal
+        const editModal = bootstrap.Modal.getInstance(document.getElementById('EditModal'));
+        editModal.hide();
+    }
+</script>

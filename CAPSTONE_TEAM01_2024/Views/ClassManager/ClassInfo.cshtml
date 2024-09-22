@@ -1,0 +1,123 @@
+﻿@{
+    Layout = "_MainLayout";
+}
+@if (TempData["MessageAddStudent"] != null)
+{
+    <div class="alert alert-@TempData["MessageAddStudentType"]">
+        @TempData["MessageAddStudent"]
+    </div>
+}
+@model CAPSTONE_TEAM01_2024.ViewModels.ClassInfoViewModel
+
+<div class="content-wrapper" style="min-height: 912.2px;">
+    <!-- Content Header (Page header) -->
+    <header class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Danh Sách SV </h1>
+                    <h2 class="m-0">Năm @(Model.AcademicPeriod.Year + "-" + (Model.AcademicPeriod.Year + 1))</h2>
+                    <h3 class ="m-0">Lớp @(Model.Class.ClassName)</h3>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </header>
+    <!-- /.content-header -->
+    <!-- Main content -->
+    <main class="content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row text-center">
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-success" id="openAddStudentModal">
+                                <i class="bi bi-plus custom-icon"></i> Thêm SV
+                            </button>
+
+                        </div>
+                        <div class="col">
+                            <nav class="navbar navbar-light bg-light">
+                                <form class="d-flex ms-auto">
+                                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                                    <button class="btn btn-outline-success" type="submit">Search</button>
+                                </form>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-header -->
+
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr class="text-center">
+                                <th scope="col">#</th>
+                                <th scope="col">Mã Số SV</th>
+                                <th scope="col">Họ Tên SV</th>
+                                <th scope="col">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int number = 0;
+                            }
+                            @foreach (ClassInfo student in Model.ClassInfos)
+                            {
+                                number++;
+                                <tr class="table-row">
+                                    <th scope="row" class="text-center">@number</th>
+                                    <td class="text-center">@student.StudentId</td>
+                                    <td class="text-center">@student.StudentName</td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-outline-primary btn-sm" aria-label="Edit class details"">
+                                            <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập Nhật
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm" aria-label="Delete class"">
+                                            <i class="fa-solid fa-trash custom-icon"></i> Xóa
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            <!-- Additional rows can go here -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+        </div>
+    </main>
+    <!-- /.content -->
+</div>
+
+<!-- Add Modal -->
+<div id="ClassInfoAddStudentModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:30%; position:relative; border-radius:10px;">
+        <h2 style="text-align:center; margin-bottom:20px;">Thêm SV Mới</h2>
+        <form id="addClassForm" asp-controller="ClassManager" asp-action="AddInfo" method="post">
+            <input type="hidden" name="classId" value="@(Model.Class.ClassId)"/>
+            <div style="margin-bottom:15px;">
+                <label for="newStudentCode" style="display:block; margin-bottom:5px;">Mã Số SV</label>
+                <input type="text" id="newStudentCode" name="studentId" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px;" placeholder="Nhập mã số SV">
+            </div>
+            <div style="margin-bottom:15px;">
+                <label for="newStudentName" style="display:block; margin-bottom:5px;">Họ Tên SV</label>
+                <input type="text" id="newStudentName" name="studentName" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px;" placeholder="Nhập họ tên SV">
+            </div>
+            <div style="text-align:right;">
+                <button type="button" class="btn btn-outline-secondary" style="padding:10px 20px; margin-right:10px;" onclick="closeClassListAddClassModal()">Đóng</button>
+                <button type="submit" class="btn btn-outline-primary" style="padding:10px 20px;">Thêm</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+//For add student modal
+    document.getElementById('openAddStudentModal').addEventListener('click', function() {
+        document.getElementById('ClassInfoAddStudentModal').style.display = 'block';
+    });
+
+    function closeClassListAddClassModal() {
+        document.getElementById('ClassInfoAddStudentModal').style.display = 'none';
+    }
+
+</script>

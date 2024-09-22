@@ -65,21 +65,27 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @{int number = 0;}
+                            @{
+                                int number = 0;
+                            }
                             @foreach (Class classes in Model.Classes)
                             {
                                 number++;
-                                <tr class="table-row">
+                                <tr class="table-row"
+                                    style="cursor: pointer;"
+                                    onmouseover="this.style.backgroundColor='#c7c1c1 '; this.style.color='white';"
+                                    onmouseout="this.style.backgroundColor='white'; this.style.color='black';"
+                                    onclick="window.location.href='/ClassManager/ClassInfo/@classes.ClassId'">
                                     <th scope="row" class="text-center">@number</th>
                                     <td class="text-center">@classes.ClassName</td>
                                     <td class="text-center">@classes.Advisor</td>
                                     <td class="text-center">@classes.StudentCount</td>
                                     <td class="text-center">@classes.EnrollmentNumber</td>
                                     <td class="text-center">
-                                        <button type="button" class="btn btn-outline-primary btn-sm" aria-label="Edit class details" onclick="openClassListEditModal(@classes.ClassId, '@classes.ClassName', '@classes.Advisor', @classes.StudentCount, @classes.EnrollmentNumber, @classes.AcademicPeriodId)">
+                                        <button type="button" class="btn btn-outline-primary btn-sm" aria-label="Edit class details" onclick="event.stopPropagation(); openClassListEditModal(@classes.ClassId, '@classes.ClassName', '@classes.Advisor', @classes.StudentCount, @classes.EnrollmentNumber, @classes.AcademicPeriodId)">
                                             <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập Nhật
                                         </button>
-                                        <button type="button" class="btn btn-outline-danger btn-sm" aria-label="Delete class" onclick="openClassListDeleteModal(@classes.ClassId)">
+                                        <button type="button" class="btn btn-outline-danger btn-sm" aria-label="Delete class" onclick="event.stopPropagation(); openClassListDeleteModal(@classes.ClassId)">
                                             <i class="fa-solid fa-trash custom-icon"></i> Xóa
                                         </button>
                                     </td>

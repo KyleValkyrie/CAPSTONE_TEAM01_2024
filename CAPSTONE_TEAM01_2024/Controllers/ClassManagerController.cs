@@ -107,5 +107,63 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return View(viewModel);
         }
+//for ClassInfo view
+        //render ClassInfo table in view
+        public async Task<IActionResult> ClassInfo(int id)
+        {
+            // Fetch the class data including related academic period and students
+            var classData = await _context.Classes
+                .Include(c => c.AcademicPeriod)
+                .FirstOrDefaultAsync(c => c.ClassId == id);
+
+            // Fetch the classinfo data related to the class
+            var infos = await _context.ClassInfos
+                .Where(c => c.ClassId == id)
+                .ToListAsync();
+
+            var viewModel = new ClassInfoViewModel
+            {
+                AcademicPeriod = classData.AcademicPeriod,
+                Class = classData,
+                ClassInfos = infos
+            };
+            return View(viewModel);
+        }
+        //add new Info
+        [HttpPost]
+        public async Task<IActionResult> AddInfo(string studentId, string studentName, int classId)
+        {
+            // Create a new Class object
+            var newInfo = new ClassInfo
+            {
+                ClassId = classId,
+                StudentId = studentId,
+                StudentName=studentName
+            };
+
+            // Add the new object to the database
+            // Check if the class already exists
+            bool isFound = await _context.ClassInfos
+                .AnyAsync(r => r.StudentId == newInfo.StudentId &&
+                               r.StudentName == newInfo.StudentName &&
+                               r.ClassId == newInfo.ClassId);
+            if (!isFound) //Can add
+            {
+                _context.ClassInfos.Add(newInfo);
+                await _context.SaveChangesAsync();
+
+                TempData["MessageAddStudent"] = "Thêm SV thành công!";
+                TempData["MessageAddStudentType"] = "success";
+
+                // Redirect to the Page to see update
+                return RedirectToAction("ClassInfo", new { id = classId });
+            }
+            else
+            {
+                TempData["MessageAddStudent"] = "SV đã tồn tại!";
+                TempData["MessageAddStudentType"] = "danger";
+                return RedirectToAction("ClassInfo", new { id = classId });
+            }
+        }
     }
 }

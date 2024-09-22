@@ -24,5 +24,8 @@ namespace CAPSTONE_TEAM01_2024.Models
 
         // Navigation property
         public AcademicPeriod AcademicPeriod { get; set; }
+
+        // Navigation property for students
+        public ICollection<ClassInfo> ClassInfos { get; set; }
     }
 }

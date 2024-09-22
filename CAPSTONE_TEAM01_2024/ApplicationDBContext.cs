@@ -11,6 +11,7 @@ namespace CAPSTONE_TEAM01_2024
         }
         public DbSet<AcademicPeriod> AcademicPeriods { get; set; }
         public DbSet<Class> Classes { get; set; }
+        public DbSet<ClassInfo> ClassInfos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -20,6 +21,11 @@ namespace CAPSTONE_TEAM01_2024
                 .HasMany(ap => ap.Classes)
                 .WithOne(c => c.AcademicPeriod)
                 .HasForeignKey(c => c.AcademicPeriodId);
+
+            modelBuilder.Entity<Class>()
+            .HasMany(c => c.ClassInfos)
+            .WithOne(s => s.Class)
+            .HasForeignKey(s => s.ClassId);
         }
     }
 }

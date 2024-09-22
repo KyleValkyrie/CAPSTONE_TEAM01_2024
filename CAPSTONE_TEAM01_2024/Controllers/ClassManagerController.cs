@@ -165,5 +165,21 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("ClassInfo", new { id = classId });
             }
         }
+        //edit info
+        [HttpPost]
+        public async Task<IActionResult> EditInfo(int classId, string studentId, string studentName)
+        {
+            var infoItem = await _context.ClassInfos.FindAsync(studentId);
+            if (infoItem != null)
+            {
+                infoItem.StudentName = studentName;
+
+                TempData["MessageEditInfo"] = "Cập nhật thành công!";
+                TempData["MessageEditInfoType"] = "success";
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("ClassInfo", new { id = classId });
+        }
     }
 }

@@ -7,6 +7,13 @@
         @TempData["MessageAddStudent"]
     </div>
 }
+
+@if (TempData["MessageEditInfo"] != null)
+{
+    <div class="alert alert-@TempData["MessageEditInfoType"]">
+        @TempData["MessageEditInfo"]
+    </div>
+}
 @model CAPSTONE_TEAM01_2024.ViewModels.ClassInfoViewModel
 
 <div class="content-wrapper" style="min-height: 912.2px;">
@@ -69,10 +76,12 @@
                                     <td class="text-center">@student.StudentId</td>
                                     <td class="text-center">@student.StudentName</td>
                                     <td class="text-center">
-                                        <button type="button" class="btn btn-outline-primary btn-sm" aria-label="Edit class details"">
+                                        <button type="button" class="btn btn-outline-primary btn-sm" aria-label="Edit class details"
+                                                onclick="openEditModal(@student.ClassId, '@student.StudentId', '@student.StudentName')">
                                             <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập Nhật
                                         </button>
-                                        <button type="button" class="btn btn-outline-danger btn-sm" aria-label="Delete class"">
+
+                                        <button type="button" class="btn btn-outline-danger btn-sm" aria-label="Delete class">
                                             <i class="fa-solid fa-trash custom-icon"></i> Xóa
                                         </button>
                                     </td>
@@ -110,6 +119,33 @@
         </form>
     </div>
 </div>
+
+<!-- Edit Modal -->
+<div id="ClassInfoEditModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:30%; position:relative; border-radius:10px;">
+        <h2 style="text-align:center; margin-bottom:20px;">Chỉnh Sửa Thông Tin Lớp</h2>
+        <form id="ClassInfoEditClassForm" method="post" asp-controller="ClassManager" asp-action="EditInfo">
+            <div class="mb-3">
+                <label for="classId" class="form-label">ID Lớp</label>
+                <input type="text" class="form-control" id="classId" name="classId" readonly>
+            </div>
+            <div class="mb-3">
+                <label for="studentId" class="form-label">Mã Số SV</label>
+                <input type="text" class="form-control" id="studentId" name="studentId" placeholder="Nhập mã số SV" readonly>
+            </div>
+            <div class="mb-3">
+                <label for="studentName" class="form-label">Cố Vấn Học Tập</label>
+                <input type="text" class="form-control" id="studentName" name="studentName" placeholder="Nhập họ tên SV">
+            </div>
+            <div style="text-align:right;">
+                <button type="button" class="btn btn-outline-secondary" style="padding:10px 20px; margin-right:10px;" onclick="closeEditModal()">Đóng</button>
+                <button type="submit" class="btn btn-outline-primary" style="padding:10px 20px;">Lưu Thay Đổi</button>
+            </div>
+            <input type="hidden" id="academicPeriodId" name="academicPeriodId" readonly>
+        </form>
+    </div>
+</div>
+
 <script>
 //For add student modal
     document.getElementById('openAddStudentModal').addEventListener('click', function() {
@@ -118,6 +154,18 @@
 
     function closeClassListAddClassModal() {
         document.getElementById('ClassInfoAddStudentModal').style.display = 'none';
+    }
+//for edit student modal
+    function openEditModal(classId, studentId, studentName) {
+        document.getElementById('classId').value = classId;
+        document.getElementById('studentId').value = studentId;
+        document.getElementById('studentName').value = studentName;
+
+        document.getElementById('ClassInfoEditModal').style.display = 'block';
+    }
+
+    function closeEditModal() {
+        document.getElementById('ClassInfoEditModal').style.display = 'none';
     }
 
 </script>

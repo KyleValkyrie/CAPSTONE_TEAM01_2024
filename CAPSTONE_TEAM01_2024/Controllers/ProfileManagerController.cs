@@ -35,7 +35,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         public IActionResult Create(ProfileManagerModel model)
         {
 
-           bool isFound = _context.ProfileManagers.Where(x => x.Email == model.Email || x.MaSo == model.MaSo || x.SoDienThoai == model.SoDienThoai ).Any();
+           bool isFound = _context.ProfileManagers.Where(x => x.Email == model.Email || x.MaSo == model.MaSo || x.SoDienThoai == model.SoDienThoai || x.VaiTro == model.VaiTro ).Any();
             if(!isFound) {
                 _context.ProfileManagers.Add(model);
                 _context.SaveChanges();
@@ -65,9 +65,25 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         // Save  Item edited to database and return Index_ProfileManager
         [HttpPost]
         public IActionResult Edit(ProfileManagerModel model) 
-        { 
-            _context.ProfileManagers.Update(model);
-            _context.SaveChanges();
+        {
+            bool isFound = _context.ProfileManagers.Where(x => x.Email == model.Email && x.MaSo == model.MaSo && x.SoDienThoai == model.SoDienThoai && x.VaiTro == model.VaiTro).Any();
+            if (!isFound)
+            {
+                _context.ProfileManagers.Update(model);
+                _context.SaveChanges();
+
+                TempData["Message"] = "Chỉnh Sửa Thành Công!";
+                TempData["MessageType"] = "success";
+                return RedirectToAction("Index_ProfileManager", "ProfileManager");
+            }
+            else
+            {
+                TempData["Message"] = "Email hoặc Mã Số hoặc Số Điện Thoại Đã Tồn Tại";
+                TempData["MessageType"] = "danger";
+                return RedirectToAction("Index_ProfileManager", "ProfileManager");
+            }
+            
+            
             return RedirectToAction("Index_ProfileManager");
         }
         // => Delete ProfileManager

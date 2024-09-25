@@ -9,7 +9,5 @@ namespace CAPSTONE_TEAM01_2024
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
         }
-        public DbSet<AcademicPeriod> AcademicPeriods { get; set; }
-        public DbSet<ProfileManagerModel> ProfileManagers { get; set; }
     }
 }

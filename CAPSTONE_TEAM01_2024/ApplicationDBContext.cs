@@ -10,5 +10,6 @@ namespace CAPSTONE_TEAM01_2024
         {
         }
         public DbSet<ProfileManagerModel> ProfileManagers { get; set; }
+        public DbSet<AcademicPeriod> AcademicPeriods { get; set; }
     }
 }

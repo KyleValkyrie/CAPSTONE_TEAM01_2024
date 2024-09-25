@@ -129,7 +129,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             };
             return View(viewModel);
         }
-        //add new Info
+//add new Info
         [HttpPost]
         public async Task<IActionResult> AddInfo(string studentId, string studentName, int classId)
         {
@@ -165,7 +165,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("ClassInfo", new { id = classId });
             }
         }
-        //edit info
+//edit info
         [HttpPost]
         public async Task<IActionResult> EditInfo(int classId, string studentId, string studentName)
         {
@@ -180,6 +180,20 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             }
 
             return RedirectToAction("ClassInfo", new { id = classId });
+        }
+//Delete ClassList Item
+        [HttpPost]
+        public async Task<IActionResult> DeleteInfo(int id)
+        {
+            var infoItem = await _context.ClassInfos.FindAsync(id);
+            var redirectID = infoItem.ClassId;
+            if (infoItem != null)
+            {
+                _context.ClassInfos.Remove(infoItem);
+                await _context.SaveChangesAsync();
+            }
+            // Redirect to the Page to see update
+            return RedirectToAction("ClassList", new { id = redirectID });
         }
     }
 }

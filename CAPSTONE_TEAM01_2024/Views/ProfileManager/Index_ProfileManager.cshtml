@@ -1,0 +1,131 @@
+﻿@model IEnumerable<CAPSTONE_TEAM01_2024.Models.ProfileManagerModel>
+@if (TempData["Message"] != null)
+{
+	<div class="alert alert-@TempData["MessageType"]">
+		@TempData["Message"]
+	</div>
+}
+@{
+	ViewData["Title"] = "Profile Manager Page";
+	ViewData["CategoryVisibility"] = ViewData["CategoryVisibility"];
+}
+<div class="content-wrapper" style="min-height: 912.2px;">
+	<!-- Content Header (Page header) -->
+	<header class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h1 class="m-0">Quản Lý Tài Khoản</h1>
+				</div><!-- /.col -->
+			</div><!-- /.row -->
+		</div><!-- /.container-fluid -->
+	</header>
+
+	<!-- /.content-header -->
+	<!-- Main content -->
+	<main class="content">
+		<div class="container-fluid">
+			<div class="card">
+				<div class="card-header">
+					<div class="row text-center">
+						<div class="col-auto">
+							<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddClassModal">
+								<i class="bi bi-plus custom-icon"></i> Thêm Tài Khoản
+							</button>
+						</div>
+						<div class="col">
+							<nav class="navbar navbar-light bg-light">
+								<form class="d-flex ms-auto">
+									<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+									<button class="btn btn-outline-success" type="submit">Search</button>
+								</form>
+							</nav>
+						</div>
+					</div>
+				</div>
+				<!-- /.card-header -->
+
+				<div class="card-body">
+					<table class="table table-striped">
+						<thead>
+							<tr class="text-center">
+								<th scope="col">#</th>
+								<th scope="col">Email</th>
+								<th scope="col">Mã số</th>
+								<th scope="col">Tên đầy đủ</th>
+								<th scope="col">Số điện thoại</th>
+								<th scope="col">Vai trò</th>
+								<th scope="col">Thao Tác</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (ProfileManagerModel profile in @Model)
+							{
+								<tr class="table-row">
+									<th scope="row" class="text-center">@profile.Id</th>
+									<td class="text-center">@profile.Email</td>
+									<td class="text-center">@profile.MaSo</td>
+									<td class="text-center">@profile.TenDayDu</td>
+									<td class="text-center">@profile.SoDienThoai</td>
+									<td class="text-center">@profile.VaiTro</td>
+									<td class="text-center">
+										<button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="@("#DetailModal-"+@profile.Id)" data-url="@Url.Action($"Detail/{@profile.Id}")">
+											<i class="fa-solid fa-eye custom-icon"></i> Xem Chi Tiết
+										</button>
+										@await Html.PartialAsync("DetailProfileManager", @profile)
+										<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" aria-label="Edit class details" data-bs-target="@("#EditModal-"+@profile.Id)" data-url="@Url.Action($"Edit/{@profile.Id}")">
+											<i class="fa-solid fa-pen-to-square custom-icon"></i> Cập Nhật
+										</button>
+
+										<button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="@("#DeleteModal-"+@profile.Id)" aria-label="Delete class" data-url="@Url.Action($"Delete/{@profile.Id}")">
+											<i class="fa-solid fa-trash custom-icon"></i> Xóa
+										</button>
+										@await Html.PartialAsync("DeleteProfileManager", @profile)
+									</td>
+									@await Html.PartialAsync("EditProfileManager", @profile)
+
+								</tr>
+
+
+							}
+
+							<!-- Additional rows can go here -->
+						</tbody>
+					</table>
+				</div>
+				<!-- /.card-body -->
+			</div>
+		</div>
+	</main>
+	<!-- /.content -->
+</div>
+
+<!-- Modal: Thêm tài khoản -->
+<!-- Modal: Xem chi tiết -->
+<!-- Modal: Cập nhật -->
+<!-- Modal: Xóa -->
+
+<script src="https://cdn.jsdelivr.net/npm/popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+<script>
+	function openViewDetailsModal(id, email, idNumber, fullName, phone, role) {
+		document.getElementById('viewEmail').textContent = email;
+		document.getElementById('viewId').textContent = idNumber;
+		document.getElementById('viewFullName').textContent = fullName;
+		document.getElementById('viewPhone').textContent = phone;
+		document.getElementById('viewRole').textContent = role;
+	}
+
+	function openEditModal(id, email, idNumber, fullName, phone, role) {
+		document.getElementById('editEmail').value = email;
+		document.getElementById('editId').value = idNumber;
+		document.getElementById('editFullName').value = fullName;
+		document.getElementById('editPhone').value = phone;
+		document.getElementById('editRole').value = role;
+	}
+	function openDeleteModal(id) {
+		// Handle delete confirmation here
+	}
+</script>
+}
+@await Html.PartialAsync("AddProfileManager", new ProfileManagerModel())

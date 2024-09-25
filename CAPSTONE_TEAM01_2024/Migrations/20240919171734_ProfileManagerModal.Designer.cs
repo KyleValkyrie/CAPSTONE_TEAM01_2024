@@ -4,6 +4,7 @@ using CAPSTONE_TEAM01_2024;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CAPSTONE_TEAM01_2024.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240919171734_ProfileManagerModal")]
+    partial class ProfileManagerModal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -271,28 +273,6 @@ namespace CAPSTONE_TEAM01_2024.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.Class", b =>
-                {
-                    b.HasOne("CAPSTONE_TEAM01_2024.Models.AcademicPeriod", "AcademicPeriod")
-                        .WithMany("Classes")
-                        .HasForeignKey("AcademicPeriodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AcademicPeriod");
-                });
-
-            modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.ClassInfo", b =>
-                {
-                    b.HasOne("CAPSTONE_TEAM01_2024.Models.Class", "Class")
-                        .WithMany("ClassInfos")
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Class");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -342,16 +322,6 @@ namespace CAPSTONE_TEAM01_2024.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.AcademicPeriod", b =>
-                {
-                    b.Navigation("Classes");
-                });
-
-            modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.Class", b =>
-                {
-                    b.Navigation("ClassInfos");
                 });
 #pragma warning restore 612, 618
         }

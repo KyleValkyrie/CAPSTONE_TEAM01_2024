@@ -81,7 +81,7 @@
                                             <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập Nhật
                                         </button>
 
-                                        <button type="button" class="btn btn-outline-danger btn-sm" aria-label="Delete class">
+                                        <button type="button" class="btn btn-outline-danger btn-sm" aria-label="Delete class" onclick="openClassInfoDeleteModal(@student.StudentId)">
                                             <i class="fa-solid fa-trash custom-icon"></i> Xóa
                                         </button>
                                     </td>
@@ -146,6 +146,21 @@
     </div>
 </div>
 
+<!-- Delete Modal -->
+<div id="ClassInfoDeleteModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:30%; position:relative; border-radius:10px;">
+        <h2 style="text-align:center; margin-bottom:20px;">Xóa Lớp</h2>
+        <div class="modal-body">
+            <p>Bạn có chắc chắn muốn xóa SV này không?</p>
+            <input type="hidden" id="deleteClassId">
+        </div>
+        <div style="text-align:right;">
+            <button type="button" class="btn btn-outline-secondary" style="padding:10px 20px; margin-right:10px;" onclick="closeClassInfoDeleteModal()">Đóng</button>
+            <button type="button" class="btn btn-outline-danger" style="padding:10px 20px;" onclick="confirmClassInformDelete()">Xóa</button>
+        </div>
+    </div>
+</div>
+
 <script>
 //For add student modal
     document.getElementById('openAddStudentModal').addEventListener('click', function() {
@@ -167,5 +182,31 @@
     function closeEditModal() {
         document.getElementById('ClassInfoEditModal').style.display = 'none';
     }
+//For Delete student
+    var ClassInfoDeleteModal = document.getElementById("ClassInfoDeleteModal");
+    var deleteInfoId = 0;
 
+    function openClassInfoDeleteModal(id) {
+        deleteInfoId = id;
+        ClassListDeleteModal.style.display = "block";
+    }
+
+    function closeClassInfoDeleteModal() {
+        ClassListDeleteModal.style.display = "none";
+    }
+
+    function confirmClassInfoDelete() {
+        var form = document.createElement("form");
+        form.method = "post";
+        form.action = "/ClassManager/DeleteInfo";
+
+        var input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "id";
+        input.value = deleteInfoId;
+        form.appendChild(input);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
 </script>

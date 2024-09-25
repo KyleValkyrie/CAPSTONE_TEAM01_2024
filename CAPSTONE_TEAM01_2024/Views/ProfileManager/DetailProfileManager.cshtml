@@ -1,0 +1,21 @@
+﻿@model ProfileManagerModel
+	<div class="modal fade" id="DetailModal-@Model.Id" data-bs-backdrop="false" tabindex="-1" aria-labelledby="ViewDetailsModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="ViewDetailsModalLabel">Chi Tiết Tài Khoản</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+
+				<p><strong>Email:</strong> <span id="viewEmail">@Html.DisplayFor(model=> model.Email)</span></p>
+				<p><strong>Mã số:</strong> <span id="viewId">@Html.DisplayFor(model => model.MaSo)</span></p>
+				<p><strong>Tên đầy đủ:</strong> <span id="viewFullName">@Html.DisplayFor(model => model.TenDayDu)</span></p>
+				<p><strong>Số điện thoại:</strong> <span id="viewPhone">@Html.DisplayFor(model => model.SoDienThoai)</span></p>
+				<p><strong>Vai trò:</strong> <span id="viewRole">@Html.DisplayFor(model => model.VaiTro	)</span></p>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+				</div>
+
+			</div>
+		</div>
+	</div>

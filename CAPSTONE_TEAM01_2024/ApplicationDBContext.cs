@@ -9,5 +9,6 @@ namespace CAPSTONE_TEAM01_2024
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
         }
+        public DbSet<ProfileManagerModel> ProfileManagers { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using CAPSTONE_TEAM01_2024.Models;
+using CAPSTONE_TEAM01_2024.Utilities;
+using CAPSTONE_TEAM01_2024.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -32,14 +34,23 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             ViewData["page"] = "ClassInfo";
             return View();
         }
-//SchoolYear actions
+		//SchoolYear actions
 		//Render SchoolYear view
-        public async Task<IActionResult> SchoolYear()
-        {
-            ViewData["page"] = "SchoolYear";
-			var academicPeriods = await _context.AcademicPeriods.ToListAsync();
-			return View(academicPeriods);
-        }
+		public async Task<IActionResult> SchoolYear(int pageNumber = 1, int pageSize = 10)
+		{
+			ViewData["page"] = "SchoolYear";
+			var periods = _context.AcademicPeriods.AsQueryable();
+
+			var paginatedPeriods = await PaginatedList<AcademicPeriod>.CreateAsync(periods.OrderBy(p => p.PeriodStart), pageNumber, pageSize);
+
+			var model = new SchoolYearViewModel
+			{
+				PaginatedPeriods = paginatedPeriods
+			};
+
+			return View(model);
+		}
+
 		//Edit Academic Year
 		[HttpPost]
 		public async Task<IActionResult> EditPeriod(int periodId, string periodName, DateTime periodStart, DateTime periodEnd)

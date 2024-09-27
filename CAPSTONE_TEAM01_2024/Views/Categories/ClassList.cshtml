@@ -1,1 +1,138 @@
 ﻿
+<div class="content-wrapper" style="min-height: 912.2px;">
+	<!-- Content Header (Page header) -->
+	<header class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h1 class="m-0">Danh Sách Lớp</h1>
+				</div><!-- /.col -->
+			</div><!-- /.row -->
+		</div><!-- /.container-fluid -->
+	</header>
+
+	<!-- /.content-header -->
+	<!-- Main content -->
+	<main class="content">
+		<div class="container-fluid">
+			<div class="card">
+				<div class="card-header">
+					<div class="row text-center">
+						<div class="col-auto">
+							<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddClassModal">
+								<i class="bi bi-plus custom-icon"></i> Thêm Lớp
+							</button>
+						</div>
+						<div class="col">
+							<nav class="navbar navbar-light bg-light">
+								<form class="d-flex ms-auto">
+									<input class="form-control me-2" type="search" id="searchInput" placeholder="Nhập nội dung cần tìm" aria-label="Search">
+								</form>
+							</nav>
+						</div>
+					</div>
+				</div>
+				<!-- /.card-header -->
+
+				<div class="card-body">
+					<table class="table table-striped">
+						<thead>
+							<tr class="text-center">
+								<th scope="col">#</th>
+								<th scope="col">Mã Lớp</th>
+								<th scope="col">Cố Vấn Học Tập</th>
+								<th scope="col">Năm Học</th>
+								<th scope="col">Ngành</th>
+								<th scope="col">Số lượng SV</th>
+								<th scope="col">Thao Tác</th>
+							</tr>
+						</thead>
+						<tbody id="periodTable">
+						@* @{int number = (Model.PaginatedPeriods.PageIndex - 1) * Model.PaginatedPeriods.PageSize;} *@
+						@* @foreach (var period in Model.PaginatedPeriods)
+						{
+							number++;
+							<tr class="table-row">
+								<td scope="row" class="text-center">@number</td>
+								<td class="text-center">@period.PeriodName</td>
+								<td class="text-center">@period.PeriodStart.ToString("dd/MM/yyyy")</td>
+								<td class="text-center">@period.PeriodEnd.ToString("dd/MM/yyyy")</td>
+								<td class="text-center">
+									<button type="button" class="btn btn-outline-primary btn-sm"
+											data-bs-toggle="modal"
+											data-bs-target="#EditPeriodModal"
+											data-period-id="@period.PeriodId"
+											data-period-name="@period.PeriodName"
+											data-period-start="@period.PeriodStart.ToString("yyyy-MM-dd")"
+											data-period-end="@period.PeriodEnd.ToString("yyyy-MM-dd")"
+											aria-label="Edit class details">
+										<i class="fa-solid fa-pen-to-square custom-icon"></i> Cập Nhật
+									</button>
+									<button type="button" class="btn btn-outline-danger btn-sm"
+											data-bs-toggle="modal"
+											data-bs-target="#DeletePeriodModal"
+											data-period-id="@period.PeriodId"
+											aria-label="Delete class">
+										<i class="fa-solid fa-trash custom-icon"></i> Xóa
+									</button>
+								</td>
+							</tr>
+						}
+						<!-- Additional rows can go here -->
+						<tr id="noResults" style="display: none;">
+							<td colspan="5" class="text-center">Nothing found</td>
+						</tr> *@
+						</tbody>
+					</table>
+					@* <nav aria-label="Page navigation" style=" float:right;">
+						<ul class="pagination">
+							@if (Model.PaginatedPeriods.HasPreviousPage)
+							{
+								<li class="page-item">
+									<a class="page-link" asp-action="SchoolYear" asp-route-pageNumber="@(Model.PaginatedPeriods.PageIndex - 1)">Previous</a>
+								</li>
+							}
+							else
+							{
+								<li class="page-item disabled">
+									<span class="page-link">Previous</span>
+								</li>
+							}
+
+							@for (int i = 1; i <= Model.PaginatedPeriods.TotalPages; i++)
+							{
+								if (i == Model.PaginatedPeriods.PageIndex)
+								{
+									<li class="page-item active">
+										<span class="page-link">@i</span>
+									</li>
+								}
+								else
+								{
+									<li class="page-item">
+										<a class="page-link" asp-action="SchoolYear" asp-route-pageNumber="@i">@i</a>
+									</li>
+								}
+							}
+
+							@if (Model.PaginatedPeriods.HasNextPage)
+							{
+								<li class="page-item">
+									<a class="page-link" asp-action="SchoolYear" asp-route-pageNumber="@(Model.PaginatedPeriods.PageIndex + 1)">Next</a>
+								</li>
+							}
+							else
+							{
+								<li class="page-item disabled">
+									<span class="page-link">Next</span>
+								</li>
+							}
+						</ul>
+					</nav> *@
+				</div>
+				<!-- /.card-body -->
+			</div>
+		</div>
+	</main>
+	<!-- /.content -->
+</div>

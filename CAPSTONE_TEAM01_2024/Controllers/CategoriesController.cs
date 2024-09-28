@@ -2,6 +2,7 @@
 using CAPSTONE_TEAM01_2024.Utilities;
 using CAPSTONE_TEAM01_2024.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -15,26 +16,96 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         public CategoriesController(ApplicationDbContext context)
         {
             _context = context;
-        }
-//EndSemesterReport actions
+        }//EndSemesterReport actions
         public IActionResult EndSemesterReport()
         {
             ViewData["page"] = "EndSemesterReport";
             return View();
         }
 //ClassList actions
-        public IActionResult ClassList()
+        //Render ClassList view
+        public async Task<IActionResult> ClassList(int pageNumber = 1, int pageSize = 10)
         {
-            ViewData["page"] = "ClassList";
-            return View();
+			ViewData["page"] = "ClassList";
+			var classes = _context.Classes.AsQueryable();
+
+            var paginatedClasses = await PaginatedList<Class>.CreateAsync(classes.OrderBy(c => c.ClassName), pageNumber, pageSize);
+
+            var advisors = await _context.ProfileManagers
+                .Where(pm => pm.VaiTro == "Cố vấn học tập")
+                .Select(pm => new SelectListItem
+                {
+                    Value = pm.Id.ToString(),
+                    Text = pm.TenDayDu
+                }).ToListAsync();
+
+            var years = await _context.AcademicPeriods
+                .Select(ap => new SelectListItem
+                {
+                    Value = ap.PeriodId.ToString(),
+                    Text = ap.PeriodName + "/--/Bắt Đầu: " + ap.PeriodStart.ToString("dd/MM/yyyy") + "/--/Kết Thúc: " + ap.PeriodEnd.ToString("dd/MM/yyyy")
+				}).ToListAsync();
+
+            var viewModel = new ClassListViewModel
+            {
+                Class = new Class(),
+                Advisors = advisors,
+                Years = years,
+                PaginatedClasses = paginatedClasses
+            };
+
+            return View(viewModel);
         }
-//ClassInfo actions
-        public IActionResult ClassInfo()
+		//Add new Class
+		[HttpPost]
+		public async Task<IActionResult> AddClass(string className, string advisor, int advisorId, int yearId, string year, string department, int studentCount)
+		{
+			// Create a new AcademicPeriod object
+			var newClass = new Class
+			{
+				ClassName = className,
+				AdvisorName = advisor,
+				AdvisorId=advisorId,
+				YearName = year,
+				YearId=yearId,
+				Department = department,
+				StudentCount = studentCount
+			};
+			// Add the new object to the database
+			bool isFound = _context.Classes
+					 .Where(r => r.ClassName == newClass.ClassName &&
+								 r.AdvisorName == newClass.AdvisorName &&
+								 r.AdvisorId == newClass.AdvisorId &&
+								 r.YearName == newClass.YearName &&
+								 r.YearId == newClass.YearId &&	
+								 r.Department == newClass.Department)
+					 .Any();
+			if (!isFound) //Can add
+			{
+				_context.Classes.Add(newClass);
+				await _context.SaveChangesAsync();
+
+				TempData["MessageAddClass"] = "Thêm lớp thành công!";
+				TempData["MessageAddClassType"] = "success";
+
+				// Redirect to the Page to see update
+				return RedirectToAction("ClassList");
+			}
+			else
+			{
+				TempData["MessageAddClass"] = "Thông tin lớp đã tồn tại!";
+				TempData["MessageAddClassType"] = "danger";
+				return RedirectToAction("ClassList");
+			}
+		}
+		//ClassInfo actions
+		//Render ClassInfo view
+		public IActionResult ClassInfo()
         {
             ViewData["page"] = "ClassInfo";
             return View();
         }
-		//SchoolYear actions
+//SchoolYear actions
 		//Render SchoolYear view
 		public async Task<IActionResult> SchoolYear(int pageNumber = 1, int pageSize = 10)
 		{
@@ -50,7 +121,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
 			return View(model);
 		}
-
 		//Edit Academic Year
 		[HttpPost]
 		public async Task<IActionResult> EditPeriod(int periodId, string periodName, DateTime periodStart, DateTime periodEnd)

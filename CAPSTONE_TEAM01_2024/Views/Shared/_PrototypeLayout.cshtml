@@ -34,7 +34,7 @@
                             <form class="form-inline" asp-action="logout" asp-controller="users" id="logoutForm">
                                 <button type="submit" class="dropdown-item" href="#" style="color: #333; font-size: 18px;">
                                     <i class="bi bi-box-arrow-right" style="font-size:18px; margin-right:5px"></i>
-                                    <span>Logout</span>
+                                    <span>Đăng Xuất</span>
                                 </button>
                             </form>
                         </li>
@@ -156,12 +156,12 @@
             });
 
             // Special case for ClassList
-            if (currentUrl.includes("ClassList")) {
-                var schoolYearLink = Array.from(navLinks).find(link => link.href.includes("SchoolYear"));
-                if (schoolYearLink) {
-                    schoolYearLink.classList.add('active');
-                }
-            }
+            // if (currentUrl.includes("ClassList")) {
+            //     var schoolYearLink = Array.from(navLinks).find(link => link.href.includes("SchoolYear"));
+            //     if (schoolYearLink) {
+            //         schoolYearLink.classList.add('active');
+            //     }
+            // }
         });
 
         // Clear session data when logout

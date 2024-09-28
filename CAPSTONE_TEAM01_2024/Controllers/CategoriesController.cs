@@ -133,7 +133,28 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				return RedirectToAction("ClassList");
 			}
 		}
-//ClassInfo actions
+		//Delete Class
+		[HttpPost]
+		public async Task<IActionResult> DeleteClass(int classId)
+		{
+			var classToDelete = await _context.Classes.FindAsync(classId);
+			if (classToDelete != null)
+			{
+				_context.Classes.Remove(classToDelete);
+				await _context.SaveChangesAsync();
+				// Redirect to the Page to see update
+				TempData["MessageDeleteClass"] = "Xóa lớp thành công!";
+				TempData["MessageDeleteClassType"] = "success";
+				return RedirectToAction("ClassList");
+			}
+			else
+			{
+				TempData["MessageDeleteClass"] = "Xảy ra lỗi khi xóa!";
+				TempData["MessageDeleteClassType"] = "danger";
+				return RedirectToAction("ClassList");
+			}
+		}
+		//ClassInfo actions
 		//Render ClassInfo view
 		public IActionResult ClassInfo()
         {

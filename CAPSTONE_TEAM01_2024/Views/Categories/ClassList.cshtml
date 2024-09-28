@@ -13,6 +13,12 @@
 		@TempData["MessageEditClass"]
 	</div>
 }
+@if (TempData["MessageDeleteClass"] != null)
+{
+	<div class="alert alert-@TempData["MessageDeleteClassType"]">
+		@TempData["MessageDeleteClass"]
+	</div>
+}
 @using CAPSTONE_TEAM01_2024.Utilities
 @model CAPSTONE_TEAM01_2024.ViewModels.ClassListViewModel
 <div class="content-wrapper" style="min-height: 912.2px;">
@@ -64,48 +70,49 @@
 							</tr>
 						</thead>
 						<tbody id="classTable">
-						@{int number = (Model.PaginatedClasses.PageIndex - 1) * Model.PaginatedClasses.PageSize;}
-						@foreach (var PClass in Model.PaginatedClasses)
-						{
-							number++;
-							<tr class="table-row">
-								<td scope="row" class="text-center">@number</td>
-								<td class="text-center">@PClass.ClassName</td>
-								<td class="text-center">@PClass.AdvisorName</td>
-								<td class="text-center">@PClass.YearName</td>
-								<td class="text-center">@PClass.Department</td>
-								<td class="text-center">@PClass.StudentCount</td>
-								<td class="text-center">
-									<button type="button" class="btn btn-outline-primary btn-sm"
-											data-bs-toggle="modal"
-											data-bs-target="#EditClassModal"
-											data-class-id="@PClass.Id"
-											data-class-name="@PClass.ClassName"
-											data-advisor-id="@PClass.AdvisorId"
-											data-advisor-name="@PClass.AdvisorName"
-											data-year-id="@PClass.YearId"
-											data-year-name="@PClass.YearName"
-											data-department="@PClass.Department"
-											data-student-count="@PClass.StudentCount"
-											aria-label="edit class details">
-										<i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
-									</button>
-
-									<button type="button" class="btn btn-outline-danger btn-sm"
-											@* data-bs-toggle="modal"
-											data-bs-target="#deleteperiodmodal"
-											data-period-id="@period.periodid"
-											aria-label="delete class" *@>
-										<i class="fa-solid fa-trash custom-icon"></i> Xóa
-									</button>
-								</td>
+							@{
+								int number = (Model.PaginatedClasses.PageIndex - 1) * Model.PaginatedClasses.PageSize;
+							}
+							@foreach (var PClass in Model.PaginatedClasses)
+							{
+								number++;
+								<tr class="table-row">
+									<td scope="row" class="text-center">@number</td>
+									<td class="text-center">@PClass.ClassName</td>
+									<td class="text-center">@PClass.AdvisorName</td>
+									<td class="text-center">@PClass.YearName</td>
+									<td class="text-center">@PClass.Department</td>
+									<td class="text-center">@PClass.StudentCount</td>
+									<td class="text-center">
+										<button type="button" class="btn btn-outline-primary btn-sm"
+												data-bs-toggle="modal"
+												data-bs-target="#EditClassModal"
+												data-class-id="@PClass.Id"
+												data-class-name="@PClass.ClassName"
+												data-advisor-id="@PClass.AdvisorId"
+												data-advisor-name="@PClass.AdvisorName"
+												data-year-id="@PClass.YearId"
+												data-year-name="@PClass.YearName"
+												data-department="@PClass.Department"
+												data-student-count="@PClass.StudentCount"
+												aria-label="edit class details">
+											<i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
+										</button>
+										<button type="button" class="btn btn-outline-danger btn-sm"
+												data-bs-toggle="modal"
+												data-bs-target="#DeleteClassModal"
+												data-class-id="@PClass.Id"
+												aria-label="delete class">
+											<i class="fa-solid fa-trash custom-icon"></i> Xóa
+										</button>
+									</td>
+								</tr>
+							}
+							<tr id="noresults" style="display: none;">
+								<td colspan="7" class="text-center">Không tìm thấy nội dung</td>
 							</tr>
-						}
-						<!-- additional rows can go here -->
-						<tr id="noresults" style="display: none;">
-							<td colspan="5" class="text-center">Không tìm thấy nội dung</td>
-						</tr>
 						</tbody>
+
 					</table>
 					<nav aria-label="Page navigation" style=" float:right;">
 						<ul class="pagination">
@@ -277,6 +284,27 @@
 	</div>
 </div>
 
+<!-- Delete Modal -->
+<div class="modal fade" id="DeleteClassModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="DeleteModalLabel">Xóa Lớp</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form asp-action="DeleteClass" method="post">
+				<div class="modal-body">
+					<input type="hidden" name="classId" />
+					<p>Bạn có chắc chắn muốn xóa lớp này không?</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+					<button type="submit" class="btn btn-danger">Xóa</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
 <script>
 //Add Modal JS
 	document.getElementById('advisorSelect').addEventListener('change', function () {
@@ -343,5 +371,53 @@
 	document.getElementById('editYearName').value = yearName;
 		});
 	});
+//Delete Modal JS
+	 document.addEventListener('DOMContentLoaded', function() {
+		var deleteClassModal = document.getElementById('DeleteClassModal');
+		deleteClassModal.addEventListener('show.bs.modal', function(event) {
+			var button = event.relatedTarget; // Button that triggered the modal
+			var classId = button.getAttribute('data-class-id');
+		
+			// Populate the hidden input field with the class ID
+			var inputClassId = deleteClassModal.querySelector('input[name="classId"]');
+			inputClassId.value = classId;
+		});
+	});
+//Search function JS
+	document.addEventListener('DOMContentLoaded', function() {
+			var searchInput = document.getElementById('searchInput');
+			searchInput.addEventListener('keyup', function() {
+				var filter = searchInput.value.toUpperCase();
+				var table = document.getElementById('classTable');
+				var tr = table.getElementsByTagName('tr');
+				var noResults = document.getElementById('noresults');
+				var found = false;
 
+				for (var i = 0; i < tr.length; i++) {
+					var td = tr[i].getElementsByTagName('td');
+					if (td.length > 0) {
+						var match = false;
+						for (var j = 0; j < td.length; j++) {
+							if (td[j].textContent.toUpperCase().indexOf(filter) > -1) {
+								match = true;
+								break;
+							}
+						}
+						if (match) {
+							tr[i].style.display = '';
+							found = true;
+						} else {
+							tr[i].style.display = 'none';
+						}
+					}
+				}
+
+				// Show or hide the "no results" row
+				if (found) {
+					noResults.style.display = 'none';
+				} else {
+					noResults.style.display = '';
+				}
+			});
+		});
 </script>

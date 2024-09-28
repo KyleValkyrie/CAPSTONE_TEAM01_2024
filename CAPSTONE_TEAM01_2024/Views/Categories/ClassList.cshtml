@@ -1,0 +1,321 @@
+﻿@{
+	ViewData["Title"] = "Class List";
+}
+@if (TempData["MessageAddClass"] != null)
+{
+	<div class="alert alert-@TempData["MessageAddClassType"]">
+		@TempData["MessageAddClass"]
+	</div>
+}
+@using CAPSTONE_TEAM01_2024.Utilities
+@model CAPSTONE_TEAM01_2024.ViewModels.ClassListViewModel
+<div class="content-wrapper" style="min-height: 912.2px;">
+	<!-- Content Header (Page header) -->
+	<header class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h1 class="m-0">Danh Sách Lớp</h1>
+				</div><!-- /.col -->
+			</div><!-- /.row -->
+		</div><!-- /.container-fluid -->
+	</header>
+
+	<!-- /.content-header -->
+	<!-- Main content -->
+	<main class="content">
+		<div class="container-fluid">
+			<div class="card">
+				<div class="card-header">
+					<div class="row text-center">
+						<div class="col-auto">
+							<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddClassModal">
+								<i class="bi bi-plus custom-icon"></i> Thêm Lớp
+							</button>
+						</div>
+						<div class="col">
+							<nav class="navbar navbar-light bg-light">
+								<form class="d-flex ms-auto">
+									<input class="form-control me-2" type="search" id="searchInput" placeholder="Nhập nội dung cần tìm" aria-label="Search">
+								</form>
+							</nav>
+						</div>
+					</div>
+				</div>
+				<!-- /.card-header -->
+
+				<div class="card-body">
+					<table class="table table-striped">
+						<thead>
+							<tr class="text-center">
+								<th scope="col">#</th>
+								<th scope="col">Mã Lớp</th>
+								<th scope="col">Cố Vấn Học Tập</th>
+								<th scope="col">Năm Học</th>
+								<th scope="col">Ngành</th>
+								<th scope="col">Số lượng SV</th>
+								<th scope="col">Thao Tác</th>
+							</tr>
+						</thead>
+						<tbody id="classTable">
+						@{int number = (Model.PaginatedClasses.PageIndex - 1) * Model.PaginatedClasses.PageSize;}
+						@foreach (var PClass in Model.PaginatedClasses)
+						{
+							number++;
+							<tr class="table-row">
+								<td scope="row" class="text-center">@number</td>
+								<td class="text-center">@PClass.ClassName</td>
+								<td class="text-center">@PClass.AdvisorName</td>
+								<td class="text-center">@PClass.YearName</td>
+								<td class="text-center">@PClass.Department</td>
+								<td class="text-center">@PClass.StudentCount</td>
+								<td class="text-center">
+									<button type="button" class="btn btn-outline-primary btn-sm"
+											data-bs-toggle="modal"
+											data-bs-target="#EditClassModal"
+											data-class-id="@PClass.Id"
+											data-class-name="@PClass.ClassName"
+											data-advisor-id="@PClass.AdvisorId"
+											data-advisor-name="@PClass.AdvisorName"
+											data-year-id="@PClass.YearId"
+											data-year-name="@PClass.YearName"
+											data-department="@PClass.Department"
+											data-student-count="@PClass.StudentCount"
+											aria-label="edit class details">
+										<i class="fa-solid fa-pen-to-square custom-icon"></i> cập nhật
+									</button>
+									<button type="button" class="btn btn-outline-danger btn-sm"
+											@* data-bs-toggle="modal"
+											data-bs-target="#deleteperiodmodal"
+											data-period-id="@period.periodid"
+											aria-label="delete class" *@>
+										<i class="fa-solid fa-trash custom-icon"></i> Xóa
+									</button>
+								</td>
+							</tr>
+						}
+						<!-- additional rows can go here -->
+						<tr id="noresults" style="display: none;">
+							<td colspan="5" class="text-center">Không tìm thấy nội dung</td>
+						</tr>
+						</tbody>
+					</table>
+					<nav aria-label="Page navigation" style=" float:right;">
+						<ul class="pagination">
+							@if (Model.PaginatedClasses.HasPreviousPage)
+							{
+								<li class="page-item">
+									<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@(Model.PaginatedClasses.PageIndex - 1)">Previous</a>
+								</li>
+							}
+							else
+							{
+								<li class="page-item disabled">
+									<span class="page-link">Trang Trước</span>
+								</li>
+							}
+
+							@for (int i = 1; i <= Model.PaginatedClasses.TotalPages; i++)
+							{
+								if (i == Model.PaginatedClasses.PageIndex)
+								{
+									<li class="page-item active">
+										<span class="page-link">@i</span>
+									</li>
+								}
+								else
+								{
+									<li class="page-item">
+										<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@i">@i</a>
+									</li>
+								}
+							}
+
+							@if (Model.PaginatedClasses.HasNextPage)
+							{
+								<li class="page-item">
+									<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@(Model.PaginatedClasses.PageIndex + 1)">Next</a>
+								</li>
+							}
+							else
+							{
+								<li class="page-item disabled">
+									<span class="page-link">Trang Sau</span>
+								</li>
+							}
+						</ul>
+					</nav>
+				</div>
+				<!-- /.card-body -->
+			</div>
+		</div>
+	</main>
+	<!-- /.content -->
+</div>
+
+<!--Add Modal-->
+<div class="modal fade" id="AddClassModal" tabindex="-1" data-bs-backdrop="false" aria-labelledby="AddClassModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="AddClassModalLabel">Thêm Lớp</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form id="addClassForm" asp-action="AddClass" method="post">
+					<div class="mb-3">
+						<label class="form-label">Mã Lớp</label>
+						<input type="text" class="form-control" id="className" name="className" required>
+					</div>
+					<div class="mb-3">
+						<label for="classAdvisor" class="form-label">Cố Vấn Học Tập</label>
+						<select asp-for="Class.AdvisorId" class="form-select" id="advisorSelect" required>
+							<option value="" disabled selected>Vui lòng chọn cố vấn phù hợp</option>
+							@foreach (var advisor in Model.Advisors)
+							{
+								<option value="@advisor.Value" data-advisor-name="@advisor.Text">@advisor.Text</option>
+							}
+						</select>
+						<span asp-validation-for="Class.AdvisorId" class="text-danger"></span>
+					</div>
+					<input type="hidden" id="advisorId" name="advisorId" />
+					<input type="hidden" id="advisorName" name="advisor" />
+					<div class="mb-3">
+						<label for="classPeriod" class="form-label">Năm Học</label>
+						<select asp-for="Class.YearId" class="form-select" id="yearSelect" required>
+							<option value="" disabled selected>Vui lòng chọn năm học phù hợp</option>
+							@foreach (var year in Model.Years)
+							{
+								<option value="@year.Value" data-year-name="@year.Text">@year.Text</option>
+							}
+						</select>
+						<span asp-validation-for="Class.YearId" class="text-danger"></span>
+					</div>
+					<input type="hidden" id="yearId" name="yearId" />
+					<input type="hidden" id="yearName" name="year" />
+					<div class="mb-3">
+						<label class="form-label">Ngành</label>
+						<input type="text" class="form-control" id="department" name="department" required>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Số Lượng SV</label>
+						<input type="number" class="form-control" id="studentCount" name="studentCount" required min="1" max="30">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+						<button type="submit" class="btn btn-primary">Thêm</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="EditClassModal" tabindex="-1" data-bs-backdrop="false" aria-labelledby="EditClassModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="EditClassModalLabel">Chỉnh Sửa Lớp</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form id="editClassForm" asp-action="EditClass" method="post">
+					<input type="hidden" id="editClassId" name="classId" />
+					<div class="mb-3">
+						<label class="form-label">Mã Lớp</label>
+						<input type="text" class="form-control" id="editClassName" name="className" required>
+					</div>
+					<div class="mb-3">
+						<label for="editClassAdvisor" class="form-label">Cố Vấn Học Tập</label>
+						<select asp-for="Class.AdvisorId" class="form-select" id="editAdvisorSelect" required>
+							<option value="" disabled selected>Vui lòng chọn cố vấn phù hợp</option>
+							@foreach (var advisor in Model.Advisors)
+							{
+								<option value="@advisor.Value" data-advisor-name="@advisor.Text">@advisor.Text</option>
+							}
+						</select>
+						<span asp-validation-for="Class.AdvisorId" class="text-danger"></span>
+					</div>
+					<input type="hidden" id="editAdvisorId" name="advisorId" />
+					<input type="hidden" id="editAdvisorName" name="advisor" />
+					<div class="mb-3">
+						<label for="editClassPeriod" class="form-label">Năm Học</label>
+						<select asp-for="Class.YearId" class="form-select" id="editYearSelect" required>
+							<option value="" disabled selected>Vui lòng chọn năm học phù hợp</option>
+							@foreach (var year in Model.Years)
+							{
+								<option value="@year.Value" data-year-name="@year.Text">@year.Text</option>
+							}
+						</select>
+						<span asp-validation-for="Class.YearId" class="text-danger"></span>
+					</div>
+					<input type="hidden" id="editYearId" name="yearId" />
+					<input type="hidden" id="editYearName" name="year" />
+					<div class="mb-3">
+						<label class="form-label">Ngành</label>
+						<input type="text" class="form-control" id="editDepartment" name="department" required>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Số Lượng SV</label>
+						<input type="number" class="form-control" id="editStudentCount" name="studentCount" required min="1" max="30">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+						<button type="submit" class="btn btn-primary">Lưu Thay Đổi</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+//Add Modal JS
+	document.getElementById('advisorSelect').addEventListener('change', function () {
+		var selectedOption = this.options[this.selectedIndex];
+		var advisorId = selectedOption.value;
+		var advisorName = selectedOption.getAttribute('data-advisor-name');
+
+		// Set the values to hidden fields or directly to the form
+		document.getElementById('advisorId').value = advisorId;
+		document.getElementById('advisorName').value = advisorName;
+	});
+
+	document.getElementById('yearSelect').addEventListener('change', function () {
+		var selectedOption = this.options[this.selectedIndex];
+		var yearId = selectedOption.value;
+		var yearName = selectedOption.getAttribute('data-year-name');
+
+		// Set the values to hidden fields or directly to the form
+		document.getElementById('yearId').value = yearId;
+		document.getElementById('yearName').value = yearName;
+	});
+//Edit Modal JS
+	document.addEventListener('DOMContentLoaded', function() {
+		var editClassModal = document.getElementById('EditClassModal');
+	editClassModal.addEventListener('show.bs.modal', function(event) {
+			var button = event.relatedTarget; // Button that triggered the modal
+	var classId = button.getAttribute('data-class-id');
+	var className = button.getAttribute('data-class-name');
+	var advisorId = button.getAttribute('data-advisor-id');
+	var advisorName = button.getAttribute('data-advisor-name');
+	var yearId = button.getAttribute('data-year-id');
+	var yearName = button.getAttribute('data-year-name');
+	var department = button.getAttribute('data-department');
+	var studentCount = button.getAttribute('data-student-count');
+
+	// Populate the modal fields
+	document.getElementById('editClassId').value = classId;
+	document.getElementById('editClassName').value = className;
+	document.getElementById('editAdvisorSelect').value = advisorId;
+	document.getElementById('editAdvisorId').value = advisorId;
+	document.getElementById('editAdvisorName').value = advisorName;
+	document.getElementById('editYearSelect').value = yearId;
+	document.getElementById('editYearId').value = yearId;
+	document.getElementById('editYearName').value = yearName;
+	document.getElementById('editDepartment').value = department;
+	document.getElementById('editStudentCount').value = studentCount;
+		});
+	});
+</script>

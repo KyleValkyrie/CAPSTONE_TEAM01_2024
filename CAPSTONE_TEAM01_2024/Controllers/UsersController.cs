@@ -22,7 +22,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Login(string? message = null)
+        public IActionResult Index(string? message = null)
         {
             //if login error, throw error report
             if(message is not null)
@@ -125,7 +125,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Users");
         }
     }
 }

@@ -9,7 +9,22 @@ namespace CAPSTONE_TEAM01_2024
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
         }
-        public DbSet<AcademicPeriod> AcademicPeriods { get; set; }
         public DbSet<ProfileManagerModel> ProfileManagers { get; set; }
+        public DbSet<AcademicPeriod> AcademicPeriods { get; set; }
+        public DbSet<Class> Classes { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+			base.OnModelCreating(modelBuilder);
+			modelBuilder.Entity<Class>()
+                .HasOne(c => c.Advisor)
+                .WithMany()
+                .HasForeignKey(c => c.AdvisorId);
+
+            modelBuilder.Entity<Class>()
+                .HasOne(c => c.Year)
+                .WithMany()
+                .HasForeignKey(c => c.YearId);
+        }
     }
 }

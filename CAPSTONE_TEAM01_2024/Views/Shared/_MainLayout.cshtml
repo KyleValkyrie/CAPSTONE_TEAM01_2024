@@ -106,7 +106,18 @@
                                          style="width:30px; height:auto;">
                                 </div>
                                 <div class="col-10">
-                                    Năm Học
+                                    Danh Sách Năm Học
+                                </div>
+                            </a>
+                            <a class="row d-flex nav-link text-dark m-1 justify-content-center align-items-center m-0 p-1"
+                               asp-area="" asp-controller="Categories" asp-action="ClassList"
+                               style="text-decoration:none;">
+                                <div class="col-2">
+                                    <img src="~/Resources/Img/Icon5.png"
+                                         style="width:30px; height:auto;">
+                                </div>
+                                <div class="col-10">
+                                    Quản Lý Lớp
                                 </div>
                             </a>
                             <a class="row d-flex nav-link text-dark m-1 justify-content-center align-items-center m-0 p-1"
@@ -217,16 +228,6 @@
             if (current) {
                 current.setAttribute('style', 'border: 5px solid #d72235;');
             }
-            
-            document.querySelector("SearchButton").addEventListener('click', (event) => {
-                event.preventDefault();
-            })
-
-            document.querySelector("#SearchField").addEventListener('keypress', (event) => {
-                if (window.location.href.includes('SchoolYear') && event.key === 'Enter') {
-                    document.querySelector('#SearchButton').click();
-                }
-            })
         });
 
         //clear session data when logout
@@ -239,159 +240,6 @@
                 });
             }
         });
-//For Adding in SchoolYear
-        // Get the modal
-        var modal = document.getElementById("AddModal");
-
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
-
-        // Function to open the modal
-        function openModal() {
-            modal.style.display = "block";
-        }
-
-        // Function to close the modal
-        function closeModal() {
-            modal.style.display = "none";
-        }
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function (event) {
-            if (event.target == modal) {
-                closeModal();
-            }
-        }
-//For Delete Confirmation in SchoolYear
-        // Get the modal
-        var confirmModal = document.getElementById("confirmDeleteModal");
-        var deleteId = 0;
-
-        // Function to open the confirmation modal
-        function openConfirmModal(id) {
-            deleteId = id;
-            confirmModal.style.display = "block";
-        }
-
-        // Function to close the confirmation modal
-        function closeConfirmModal() {
-            confirmModal.style.display = "none";
-        }
-
-        // Function to confirm deletion
-        function confirmDelete() {
-            // Create a form to submit the deletion request
-            var form = document.createElement("form");
-            form.method = "post";
-            form.action = "/Categories/DeleteAcademicYear";
-
-            // Add the id input to the form
-            var input = document.createElement("input");
-            input.type = "hidden";
-            input.name = "id";
-            input.value = deleteId;
-            form.appendChild(input);
-
-            // Append the form to the body and submit it
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function (event) {
-            if (event.target == confirmModal) {
-                closeConfirmModal();
-            }
-        }
-//For Edit in SchoolYear
-        // Get the edit modal
-        var editModal = document.getElementById("editModal");
-
-        // Function to open the edit modal
-        function openEditModal(id, year, semester) {
-            document.getElementById("editId").value = id;
-            document.getElementById("editYear").value = year;
-            document.getElementById("editSemester").value = semester;
-            editModal.style.display = "block";
-        }
-
-        // Function to close the edit modal
-        function closeEditModal() {
-            editModal.style.display = "none";
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function (event) {
-            if (event.target == editModal) {
-                closeEditModal();
-            }
-        }
-//For Searching SchoolYear
-        //Get the text field
-        function SetViewData()
-        {
-            var url = window.location.href;
-            var inputField = document.getElementById("SearchField");
-            var searchQuery = inputField.value;
-            console.log(searchQuery);
-            var resultsTableBody = document.querySelector("#queryResults tbody");
-            var results = resultsTableBody.querySelectorAll("tr");
-            for (var result of results) {
-                resultsTableBody.removeChild(result);
-            }
-
-            $.ajax({
-                type: "POST",
-                url: "/Categories/SetViewData",
-                data: {
-                    value: searchQuery
-                },
-                dataType: "json",
-                success: function (results) {
-                    var data = JSON.parse(results);
-                    console.log(`length: ${data.length}\n ${data}`);
-                    let number = 0;
-                    for (var record of data) { 
-                        number++;
-                        console.log(record);
-                        var row = document.createElement("tr");
-                        var rowHead = document.createElement("th");
-                        rowHead.setAttribute("scope", "row");
-                        rowHead.innerText = number;
-                        row.appendChild(rowHead);
-                        
-                        var cell = document.createElement("td");
-                        cell.innerText = `${record.Year.toString().substring(2)}${record.Semester}`;
-                        row.appendChild(cell);
-                        
-                        cell = document.createElement("td");
-                        cell.innerText = `${record.Year} - ${parseInt(record.Year) + 1}`;
-                        row.appendChild(cell);
-                        cell = document.createElement("td");
-                        
-                        var button = document.createElement("button");
-                        button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-                        button.setAttribute('onclick', `openEditModal(${record.Id}, ${record.Year}, ${record.Semester})`);
-                        button.innerHTML = '<i class="fa-solid fa-pen-to-square" style="padding-right:2px;"></i> Cập Nhật';
-                        cell.appendChild(button);
-                        row.appendChild(cell);
-
-                        button = document.createElement("button");
-                        button.classList.add('btn', 'btn-outline-danger', 'btn-sm');
-                        button.setAttribute('onclick', `openConfirmModal(${record.Id})`);
-                        button.setAttribute('style', 'float:right;')
-                        button.textContent = "Xóa";
-                        cell.appendChild(button);
-                        row.appendChild(cell);
-
-                        resultsTableBody.appendChild(row);
-                    }
-                }
-            });
-
-        }
-//For ClassList view
     </script>
-
-    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

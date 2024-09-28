@@ -61,6 +61,6 @@ app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Users}/{action=Login}/{id?}").RequireAuthorization();
+    pattern: "{controller=Users}/{action=Index}/{id?}").RequireAuthorization();
 
 app.Run();

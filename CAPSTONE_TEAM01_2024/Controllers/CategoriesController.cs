@@ -1,123 +1,218 @@
 ﻿using CAPSTONE_TEAM01_2024.Models;
+using CAPSTONE_TEAM01_2024.Utilities;
+using CAPSTONE_TEAM01_2024.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
-    public class CategoriesController:Controller
+    public class CategoriesController : Controller
     {
-// Database
+// Database Context
         private readonly ApplicationDbContext _context;
-
         public CategoriesController(ApplicationDbContext context)
         {
             _context = context;
-        }
-        //EndSemesterReport actions
+        }//EndSemesterReport actions
         public IActionResult EndSemesterReport()
         {
             ViewData["page"] = "EndSemesterReport";
             return View();
         }
-        //SchoolYear actions
-        //Add new Academic Year
-        [HttpPost]
-        public async Task<IActionResult> AddAcademicYear(int year, int semester)
+//ClassList actions
+        //Render ClassList view
+        public async Task<IActionResult> ClassList(int pageNumber = 1, int pageSize = 10)
         {
-            // Create a new AcademicPeriod object
-            var academicPeriod = new AcademicPeriod
+			ViewData["page"] = "ClassList";
+			var classes = _context.Classes.AsQueryable();
+
+            var paginatedClasses = await PaginatedList<Class>.CreateAsync(classes.OrderBy(c => c.ClassName), pageNumber, pageSize);
+
+            var advisors = await _context.ProfileManagers
+                .Where(pm => pm.VaiTro == "Cố vấn học tập")
+                .Select(pm => new SelectListItem
+                {
+                    Value = pm.Id.ToString(),
+                    Text = pm.TenDayDu
+                }).ToListAsync();
+
+            var years = await _context.AcademicPeriods
+                .Select(ap => new SelectListItem
+                {
+                    Value = ap.PeriodId.ToString(),
+                    Text = ap.PeriodName + "/--/Bắt Đầu: " + ap.PeriodStart.ToString("dd/MM/yyyy") + "/--/Kết Thúc: " + ap.PeriodEnd.ToString("dd/MM/yyyy")
+				}).ToListAsync();
+
+            var viewModel = new ClassListViewModel
             {
-                Year = year,
-                Semester = semester
+                Class = new Class(),
+                Advisors = advisors,
+                Years = years,
+                PaginatedClasses = paginatedClasses
             };
 
-            // Add the new object to the database
-            bool isFound = _context.AcademicPeriods
-                     .Where(r => r.Year == academicPeriod.Year && r.Semester == academicPeriod.Semester)
-                     .Any();
-            if (!isFound) //Can add
-            {
-                _context.AcademicPeriods.Add(academicPeriod);
-                await _context.SaveChangesAsync();
-
-                TempData["Message"] = "Thêm năm học thành công!";
-                TempData["MessageType"] = "success";
-
-                // Redirect to the Page to see update
-                return RedirectToAction("SchoolYear");
-            }
-            else
-            {
-                TempData["Message"] = "Năm học và học kì đã tồn tại!";
-                TempData["MessageType"] = "danger";
-                return RedirectToAction("SchoolYear");
-            }
+            return View(viewModel);
         }
-        //Delete Academic Year
-        [HttpPost]
-        public async Task<IActionResult> DeleteAcademicYear(int id)
-        {
-            var academicPeriod = await _context.AcademicPeriods.FindAsync(id);
-            if (academicPeriod != null)
-            {
-                _context.AcademicPeriods.Remove(academicPeriod);
-                await _context.SaveChangesAsync();
-            }
-            // Redirect to the Page to see update
-            return RedirectToAction("SchoolYear");
-        }
-        //Edit Academic Year
-        [HttpPost]
-        public async Task<IActionResult> EditAcademicYear(int id, int year, int semester)
-        {
-            var academicPeriod = await _context.AcademicPeriods.FindAsync(id);
-            if (academicPeriod != null)
-            {
-                academicPeriod.Year = year;
-                academicPeriod.Semester = semester;
-                await _context.SaveChangesAsync();
-            }
+		//Add new Class
+		[HttpPost]
+		public async Task<IActionResult> AddClass(string className, string advisor, int advisorId, int yearId, string year, string department, int studentCount)
+		{
+			// Create a new AcademicPeriod object
+			var newClass = new Class
+			{
+				ClassName = className,
+				AdvisorName = advisor,
+				AdvisorId=advisorId,
+				YearName = year,
+				YearId=yearId,
+				Department = department,
+				StudentCount = studentCount
+			};
+			// Add the new object to the database
+			bool isFound = _context.Classes
+					 .Where(r => r.ClassName == newClass.ClassName &&
+								 r.AdvisorName == newClass.AdvisorName &&
+								 r.AdvisorId == newClass.AdvisorId &&
+								 r.YearName == newClass.YearName &&
+								 r.YearId == newClass.YearId &&	
+								 r.Department == newClass.Department)
+					 .Any();
+			if (!isFound) //Can add
+			{
+				_context.Classes.Add(newClass);
+				await _context.SaveChangesAsync();
 
-            return RedirectToAction("SchoolYear");
-        }
-        //Render SchoolYear
-        public async Task<IActionResult> SchoolYear()
-        {
-            ViewData["page"] = "SchoolYear";
-            var academicPeriods = await _context.AcademicPeriods.ToListAsync();
-            //var results = HttpContext.Session.GetString("QueryResults");
-            //if (results != null)
-            //{
-            //    academicPeriods = JsonConvert.DeserializeObject<List<AcademicPeriod>>(results);
-            //    ModelState.Clear();
-            //}
+				TempData["MessageAddClass"] = "Thêm lớp thành công!";
+				TempData["MessageAddClassType"] = "success";
 
-            return View(academicPeriods);
-        }
-
-        [HttpPost]
-        public JsonResult SetViewData(string value)
+				// Redirect to the Page to see update
+				return RedirectToAction("ClassList");
+			}
+			else
+			{
+				TempData["MessageAddClass"] = "Thông tin lớp đã tồn tại!";
+				TempData["MessageAddClassType"] = "danger";
+				return RedirectToAction("ClassList");
+			}
+		}
+		//ClassInfo actions
+		//Render ClassInfo view
+		public IActionResult ClassInfo()
         {
-            //physics 1
-            int parsedValue;
-            bool successfulParse = int.TryParse(value, out parsedValue);
-            string academicPeriod = string.Empty;
-            if (successfulParse)
-            {
-                var results = from record in _context.AcademicPeriods where EF.Functions.Like((string)(object)record.Year, $"%{parsedValue}%") select record;
-                //HttpContext.Session.SetString("QueryResults", JsonConvert.SerializeObject(academicPeriod));
-                academicPeriod = JsonConvert.SerializeObject(results);
-            }
-            return Json(academicPeriod);
-            //return RedirectToAction("SchoolYear");
-        }
-        //SemesterPlan actions
-        public IActionResult SemesterPlan()
-        {
-            ViewData["page"] = "SemesterPlan";
+            ViewData["page"] = "ClassInfo";
             return View();
         }
-    }
+//SchoolYear actions
+		//Render SchoolYear view
+		public async Task<IActionResult> SchoolYear(int pageNumber = 1, int pageSize = 10)
+		{
+			ViewData["page"] = "SchoolYear";
+			var periods = _context.AcademicPeriods.AsQueryable();
+
+			var paginatedPeriods = await PaginatedList<AcademicPeriod>.CreateAsync(periods.OrderBy(p => p.PeriodStart), pageNumber, pageSize);
+
+			var model = new SchoolYearViewModel
+			{
+				PaginatedPeriods = paginatedPeriods
+			};
+
+			return View(model);
+		}
+		//Edit Academic Year
+		[HttpPost]
+		public async Task<IActionResult> EditPeriod(int periodId, string periodName, DateTime periodStart, DateTime periodEnd)
+		{
+			var modifiedPeriod = await _context.AcademicPeriods.FindAsync(periodId);
+			// Check if another record with the same year and semester exists
+			var existingPeriod = await _context.AcademicPeriods
+				.FirstOrDefaultAsync(ap => ap.PeriodName == periodName && 
+										   ap.PeriodStart == periodStart && 
+										   ap.PeriodEnd == periodEnd &&
+										   ap.PeriodId != periodId);
+			if (modifiedPeriod != null && existingPeriod == null)
+			{
+				TempData["MessageEditYear"] = "Cập nhật thành công!";
+				TempData["MessageEditType"] = "success";
+				modifiedPeriod.PeriodName = periodName;
+				modifiedPeriod.PeriodStart = periodStart;
+				modifiedPeriod.PeriodEnd = periodEnd;
+				await _context.SaveChangesAsync();
+				return RedirectToAction("SchoolYear");
+			}
+			else
+			{
+				TempData["MessageEditYear"] = "Trùng thời gian, cập nhật đã bị hủy!";
+				TempData["MessageEditType"] = "danger";
+				return RedirectToAction("SchoolYear");
+			}
+		}
+		//Delete Academic Year
+		[HttpPost]
+		public async Task<IActionResult> DeletePeriod(int periodId)
+		{
+			var periodToDelete = await _context.AcademicPeriods.FindAsync(periodId);
+			if (periodToDelete != null)
+			{
+				_context.AcademicPeriods.Remove(periodToDelete);
+				await _context.SaveChangesAsync();
+				// Redirect to the Page to see update
+				TempData["MessageDeleteYear"] = "Xóa năm học thành công!";
+				TempData["MessageDeleteType"] = "success";
+				return RedirectToAction("SchoolYear");				
+			}
+			else
+			{
+				TempData["MessageDeleteYear"] = "Xảy ra lỗi khi xóa!";
+				TempData["MessageDeleteType"] = "danger";
+				return RedirectToAction("SchoolYear");
+			}
+			
+		}
+		//Add new Academic Year
+		[HttpPost]
+		public async Task<IActionResult> AddPeriod(string periodName, DateTime periodStart, DateTime periodEnd)
+		{
+			// Create a new AcademicPeriod object
+			var newPeriod = new AcademicPeriod
+			{
+				PeriodName = periodName,
+				PeriodStart = periodStart,
+				PeriodEnd = periodEnd
+			};
+			// Add the new object to the database
+			bool isFound = _context.AcademicPeriods
+					 .Where(r => r.PeriodName == newPeriod.PeriodName && 
+								 r.PeriodStart == newPeriod.PeriodStart &&
+								 r.PeriodEnd == newPeriod.PeriodEnd)
+					 .Any();
+			if (!isFound) //Can add
+			{
+				_context.AcademicPeriods.Add(newPeriod);
+				await _context.SaveChangesAsync();
+
+				TempData["MessageAddYear"] = "Thêm năm học thành công!";
+				TempData["MessageAddType"] = "success";
+
+				// Redirect to the Page to see update
+				return RedirectToAction("SchoolYear");
+			}
+			else
+			{
+				TempData["MessageAddYear"] = "Thông tin năm học đã tồn tại!";
+				TempData["MessageAddType"] = "danger";
+				return RedirectToAction("SchoolYear");
+			}
+		}
+//SemesterPlan actions
+		public IActionResult SemesterPlan()
+		{
+			ViewData["page"] = "SemesterPlan";
+			return View();
+		}
+	}
 }
+
+

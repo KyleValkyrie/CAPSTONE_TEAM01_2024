@@ -1,4 +1,6 @@
 ﻿using CAPSTONE_TEAM01_2024.Models;
+using CAPSTONE_TEAM01_2024.Utilities;
+using CAPSTONE_TEAM01_2024.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
@@ -12,46 +14,29 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         {
             _context = context;
         }
-     
+
         public IActionResult Index_ProfileManager()
         {
             var listprofilemanager = _context.ProfileManagers.ToList();
             ViewData["page"] = "Index_ProfileManager";
 
             return View(listprofilemanager);
-        }
+        } 
+  //      public async Task<IActionResult> Profile(int pageNumber = 1, int pageSize = 10)
+  //      {
+		//	ViewData["page"] = "Index_ProfileManager";
+		//	var periods = _context.ProfileManagers.AsQueryable();
 
-        [HttpGet]
-        public async Task<IActionResult> Index_ProfileManager(string searchTerm )
-        {
-            ViewData["page"] = "Index_ProfileManager";
-            ViewData["Getemployeedetails"] = searchTerm;
-            var emquery = from x in _context.ProfileManagers select x; 
-            if(!String.IsNullOrEmpty(searchTerm))
-            {
-                if(int.TryParse(searchTerm, out int searchInt))
-                {
-                    emquery = emquery.Where(x => x.SoDienThoai == searchInt);
-                }
-                else
-                {
-                    emquery = emquery.Where(x => x.Email.Contains(searchTerm) || x.MaSo.Contains(searchTerm) || x.TenDayDu.Contains(searchTerm) || x.VaiTro.Contains(searchTerm));
-                }
-               
-            }
-            if(!emquery.Any())
-            {
-                ViewBag.Message = "Không Tìm Thấy Kết Quả !";
-            } 
-            
-            return View(await emquery.AsNoTracking().ToListAsync());
-        }
-        //
-        //IsUnique Database for Year & Semester 
-        // => Create New  ProfileManager
-        // Display ModalPopup AddProfileManager
-        
-        public IActionResult Create()
+		//	var paginatedProfile = await PaginatedList<ProfileManagerModel>.CreateAsync(periods.OrderBy(p => p.Email + p.MaSo+ p.TenDayDu + p.SoDienThoai + p.VaiTro), pageNumber, pageSize);
+
+		//	var model = new ProfileManagerViewModel
+		//	{
+		//		PaginatedProfile = paginatedProfile,
+		//	};
+  //          return View(model);
+		//}
+
+		public IActionResult Create()
         {
             ProfileManagerModel model = new ProfileManagerModel(); 
             return PartialView("AddProfileManager",model); 

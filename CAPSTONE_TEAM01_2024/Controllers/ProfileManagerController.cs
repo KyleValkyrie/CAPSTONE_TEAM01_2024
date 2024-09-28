@@ -63,7 +63,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         public IActionResult Create(ProfileManagerModel model)
         {
 
-           bool isFound = _context.ProfileManagers.Where(x => x.Email == model.Email || x.MaSo == model.MaSo || x.SoDienThoai == model.SoDienThoai || x.VaiTro == model.VaiTro ).Any();
+           bool isFound = _context.ProfileManagers.Where(x => x.Email == model.Email && x.MaSo == model.MaSo && x.SoDienThoai == model.SoDienThoai && x.VaiTro == model.VaiTro ).Any();
             if(!isFound) {
                 _context.ProfileManagers.Add(model);
                 _context.SaveChanges();

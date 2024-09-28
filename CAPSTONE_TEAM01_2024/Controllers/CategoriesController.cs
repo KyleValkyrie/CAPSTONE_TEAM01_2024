@@ -98,7 +98,42 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				return RedirectToAction("ClassList");
 			}
 		}
-		//ClassInfo actions
+		//Edit Class
+		[HttpPost]
+		public async Task<IActionResult> EditClass(int classId, string className, string advisor, int advisorId, int yearId, string year, string department, int studentCount)
+		{
+			var modifiedClass = await _context.Classes.FindAsync(classId);
+			// Check if another record with same info exist
+			var existingClass = await _context.Classes
+				.FirstOrDefaultAsync(cl => cl.ClassName == className &&
+										   cl.AdvisorName == advisor &&
+										   cl.AdvisorId == advisorId &&
+										   cl.YearName == year &&
+										   cl.YearId == yearId &&
+										   cl.Department == department &&
+										   cl.StudentCount == studentCount);
+			if (modifiedClass != null && existingClass == null)
+			{
+				TempData["MessageEditClass"] = "Cập nhật lớp thành công!";
+				TempData["MessageEditClassType"] = "success";
+				modifiedClass.ClassName = className;
+				modifiedClass.AdvisorName = advisor;
+				modifiedClass.AdvisorId = advisorId;
+				modifiedClass.YearName = year;
+				modifiedClass.YearId = yearId;
+				modifiedClass.Department = department;
+				modifiedClass.StudentCount = studentCount;
+				await _context.SaveChangesAsync();
+				return RedirectToAction("ClassList");
+			}
+			else
+			{
+				TempData["MessageEditClass"] = "Trùng thời gian, cập nhật đã bị hủy!";
+				TempData["MessageEditClassType"] = "danger";
+				return RedirectToAction("ClassList");
+			}
+		}
+//ClassInfo actions
 		//Render ClassInfo view
 		public IActionResult ClassInfo()
         {

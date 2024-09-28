@@ -7,6 +7,12 @@
 		@TempData["MessageAddClass"]
 	</div>
 }
+@if (TempData["MessageEditClass"] != null)
+{
+	<div class="alert alert-@TempData["MessageEditClassType"]">
+		@TempData["MessageEditClass"]
+	</div>
+}
 @using CAPSTONE_TEAM01_2024.Utilities
 @model CAPSTONE_TEAM01_2024.ViewModels.ClassListViewModel
 <div class="content-wrapper" style="min-height: 912.2px;">
@@ -82,8 +88,9 @@
 											data-department="@PClass.Department"
 											data-student-count="@PClass.StudentCount"
 											aria-label="edit class details">
-										<i class="fa-solid fa-pen-to-square custom-icon"></i> cập nhật
+										<i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
 									</button>
+
 									<button type="button" class="btn btn-outline-danger btn-sm"
 											@* data-bs-toggle="modal"
 											data-bs-target="#deleteperiodmodal"
@@ -317,5 +324,24 @@
 	document.getElementById('editDepartment').value = department;
 	document.getElementById('editStudentCount').value = studentCount;
 		});
+
+	document.getElementById('editAdvisorSelect').addEventListener('change', function() {
+			var selectedOption = this.options[this.selectedIndex];
+	var advisorId = selectedOption.value;
+	var advisorName = selectedOption.getAttribute('data-advisor-name');
+
+	document.getElementById('editAdvisorId').value = advisorId;
+	document.getElementById('editAdvisorName').value = advisorName;
+		});
+
+	document.getElementById('editYearSelect').addEventListener('change', function() {
+			var selectedOption = this.options[this.selectedIndex];
+	var yearId = selectedOption.value;
+	var yearName = selectedOption.getAttribute('data-year-name');
+
+	document.getElementById('editYearId').value = yearId;
+	document.getElementById('editYearName').value = yearName;
+		});
 	});
+
 </script>

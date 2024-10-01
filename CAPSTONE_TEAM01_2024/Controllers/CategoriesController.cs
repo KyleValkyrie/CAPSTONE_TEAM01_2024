@@ -43,14 +43,13 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 .Select(ap => new SelectListItem
                 {
                     Value = ap.PeriodId.ToString(),
-                    Text = ap.PeriodName + "/--/Bắt Đầu: " + ap.PeriodStart.ToString("dd/MM/yyyy") + "/--/Kết Thúc: " + ap.PeriodEnd.ToString("dd/MM/yyyy")
+                    Text = ap.PeriodName
 				}).ToListAsync();
 
             var viewModel = new ClassListViewModel
             {
                 Class = new Class(),
                 Advisors = advisors,
-                Years = years,
                 PaginatedClasses = paginatedClasses
             };
 
@@ -58,7 +57,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         }
 		//Add new Class
 		[HttpPost]
-		public async Task<IActionResult> AddClass(string className, string advisor, int advisorId, int yearId, string year, string department, int studentCount)
+		public async Task<IActionResult> AddClass(string className, string advisor, int advisorId, string yearName, string department, int studentCount)
 		{
 			// Create a new AcademicPeriod object
 			var newClass = new Class
@@ -66,8 +65,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				ClassName = className,
 				AdvisorName = advisor,
 				AdvisorId=advisorId,
-				YearName = year,
-				YearId=yearId,
+				YearName = yearName,
 				Department = department,
 				StudentCount = studentCount
 			};
@@ -77,7 +75,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 								 r.AdvisorName == newClass.AdvisorName &&
 								 r.AdvisorId == newClass.AdvisorId &&
 								 r.YearName == newClass.YearName &&
-								 r.YearId == newClass.YearId &&	
 								 r.Department == newClass.Department)
 					 .Any();
 			if (!isFound) //Can add
@@ -100,7 +97,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 		}
 		//Edit Class
 		[HttpPost]
-		public async Task<IActionResult> EditClass(int classId, string className, string advisor, int advisorId, int yearId, string year, string department, int studentCount)
+		public async Task<IActionResult> EditClass(int classId, string className, string advisor, int advisorId, string yearName, string department, int studentCount)
 		{
 			var modifiedClass = await _context.Classes.FindAsync(classId);
 			// Check if another record with same info exist
@@ -108,8 +105,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				.FirstOrDefaultAsync(cl => cl.ClassName == className &&
 										   cl.AdvisorName == advisor &&
 										   cl.AdvisorId == advisorId &&
-										   cl.YearName == year &&
-										   cl.YearId == yearId &&
+										   cl.YearName == yearName &&
 										   cl.Department == department &&
 										   cl.StudentCount == studentCount);
 			if (modifiedClass != null && existingClass == null)
@@ -119,8 +115,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				modifiedClass.ClassName = className;
 				modifiedClass.AdvisorName = advisor;
 				modifiedClass.AdvisorId = advisorId;
-				modifiedClass.YearName = year;
-				modifiedClass.YearId = yearId;
+				modifiedClass.YearName = yearName;
 				modifiedClass.Department = department;
 				modifiedClass.StudentCount = studentCount;
 				await _context.SaveChangesAsync();

@@ -20,11 +20,6 @@ namespace CAPSTONE_TEAM01_2024
                 .HasOne(c => c.Advisor)
                 .WithMany()
                 .HasForeignKey(c => c.AdvisorId);
-
-            modelBuilder.Entity<Class>()
-                .HasOne(c => c.Year)
-                .WithMany()
-                .HasForeignKey(c => c.YearId);
         }
     }
 }

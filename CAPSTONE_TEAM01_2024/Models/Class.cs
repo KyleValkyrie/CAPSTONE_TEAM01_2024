@@ -21,15 +21,9 @@ namespace CAPSTONE_TEAM01_2024.Models
 		[ForeignKey("AdvisorId")]
         public ProfileManagerModel Advisor { get; set; }
 
-        [Required]
-        public int YearId { get; set; }
-
 		[Required]
-		[StringLength(100)]
+		[StringLength(20)]
 		public string YearName { get; set; }
-
-		[ForeignKey("YearId")]
-        public AcademicPeriod Year { get; set; }
 
         [Required]
         [StringLength(100)]

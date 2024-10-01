@@ -63,7 +63,7 @@
 								<th scope="col">#</th>
 								<th scope="col">Mã Lớp</th>
 								<th scope="col">Cố Vấn Học Tập</th>
-								<th scope="col">Năm Học</th>
+								<th scope="col">Niên Khóa</th>
 								<th scope="col">Ngành</th>
 								<th scope="col">Số lượng SV</th>
 								<th scope="col">Thao Tác</th>
@@ -91,7 +91,6 @@
 												data-class-name="@PClass.ClassName"
 												data-advisor-id="@PClass.AdvisorId"
 												data-advisor-name="@PClass.AdvisorName"
-												data-year-id="@PClass.YearId"
 												data-year-name="@PClass.YearName"
 												data-department="@PClass.Department"
 												data-student-count="@PClass.StudentCount"
@@ -195,18 +194,9 @@
 					<input type="hidden" id="advisorId" name="advisorId" />
 					<input type="hidden" id="advisorName" name="advisor" />
 					<div class="mb-3">
-						<label for="classPeriod" class="form-label">Năm Học</label>
-						<select asp-for="Class.YearId" class="form-select" id="yearSelect" required>
-							<option value="" disabled selected>Vui lòng chọn năm học phù hợp</option>
-							@foreach (var year in Model.Years)
-							{
-								<option value="@year.Value" data-year-name="@year.Text">@year.Text</option>
-							}
-						</select>
-						<span asp-validation-for="Class.YearId" class="text-danger"></span>
+						<label for="classPeriod" class="form-label">Niên Khóa</label>
+						<input type="text" class="form-control" id="yearName" name="yearName" required>
 					</div>
-					<input type="hidden" id="yearId" name="yearId" />
-					<input type="hidden" id="yearName" name="year" />
 					<div class="mb-3">
 						<label class="form-label">Ngành</label>
 						<input type="text" class="form-control" id="department" name="department" required>
@@ -254,18 +244,9 @@
 					<input type="hidden" id="editAdvisorId" name="advisorId" />
 					<input type="hidden" id="editAdvisorName" name="advisor" />
 					<div class="mb-3">
-						<label for="editClassPeriod" class="form-label">Năm Học</label>
-						<select asp-for="Class.YearId" class="form-select" id="editYearSelect" required>
-							<option value="" disabled selected>Vui lòng chọn năm học phù hợp</option>
-							@foreach (var year in Model.Years)
-							{
-								<option value="@year.Value" data-year-name="@year.Text">@year.Text</option>
-							}
-						</select>
-						<span asp-validation-for="Class.YearId" class="text-danger"></span>
+						<label for="editYearName" class="form-label">Niên Khóa</label>
+						<input type="text" class="form-control" id="editYearName" name="yearName" required>
 					</div>
-					<input type="hidden" id="editYearId" name="yearId" />
-					<input type="hidden" id="editYearName" name="year" />
 					<div class="mb-3">
 						<label class="form-label">Ngành</label>
 						<input type="text" class="form-control" id="editDepartment" name="department" required>
@@ -316,61 +297,43 @@
 		document.getElementById('advisorId').value = advisorId;
 		document.getElementById('advisorName').value = advisorName;
 	});
-
-	document.getElementById('yearSelect').addEventListener('change', function () {
-		var selectedOption = this.options[this.selectedIndex];
-		var yearId = selectedOption.value;
-		var yearName = selectedOption.getAttribute('data-year-name');
-
-		// Set the values to hidden fields or directly to the form
-		document.getElementById('yearId').value = yearId;
-		document.getElementById('yearName').value = yearName;
-	});
 //Edit Modal JS
-	document.addEventListener('DOMContentLoaded', function() {
+	document.addEventListener('DOMContentLoaded', function () {
 		var editClassModal = document.getElementById('EditClassModal');
-	editClassModal.addEventListener('show.bs.modal', function(event) {
-			var button = event.relatedTarget; // Button that triggered the modal
-	var classId = button.getAttribute('data-class-id');
-	var className = button.getAttribute('data-class-name');
-	var advisorId = button.getAttribute('data-advisor-id');
-	var advisorName = button.getAttribute('data-advisor-name');
-	var yearId = button.getAttribute('data-year-id');
-	var yearName = button.getAttribute('data-year-name');
-	var department = button.getAttribute('data-department');
-	var studentCount = button.getAttribute('data-student-count');
+		if (editClassModal) {
+			editClassModal.addEventListener('show.bs.modal', function (event) {
+				var button = event.relatedTarget; // Button that triggered the modal
+				if (button) {
+					var classId = button.getAttribute('data-class-id');
+					var className = button.getAttribute('data-class-name');
+					var advisorId = button.getAttribute('data-advisor-id');
+					var advisorName = button.getAttribute('data-advisor-name');
+					var yearName = button.getAttribute('data-year-name');
+					var department = button.getAttribute('data-department');
+					var studentCount = button.getAttribute('data-student-count');
 
-	// Populate the modal fields
-	document.getElementById('editClassId').value = classId;
-	document.getElementById('editClassName').value = className;
-	document.getElementById('editAdvisorSelect').value = advisorId;
-	document.getElementById('editAdvisorId').value = advisorId;
-	document.getElementById('editAdvisorName').value = advisorName;
-	document.getElementById('editYearSelect').value = yearId;
-	document.getElementById('editYearId').value = yearId;
-	document.getElementById('editYearName').value = yearName;
-	document.getElementById('editDepartment').value = department;
-	document.getElementById('editStudentCount').value = studentCount;
-		});
+					// Populate the modal fields
+					document.getElementById('editClassId').value = classId;
+					document.getElementById('editClassName').value = className;
+					document.getElementById('editAdvisorSelect').value = advisorId;
+					document.getElementById('editAdvisorId').value = advisorId;
+					document.getElementById('editAdvisorName').value = advisorName;
+					document.getElementById('editYearName').value = yearName;
+					document.getElementById('editDepartment').value = department;
+					document.getElementById('editStudentCount').value = studentCount;
+				}
+			});
 
-	document.getElementById('editAdvisorSelect').addEventListener('change', function() {
-			var selectedOption = this.options[this.selectedIndex];
-	var advisorId = selectedOption.value;
-	var advisorName = selectedOption.getAttribute('data-advisor-name');
-
-	document.getElementById('editAdvisorId').value = advisorId;
-	document.getElementById('editAdvisorName').value = advisorName;
-		});
-
-	document.getElementById('editYearSelect').addEventListener('change', function() {
-			var selectedOption = this.options[this.selectedIndex];
-	var yearId = selectedOption.value;
-	var yearName = selectedOption.getAttribute('data-year-name');
-
-	document.getElementById('editYearId').value = yearId;
-	document.getElementById('editYearName').value = yearName;
-		});
+			document.getElementById('editAdvisorSelect').addEventListener('change', function () {
+				var selectedOption = this.options[this.selectedIndex];
+				var advisorId = selectedOption.value;
+				var advisorName = selectedOption.getAttribute('data-advisor-name');
+				document.getElementById('editAdvisorId').value = advisorId;
+				document.getElementById('editAdvisorName').value = advisorName;
+			});
+		}
 	});
+
 //Delete Modal JS
 	 document.addEventListener('DOMContentLoaded', function() {
 		var deleteClassModal = document.getElementById('DeleteClassModal');

@@ -44,6 +44,9 @@
 							<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddClassModal">
 								<i class="bi bi-plus custom-icon"></i> Thêm Lớp
 							</button>
+							<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ImportExcelModal">
+								<i class="bi bi-upload"></i> Nhập File
+							</button>
 						</div>
 						<div class="col">
 							<nav class="navbar navbar-light bg-light">
@@ -118,7 +121,7 @@
 							@if (Model.PaginatedClasses.HasPreviousPage)
 							{
 								<li class="page-item">
-									<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@(Model.PaginatedClasses.PageIndex - 1)">Previous</a>
+									<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@(Model.PaginatedClasses.PageIndex - 1)">Trang Trước</a>
 								</li>
 							}
 							else
@@ -147,7 +150,7 @@
 							@if (Model.PaginatedClasses.HasNextPage)
 							{
 								<li class="page-item">
-									<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@(Model.PaginatedClasses.PageIndex + 1)">Next</a>
+									<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@(Model.PaginatedClasses.PageIndex + 1)">Trang Sau</a>
 								</li>
 							}
 							else
@@ -166,7 +169,7 @@
 	<!-- /.content -->
 </div>
 
-<!--Add Modal-->
+<!-- Add Modal -->
 <div class="modal fade" id="AddClassModal" tabindex="-1" data-bs-backdrop="false" aria-labelledby="AddClassModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -198,8 +201,14 @@
 						<input type="text" class="form-control" id="yearName" name="yearName" required>
 					</div>
 					<div class="mb-3">
-						<label class="form-label">Ngành</label>
-						<input type="text" class="form-control" id="department" name="department" required>
+						<label for="department" class="form-label">Ngành</label>	
+						<select class="form-select" id="department" name="department" required>
+							<option value="" disabled selected>Vui lòng chọn ngành</option>
+							<option value="7480201 - Công nghệ Thông tin (CTTC)">7480201 - Công nghệ Thông tin (CTTC)</option>
+							<option value="7480201 - Công nghệ Thông tin (CTĐB)">7480201 - Công nghệ Thông tin (CTĐB)</option>
+							<option value="7480104 - Hệ thống Thông tin (CTTC)">7480104 - Hệ thống Thông tin (CTTC)</option>
+							<option value="7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)">7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)</option>
+						</select>
 					</div>
 					<div class="mb-3">
 						<label class="form-label">Số Lượng SV</label>
@@ -248,8 +257,14 @@
 						<input type="text" class="form-control" id="editYearName" name="yearName" required>
 					</div>
 					<div class="mb-3">
-						<label class="form-label">Ngành</label>
-						<input type="text" class="form-control" id="editDepartment" name="department" required>
+						<label for="editDepartment" class="form-label">Ngành</label>
+						<select class="form-select" id="editDepartment" name="department" required>
+							<option value="" disabled selected>Vui lòng chọn ngành</option>
+							<option value="7480201 - Công nghệ Thông tin (CTTC)">7480201 - Công nghệ Thông tin (CTTC)</option>
+							<option value="7480201 - Công nghệ Thông tin (CTĐB)">7480201 - Công nghệ Thông tin (CTĐB)</option>
+							<option value="7480104 - Hệ thống Thông tin (CTTC)">7480104 - Hệ thống Thông tin (CTTC)</option>
+							<option value="7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)">7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)</option>
+						</select>
 					</div>
 					<div class="mb-3">
 						<label class="form-label">Số Lượng SV</label>
@@ -264,6 +279,7 @@
 		</div>
 	</div>
 </div>
+
 
 <!-- Delete Modal -->
 <div class="modal fade" id="DeleteClassModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true">
@@ -286,6 +302,45 @@
 		</div>
 	</div>
 </div>
+
+<!-- Import Modal -->
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" data-bs-backdrop="false" aria-labelledby="ImportExcelModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="ImportExcelModalLabel">Nhập File Excel</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<label for="excelTemplateFile" class="form-label fw-bold"> Tải file Excel mẫu</label>
+					<div id="excelTemplateFile" style="position: relative; display: inline-block; width: 100%; height: calc(1.5em + .75rem + 2px); margin-bottom: 0px;">
+						<a class="btn btn-warning text-dark" asp-controller="Categories" asp-action="DownloadTemplate">
+							<i class="bi bi-download"></i> Tải file mẫu
+						</a>
+					</div>
+				</div>
+				<form id="importExcelForm" asp-action="ImportFromExcel" method="post" enctype="multipart/form-data">
+					<div class="mb-3">
+						<label for="excelFile" class="form-label fw-bold"> Chọn file Excel để nhập</label>
+						<div class="custom-file" style="position: relative; display: inline-block; width: 100%; height: calc(1.5em + .75rem + 2px); margin-bottom: 0;">
+							<input type="file" class="custom-file-input" id="excelFile" name="file" accept=".xlsx,.xls" required style="position: absolute; width: 100%; height: 100%; margin: 0; opacity: 0;">
+							<label class="custom-file-label" for="excelFile" style="position: absolute; top: 0; right: 0; left: 0; z-index: 1; height: calc(1.5em + .75rem + 2px); padding: .375rem .75rem; font-weight: 400; line-height: 1.5; color: #495057; background-color: #fff; border: 1px solid #ced4da; border-radius: .25rem; cursor: pointer;">
+								Chọn file <i class="bi bi-upload" style="float:right;"></i>
+							</label>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+						<button type="submit" class="btn btn-primary"> Nhập</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
 <script>
 //Add Modal JS
 	document.getElementById('advisorSelect').addEventListener('change', function () {
@@ -333,7 +388,6 @@
 			});
 		}
 	});
-
 //Delete Modal JS
 	 document.addEventListener('DOMContentLoaded', function() {
 		var deleteClassModal = document.getElementById('DeleteClassModal');
@@ -383,4 +437,10 @@
 				}
 			});
 		});
+//Import modal JS
+	document.querySelector('.custom-file-input').addEventListener('change', function (e) {
+		var fileName = document.getElementById("excelFile").files[0].name;
+		var nextSibling = e.target.nextElementSibling;
+		nextSibling.innerText = fileName;
+	});
 </script>

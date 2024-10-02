@@ -110,7 +110,7 @@
 							@if (Model.PaginatedPeriods.HasPreviousPage)
 							{
 								<li class="page-item">
-									<a class="page-link" asp-action="SchoolYear" asp-route-pageNumber="@(Model.PaginatedPeriods.PageIndex - 1)">Previous</a>
+									<a class="page-link" asp-action="SchoolYear" asp-route-pageNumber="@(Model.PaginatedPeriods.PageIndex - 1)">Trang Trước</a>
 								</li>
 							}
 							else
@@ -139,7 +139,7 @@
 							@if (Model.PaginatedPeriods.HasNextPage)
 							{
 								<li class="page-item">
-									<a class="page-link" asp-action="SchoolYear" asp-route-pageNumber="@(Model.PaginatedPeriods.PageIndex + 1)">Next</a>
+									<a class="page-link" asp-action="SchoolYear" asp-route-pageNumber="@(Model.PaginatedPeriods.PageIndex + 1)">Trang Sau</a>
 								</li>
 							}
 							else

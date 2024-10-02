@@ -2,6 +2,7 @@ using CAPSTONE_TEAM01_2024;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,15 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 })
                .AddEntityFrameworkStores<ApplicationDbContext>()
                .AddDefaultTokenProviders();
+
+// Set EPPlus LicenseContext
+var licenseContext = builder.Configuration["EPPlus:ExcelPackage:LicenseContext"];
+if (!string.IsNullOrEmpty(licenseContext))
+{
+	ExcelPackage.LicenseContext = licenseContext == "Commercial"
+		? LicenseContext.Commercial
+		: LicenseContext.NonCommercial;
+}
 
 // Post Configurations
 builder.Services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme,

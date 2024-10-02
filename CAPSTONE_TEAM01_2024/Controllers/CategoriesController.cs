@@ -4,8 +4,10 @@ using CAPSTONE_TEAM01_2024.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
@@ -16,14 +18,15 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         public CategoriesController(ApplicationDbContext context)
         {
             _context = context;
-        }//EndSemesterReport actions
+        }
+//EndSemesterReport actions
         public IActionResult EndSemesterReport()
         {
             ViewData["page"] = "EndSemesterReport";
             return View();
         }
 //ClassList actions
-        //Render ClassList view
+    //Render ClassList view
         public async Task<IActionResult> ClassList(int pageNumber = 1, int pageSize = 10)
         {
 			ViewData["page"] = "ClassList";
@@ -55,7 +58,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return View(viewModel);
         }
-		//Add new Class
+	//Add new Class
 		[HttpPost]
 		public async Task<IActionResult> AddClass(string className, string advisor, int advisorId, string yearName, string department, int studentCount)
 		{
@@ -95,7 +98,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				return RedirectToAction("ClassList");
 			}
 		}
-		//Edit Class
+	//Edit Class
 		[HttpPost]
 		public async Task<IActionResult> EditClass(int classId, string className, string advisor, int advisorId, string yearName, string department, int studentCount)
 		{
@@ -128,7 +131,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				return RedirectToAction("ClassList");
 			}
 		}
-		//Delete Class
+	//Delete Class
 		[HttpPost]
 		public async Task<IActionResult> DeleteClass(int classId)
 		{
@@ -149,15 +152,144 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				return RedirectToAction("ClassList");
 			}
 		}
-		//ClassInfo actions
-		//Render ClassInfo view
+	//Import xls
+		//Get All Advisors from the DB
+		public List<string> GetAdvisors()
+		{
+			var advisors = new List<string?>();
+			// Assuming you have a DbContext named 'YourDbContext'
+			using (var context = _context)
+			{
+				advisors = context.ProfileManagers
+								  .Where(p => p.VaiTro == "Cố vấn học tập")
+								  .Select(p => p.TenDayDu) // Assuming 'Name' is the column with advisor names
+								  .ToList();
+			}
+			return advisors;
+		}
+		//Download Template
+		[HttpGet]
+		public IActionResult DownloadTemplate()
+		{
+			try
+			{
+				ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+				using (var stream = new MemoryStream())
+				{
+					using (var package = new ExcelPackage(stream))
+					{
+						var worksheet = package.Workbook.Worksheets.Add("Template");
+						// Manually adjust row height to fit content
+						for (int row = 1; row <= 100; row++)
+						{
+							worksheet.Row(row).Height = worksheet.Row(row).Height * 1.8; // Adjust multiplier as needed
+						}
+						worksheet.Cells[6, 1, 100, 5].Style.Font.Size = 14;
+						worksheet.Cells[1, 1, 100, 5].Style.Font.Name = "Times New Roman";
+						worksheet.Cells[6, 1, 100, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+						// Organization name
+						worksheet.Cells[1, 1].Value = "TRƯỜNG ĐẠI HỌC VĂN LANG";
+						worksheet.Cells[1, 1].Style.Font.Size = 14;
+						
+						//Department Name
+						worksheet.Cells[2, 1].Value = "KHOA CÔNG NGHỆ THÔNG TIN";
+						worksheet.Cells[2, 1].Style.Font.Size = 14;
+						worksheet.Cells[2, 1].Style.Font.Bold = true;
+
+						// Document Title
+						worksheet.Cells[3, 1, 3, 5].Merge = true;
+						worksheet.Cells[3, 1].Value = "DANH SÁCH CỐ VẤN HỌC TẬP";
+						worksheet.Cells[3, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+						worksheet.Cells[3, 1].Style.Font.Bold = true;
+						worksheet.Cells[3, 1].Style.Font.Size = 20;
+
+						//Document Period
+						worksheet.Cells[4, 1, 4, 5].Merge = true;
+						worksheet.Cells[4, 1].Value = "NĂM HỌC: ";
+						worksheet.Cells[4, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+						worksheet.Cells[4, 1].Style.Font.Bold = true;
+						worksheet.Cells[4, 1].Style.Font.Size = 18;
+
+						// Define headers
+						worksheet.Cells[5, 1].Value = "Mã Lớp";
+						worksheet.Cells[5, 2].Value = "Cố Vấn Học Tập";
+						worksheet.Cells[5, 3].Value = "Niên Khóa";
+						worksheet.Cells[5, 4].Value = "Ngành";
+						worksheet.Cells[5, 5].Value = "Số lượng SV";
+
+						// Apply some styling to the headers
+						using (var range = worksheet.Cells[5, 1, 5, 5])
+						{
+							range.Style.Font.Bold = true;
+							range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+							range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+							range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+							range.Style.Font.Size = 16;
+						}
+
+						// Add sample data
+						worksheet.Cells[6, 1].Value = "PM01";
+						worksheet.Cells[6, 2].Value = "Lý Thị Huyền Châu";
+						worksheet.Cells[6, 3].Value = "2018 - 2022";
+						worksheet.Cells[6, 4].Value = "7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)";
+						worksheet.Cells[6, 5].Value = "30";
+
+						// Add dropdown list (data validation) to the "Ngành" column
+						var validation1 = worksheet.DataValidations.AddListValidation("D6:D100");
+						validation1.Formula.Values.Add("7480201 - Công nghệ Thông tin (CTTC)");
+						validation1.Formula.Values.Add("7480201 - Công nghệ Thông tin (CTĐB)");
+						validation1.Formula.Values.Add("7480104 - Hệ thống Thông tin (CTTC)");
+						validation1.Formula.Values.Add("7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)");
+
+						// Add data validation to limit the value of the "Số lượng SV" column
+						var validation2 = worksheet.DataValidations.AddDecimalValidation("E6:E100");
+						validation2.Formula.Value = 0; // Minimum value
+						validation2.Formula2.Value = 30; // Maximum value
+						validation2.ShowErrorMessage = true;
+						validation2.ErrorTitle = "Thông tin không hợp lệ";
+						validation2.Error = "Sinh viên trong khoảng từ 0 tới 30.";
+
+						// Add dropdown list (data validation) to the "Cố Vấn Học Tập" column
+						var validation3 = worksheet.DataValidations.AddListValidation("B6:B100");
+						var advisors = GetAdvisors();
+						foreach (var advisor in advisors)
+						{
+							validation3.Formula.Values.Add(advisor);
+						}
+
+						// wrap text for entire table
+						//worksheet.Cells[1, 1, 100, 5].Style.WrapText = true;
+						// Auto-fit columns to adjust width based on content
+						worksheet.Cells.AutoFitColumns();
+
+						package.Save();
+					}
+
+					stream.Position = 0;
+					var content = stream.ToArray();
+					return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Mẫu Năm Học.xlsx");
+				}
+			}
+			catch (Exception ex)
+			{
+				// Log the exception details
+				//_logger.LogError(ex, "Error generating Excel template");;
+				//return RedirectToAction("ClassList");
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+		}
+
+//ClassInfo actions
+	//Render ClassInfo view
 		public IActionResult ClassInfo()
         {
             ViewData["page"] = "ClassInfo";
             return View();
         }
 //SchoolYear actions
-		//Render SchoolYear view
+	//Render SchoolYear view
 		public async Task<IActionResult> SchoolYear(int pageNumber = 1, int pageSize = 10)
 		{
 			ViewData["page"] = "SchoolYear";
@@ -172,7 +304,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
 			return View(model);
 		}
-		//Edit Academic Year
+	//Edit Academic Year
 		[HttpPost]
 		public async Task<IActionResult> EditPeriod(int periodId, string periodName, DateTime periodStart, DateTime periodEnd)
 		{
@@ -200,7 +332,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				return RedirectToAction("SchoolYear");
 			}
 		}
-		//Delete Academic Year
+	//Delete Academic Year
 		[HttpPost]
 		public async Task<IActionResult> DeletePeriod(int periodId)
 		{
@@ -222,7 +354,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 			}
 			
 		}
-		//Add new Academic Year
+	//Add new Academic Year
 		[HttpPost]
 		public async Task<IActionResult> AddPeriod(string periodName, DateTime periodStart, DateTime periodEnd)
 		{

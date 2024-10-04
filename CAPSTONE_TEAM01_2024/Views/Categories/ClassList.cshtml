@@ -19,6 +19,12 @@
 		@TempData["MessageDeleteClass"]
 	</div>
 }
+@if (TempData["MessageImportClass"] != null)
+{
+	<div class="alert alert-@TempData["MessageImportClassType"]">
+		@TempData["MessageImportClass"]
+	</div>
+}
 @using CAPSTONE_TEAM01_2024.Utilities
 @model CAPSTONE_TEAM01_2024.ViewModels.ClassListViewModel
 <div class="content-wrapper" style="min-height: 912.2px;">

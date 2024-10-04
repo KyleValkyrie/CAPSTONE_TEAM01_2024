@@ -269,7 +269,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
 					stream.Position = 0;
 					var content = stream.ToArray();
-					return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Mẫu Năm Học.xlsx");
+					return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Mẫu Danh Sách Lớp.xlsx");
 				}
 			}
 			catch (Exception ex)
@@ -280,9 +280,88 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				return StatusCode(500, $"Internal server error: {ex.Message}");
 			}
 		}
+		//Import Records
+		[HttpPost]
+		public async Task<IActionResult> ImportFromExcel(IFormFile file)
+		{
+			if (file == null || file.Length == 0)
+				return BadRequest("File not selected");
 
-//ClassInfo actions
-	//Render ClassInfo view
+			var successfulImports = 0;
+			var duplicateRecords = 0;
+
+			// Fetch advisor data
+			var advisors = _context.ProfileManagers.ToDictionary(a => a.TenDayDu, a => a.Id);
+
+			using (var stream = new MemoryStream())
+			{
+				await file.CopyToAsync(stream);
+				using (var package = new ExcelPackage(stream))
+				{
+					var worksheet = package.Workbook.Worksheets[0];
+					var rowCount = worksheet.Dimension.Rows;
+
+					for (int row = 2; row <= rowCount; row++)
+					{
+						var className = worksheet.Cells[row, 1].Value?.ToString();
+						var advisorName = worksheet.Cells[row, 2].Value?.ToString();
+						var yearName = worksheet.Cells[row, 3].Value?.ToString();
+						var department = worksheet.Cells[row, 4].Value?.ToString();
+						var studentCountStr = worksheet.Cells[row, 5].Value?.ToString();
+
+						if (string.IsNullOrWhiteSpace(className) ||
+							string.IsNullOrWhiteSpace(advisorName) ||
+							string.IsNullOrWhiteSpace(yearName) ||
+							string.IsNullOrWhiteSpace(department) ||
+							string.IsNullOrWhiteSpace(studentCountStr))
+						{
+							continue; // Skip this row if any required cell is null or empty
+						}
+
+						if (!advisors.TryGetValue(advisorName, out var advisorId))
+						{
+							// Handle case where advisor is not found
+							continue;
+						}
+
+						int studentCount = int.Parse(studentCountStr);
+
+						var record = new Class
+						{
+							ClassName = className,
+							AdvisorId = advisorId,
+							AdvisorName = advisorName,
+							YearName = yearName,
+							Department = department,
+							StudentCount = studentCount
+						};
+
+						if (!_context.Classes.Any(r => r.ClassName == record.ClassName &&
+														r.AdvisorName == record.AdvisorName &&
+														r.AdvisorId == record.AdvisorId &&
+														r.YearName == record.YearName &&
+														r.Department == record.Department))
+						{
+							_context.Classes.Add(record);
+							successfulImports++;
+						}
+						else
+						{
+							duplicateRecords++;
+						}
+					}
+				}
+			}
+
+			await _context.SaveChangesAsync();
+
+			TempData["MessageImportClass"] = $"Nhập dữ liệu thành công! Đã nhập {successfulImports} bản ghi. Có {duplicateRecords} bản ghi bị trùng.";
+			TempData["MessageImportClassType"] = "success";
+
+			return RedirectToAction("ClassList");
+		}
+		//ClassInfo actions
+		//Render ClassInfo view
 		public IActionResult ClassInfo()
         {
             ViewData["page"] = "ClassInfo";

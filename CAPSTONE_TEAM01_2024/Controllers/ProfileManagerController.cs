@@ -15,28 +15,28 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             _context = context;
         }
 
-        public IActionResult Index_ProfileManager()
+        //public IActionResult Index_ProfileManager()
+        //{
+        //    var listprofilemanager = _context.ProfileManagers.ToList();
+        //    ViewData["page"] = "Index_ProfileManager";
+
+        //    return View(listprofilemanager);
+        //}
+        public async Task<IActionResult> Index_ProfileManager(int pageNumber = 1, int pageSize = 10)
         {
-            var listprofilemanager = _context.ProfileManagers.ToList();
-            ViewData["page"] = "Index_ProfileManager";
+			ViewData["page"] = "Index_ProfileManager";
+			var periods = _context.ProfileManagers.AsQueryable();
 
-            return View(listprofilemanager);
-        } 
-  //      public async Task<IActionResult> Profile(int pageNumber = 1, int pageSize = 10)
-  //      {
-		//	ViewData["page"] = "Index_ProfileManager";
-		//	var periods = _context.ProfileManagers.AsQueryable();
+            var paginatedProfile = await PaginatedList<ProfileManagerModel>.CreateAsync(periods.OrderBy(p => p.Email + p.MaSo + p.TenDayDu + p.SoDienThoai + p.VaiTro), pageNumber, pageSize);
 
-		//	var paginatedProfile = await PaginatedList<ProfileManagerModel>.CreateAsync(periods.OrderBy(p => p.Email + p.MaSo+ p.TenDayDu + p.SoDienThoai + p.VaiTro), pageNumber, pageSize);
+            var model = new ProfileManagerViewModel
+            {
+                PaginatedProfile = paginatedProfile,
+            };
+            return View(model);
+        }
 
-		//	var model = new ProfileManagerViewModel
-		//	{
-		//		PaginatedProfile = paginatedProfile,
-		//	};
-  //          return View(model);
-		//}
-
-		public IActionResult Create()
+        public IActionResult Create()
         {
             ProfileManagerModel model = new ProfileManagerModel(); 
             return PartialView("AddProfileManager",model); 

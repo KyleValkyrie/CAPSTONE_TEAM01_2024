@@ -42,7 +42,7 @@ namespace CAPSTONE_TEAM01_2024.Migrations
 
                     b.HasKey("PeriodId");
 
-                    b.ToTable("AcademicPeriods");
+                    b.ToTable("AcademicPeriods", (string)null);
                 });
 
             modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.Class", b =>
@@ -83,7 +83,7 @@ namespace CAPSTONE_TEAM01_2024.Migrations
 
                     b.HasIndex("AdvisorId");
 
-                    b.ToTable("Classes");
+                    b.ToTable("Classes", (string)null);
                 });
 
             modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.ProfileManagerModel", b =>
@@ -115,7 +115,7 @@ namespace CAPSTONE_TEAM01_2024.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProfileManagers");
+                    b.ToTable("ProfileManagers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

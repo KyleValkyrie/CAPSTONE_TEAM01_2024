@@ -125,60 +125,49 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Handle dropdown menu state
-            const categoryContent = document.getElementById("dropdownMenu2");
-            const savedState = sessionStorage.getItem("CategoryVisibility");
+    document.addEventListener("DOMContentLoaded", function () {
+        // Handle dropdown menu state
+        const categoryContent = document.getElementById("dropdownMenu2");
+        const savedState = sessionStorage.getItem("CategoryVisibility");
 
-            if (savedState) {
-                categoryContent.style.display = savedState;
+        if (savedState) {
+            categoryContent.style.display = savedState;
+        }
+
+        document.getElementById("dropdownToggle").addEventListener("click", function (event) {
+            event.preventDefault();
+            if (categoryContent.style.display === "none" || categoryContent.style.display === "") {
+                categoryContent.style.display = "block";
+                sessionStorage.setItem("CategoryVisibility", "block");
+            } else {
+                categoryContent.style.display = "none";
+                sessionStorage.setItem("CategoryVisibility", "none");
             }
+        });
 
-            document.getElementById("dropdownToggle").addEventListener("click", function (event) {
-                event.preventDefault();
-                if (categoryContent.style.display === "none" || categoryContent.style.display === "") {
-                    categoryContent.style.display = "block";
-                    sessionStorage.setItem("CategoryVisibility", "block");
-                } else {
-                    categoryContent.style.display = "none";
-                    sessionStorage.setItem("CategoryVisibility", "none");
-                }
-            });
+        // Highlight active menu item
+        var currentUrl = window.location.pathname;
+        var navLinks = document.querySelectorAll('.nav-link, .dropdown-item');
 
-            // Highlight active menu item
-            var currentUrl = window.location.pathname;
-            var navLinks = document.querySelectorAll('.nav-link, .dropdown-item');
+        navLinks.forEach(function (link) {
+            // Remove existing active styles
+            link.classList.remove('active');
+            link.style.border = '';
 
-            navLinks.forEach(function (link) {
-                // Remove existing active styles
-                link.classList.remove('active');
-                link.style.border = '';
-
-                // Check if the link matches the current URL
-                if (link.getAttribute('href') === currentUrl) {
-                    link.classList.add('active');
-                }
-            });
-
-            // Special case for ClassList
-            // if (currentUrl.includes("ClassList")) {
-            //     var schoolYearLink = Array.from(navLinks).find(link => link.href.includes("SchoolYear"));
-            //     if (schoolYearLink) {
-            //         schoolYearLink.classList.add('active');
-            //     }
-            // }
+            // Check if the link matches the current URL or relevant path
+            if (link.getAttribute('href') === currentUrl || 
+                currentUrl.startsWith('/Categories/ClassInfo') && link.getAttribute('href') === '/Categories/ClassList') {
+                link.classList.add('active');
+            }
         });
 
         // Clear session data when logout
-        document.addEventListener("DOMContentLoaded", function () {
-            const logoutButton = document.getElementById("logoutForm");
-
-            if (logoutButton) {
-                logoutButton.addEventListener("click", function () {
-                    sessionStorage.clear();
-                });
-            }
-        });
-
+        const logoutButton = document.getElementById("logoutForm");
+        if (logoutButton) {
+            logoutButton.addEventListener("click", function () {
+                sessionStorage.clear();
+            });
+        }
+    });
     </script>
 </body>

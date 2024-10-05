@@ -32,7 +32,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 			ViewData["page"] = "ClassList";
 			var classes = _context.Classes.AsQueryable();
 
-            var paginatedClasses = await PaginatedList<Class>.CreateAsync(classes.OrderBy(c => c.ClassName), pageNumber, pageSize);
+            var paginatedClasses = await PaginatedList<Class>.CreateAsync(classes.OrderBy(c => c.Id), pageNumber, pageSize);
 
             var advisors = await _context.ProfileManagers
                 .Where(pm => pm.VaiTro == "Cố vấn học tập")
@@ -162,7 +162,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 			{
 				advisors = context.ProfileManagers
 								  .Where(p => p.VaiTro == "Cố vấn học tập")
-								  .Select(p => p.TenDayDu) // Assuming 'Name' is the column with advisor names
+								  .Select(p => p.TenDayDu) 
 								  .ToList();
 			}
 			return advisors;
@@ -183,7 +183,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 						// Manually adjust row height to fit content
 						for (int row = 1; row <= 100; row++)
 						{
-							worksheet.Row(row).Height = worksheet.Row(row).Height * 1.8; // Adjust multiplier as needed
+							worksheet.Row(row).Height = worksheet.Row(row).Height * 2; // Adjust multiplier as needed
 						}
 						worksheet.Cells[6, 1, 100, 5].Style.Font.Size = 14;
 						worksheet.Cells[1, 1, 100, 5].Style.Font.Name = "Times New Roman";
@@ -360,12 +360,114 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
 			return RedirectToAction("ClassList");
 		}
-		//ClassInfo actions
-		//Render ClassInfo view
-		public IActionResult ClassInfo()
+		//Export Records
+		[HttpGet]
+		public async Task<IActionResult> ExportClassToExcel()
+		{
+			// Fetch records from the database
+			var records = await _context.Classes.ToListAsync();
+
+			using (var package = new ExcelPackage())
+			{
+				var worksheet = package.Workbook.Worksheets.Add("Classes");
+				// Manually adjust row height to fit content
+				for (int exportRow = 1; exportRow <= 100; exportRow++)
+				{
+					worksheet.Row(exportRow).Height = worksheet.Row(exportRow).Height * 2; // Adjust multiplier as needed
+				}
+
+				worksheet.Cells[6, 1, 100, 5].Style.Font.Size = 14;
+				worksheet.Cells[1, 1, 100, 5].Style.Font.Name = "Times New Roman";
+				worksheet.Cells[6, 1, 100, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+				// Organization name
+				worksheet.Cells[1, 1].Value = "TRƯỜNG ĐẠI HỌC VĂN LANG";
+				worksheet.Cells[1, 1].Style.Font.Size = 14;
+
+				//Department Name
+				worksheet.Cells[2, 1].Value = "KHOA CÔNG NGHỆ THÔNG TIN";
+				worksheet.Cells[2, 1].Style.Font.Size = 14;
+				worksheet.Cells[2, 1].Style.Font.Bold = true;
+
+				// Document Title
+				worksheet.Cells[3, 1, 3, 5].Merge = true;
+				worksheet.Cells[3, 1].Value = "DANH SÁCH CỐ VẤN HỌC TẬP";
+				worksheet.Cells[3, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+				worksheet.Cells[3, 1].Style.Font.Bold = true;
+				worksheet.Cells[3, 1].Style.Font.Size = 20;
+
+				//Document Period
+				worksheet.Cells[4, 1, 4, 5].Merge = true;
+				worksheet.Cells[4, 1].Value = "NĂM HỌC: ";
+				worksheet.Cells[4, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+				worksheet.Cells[4, 1].Style.Font.Bold = true;
+				worksheet.Cells[4, 1].Style.Font.Size = 18;
+
+				// Define headers
+				worksheet.Cells[5, 1].Value = "Mã Lớp";
+				worksheet.Cells[5, 2].Value = "Cố Vấn Học Tập";
+				worksheet.Cells[5, 3].Value = "Niên Khóa";
+				worksheet.Cells[5, 4].Value = "Ngành";
+				worksheet.Cells[5, 5].Value = "Số lượng SV";
+
+				// Apply some styling to the headers
+				using (var range = worksheet.Cells[5, 1, 5, 5])
+				{
+					range.Style.Font.Bold = true;
+					range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+					range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+					range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+					range.Style.Font.Size = 16;
+				}
+
+				// Add dropdown list (data validation) to the "Ngành" column
+				var validation1 = worksheet.DataValidations.AddListValidation("D6:D100");
+				validation1.Formula.Values.Add("7480201 - Công nghệ Thông tin (CTTC)");
+				validation1.Formula.Values.Add("7480201 - Công nghệ Thông tin (CTĐB)");
+				validation1.Formula.Values.Add("7480104 - Hệ thống Thông tin (CTTC)");
+				validation1.Formula.Values.Add("7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)");
+
+				// Add data validation to limit the value of the "Số lượng SV" column
+				var validation2 = worksheet.DataValidations.AddDecimalValidation("E6:E100");
+				validation2.Formula.Value = 0; // Minimum value
+				validation2.Formula2.Value = 30; // Maximum value
+				validation2.ShowErrorMessage = true;
+				validation2.ErrorTitle = "Thông tin không hợp lệ";
+				validation2.Error = "Sinh viên trong khoảng từ 0 tới 30.";
+
+				// Add dropdown list (data validation) to the "Cố Vấn Học Tập" column
+				var validation3 = worksheet.DataValidations.AddListValidation("B6:B100");
+				var advisors = GetAdvisors();
+				foreach (var advisor in advisors)
+				{
+					validation3.Formula.Values.Add(advisor);
+				}
+
+				// Add data
+				int row = 6;
+				foreach (var record in records)
+				{
+					worksheet.Cells[row, 1].Value = record.ClassName;
+					worksheet.Cells[row, 2].Value = record.AdvisorName;
+					worksheet.Cells[row, 3].Value = record.YearName;
+					worksheet.Cells[row, 4].Value = record.Department;
+					worksheet.Cells[row, 5].Value = record.StudentCount;
+					row++;
+				}
+
+				// Auto-fit columns
+				worksheet.Cells.AutoFitColumns();
+
+				var bytes = package.GetAsByteArray();
+				return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Danh sách lớp.xlsx");
+			}
+		}
+//ClassInfo actions
+	//Render ClassInfo view
+		public IActionResult StudentList(int ClassId)
         {
             ViewData["page"] = "ClassInfo";
-            return View();
+            return View(ClassId);
         }
 //SchoolYear actions
 	//Render SchoolYear view

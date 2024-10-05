@@ -1,0 +1,158 @@
+﻿@{
+	ViewData["Title"] = "Class Info";
+}
+@using CAPSTONE_TEAM01_2024.Utilities
+<div class="content-wrapper" style="min-height: 912.2px;">
+	<!-- Content Header (Page header) -->
+	<header class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h1 class="m-0">Danh Sách Sinh Viên</h1>
+				</div><!-- /.col -->
+			</div><!-- /.row -->
+		</div><!-- /.container-fluid -->
+	</header>
+
+	<!-- /.content-header -->
+	<!-- Main content -->
+	<main class="content">
+		<div class="container-fluid">
+			<div class="card">
+				<div class="card-header">
+					<div class="row text-center">
+						<div class="col-auto">
+							<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddStudentModal">
+								<i class="bi bi-plus custom-icon"></i> Thêm Sinh Viên
+							</button>
+							<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ImportExcelModal">
+								<i class="bi bi-upload"></i> Nhập File
+							</button>
+							<a type="button" class="btn btn-secondary" asp-controller="Categories" asp-action="ExportStudentToExcel">
+								<i class="bi bi-download"></i> Xuất File
+							</a>
+						</div>
+						<div class="col">
+							<nav class="navbar navbar-light bg-light">
+								<form class="d-flex ms-auto">
+									<input class="form-control me-2" type="search" id="searchInput" placeholder="Nhập nội dung cần tìm" aria-label="Search">
+								</form>
+							</nav>
+						</div>
+					</div>
+				</div>
+				<!-- /.card-header -->
+
+				<div class="card-body">
+					<table class="table table-striped">
+						<thead>
+							<tr class="text-center">
+								<th scope="col">#</th>
+								<th scope="col">Mã Số SV</th>
+								<th scope="col">Email</th>
+								<th scope="col">Họ và Tên</th>
+								<th scope="col">Ngày Tháng Năm Sinh</th>
+								<th scope="col">Mã Lớp</th>
+								<th scope="col">Tình Trạng</th>
+								<th scope="col">Thao Tác</th>
+							</tr>
+						</thead>
+						@* <tbody id="classTable">
+							@{
+								int number = (Model.PaginatedClasses.PageIndex - 1) * Model.PaginatedClasses.PageSize;
+							}
+							@foreach (var PClass in Model.PaginatedClasses)
+							{
+								number++;
+								<tr class="table-row"
+									onclick="window.location.href='@Url.Action("ClassInfo", new { id = PClass.Id })';"
+									style="cursor: pointer; transition: background-color 0.3s;"
+									onmouseover="this.style.backgroundColor='#d8d8d8';"
+									onmouseout="this.style.backgroundColor='';">
+									<td scope="row" class="text-center">@number</td>
+									<td class="text-center">@PClass.ClassName</td>
+									<td class="text-center">@PClass.AdvisorName</td>
+									<td class="text-center">@PClass.YearName</td>
+									<td class="text-center">@PClass.Department</td>
+									<td class="text-center">@PClass.StudentCount</td>
+									<td class="text-center">
+										<button type="button" class="btn btn-outline-primary btn-sm"
+												data-bs-toggle="modal"
+												data-bs-target="#EditClassModal"
+												data-class-id="@PClass.Id"
+												data-class-name="@PClass.ClassName"
+												data-advisor-id="@PClass.AdvisorId"
+												data-advisor-name="@PClass.AdvisorName"
+												data-year-name="@PClass.YearName"
+												data-department="@PClass.Department"
+												data-student-count="@PClass.StudentCount"
+												aria-label="edit class details">
+											<i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
+										</button>
+										<button type="button" class="btn btn-outline-danger btn-sm"
+												data-bs-toggle="modal"
+												data-bs-target="#DeleteClassModal"
+												data-class-id="@PClass.Id"
+												aria-label="delete class">
+											<i class="fa-solid fa-trash custom-icon"></i> Xóa
+										</button>
+									</td>
+								</tr>
+							}
+							<tr id="noresults" style="display: none;">
+								<td colspan="7" class="text-center">Không tìm thấy nội dung</td>
+							</tr>
+						</tbody> *@
+					</table>
+					@* <nav aria-label="Page navigation" style=" float:right;">
+						<ul class="pagination">
+							@if (Model.PaginatedClasses.HasPreviousPage)
+							{
+								<li class="page-item">
+									<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@(Model.PaginatedClasses.PageIndex - 1)">Trang Trước</a>
+								</li>
+							}
+							else
+							{
+								<li class="page-item disabled">
+									<span class="page-link">Trang Trước</span>
+								</li>
+							}
+
+							@for (int i = 1; i <= Model.PaginatedClasses.TotalPages; i++)
+							{
+								if (i == Model.PaginatedClasses.PageIndex)
+								{
+									<li class="page-item active">
+										<span class="page-link">@i</span>
+									</li>
+								}
+								else
+								{
+									<li class="page-item">
+										<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@i">@i</a>
+									</li>
+								}
+							}
+
+							@if (Model.PaginatedClasses.HasNextPage)
+							{
+								<li class="page-item">
+									<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@(Model.PaginatedClasses.PageIndex + 1)">Trang Sau</a>
+								</li>
+							}
+							else
+							{
+								<li class="page-item disabled">
+									<span class="page-link">Trang Sau</span>
+								</li>
+							}
+						</ul>
+					</nav> *@
+				</div>
+				<!-- /.card-body -->
+			</div>
+		</div>
+	</main>
+	<!-- /.content -->
+</div>

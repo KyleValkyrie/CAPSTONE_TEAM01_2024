@@ -53,6 +53,9 @@
 							<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ImportExcelModal">
 								<i class="bi bi-upload"></i> Nhập File
 							</button>
+							<a type="button" class="btn btn-secondary" asp-controller="Categories" asp-action="ExportClassToExcel">
+								<i class="bi bi-download"></i> Xuất File
+							</a>
 						</div>
 						<div class="col">
 							<nav class="navbar navbar-light bg-light">
@@ -84,8 +87,7 @@
 							}
 							@foreach (var PClass in Model.PaginatedClasses)
 							{
-								number++;
-								<tr class="table-row">
+								<tr class="table-row" onclick="rowClickHandler(event, '@Url.Action("StudentList", new { id = PClass.Id })');" style="cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#f1f1f1';" onmouseout="this.style.backgroundColor='';">
 									<td scope="row" class="text-center">@number</td>
 									<td class="text-center">@PClass.ClassName</td>
 									<td class="text-center">@PClass.AdvisorName</td>
@@ -94,6 +96,7 @@
 									<td class="text-center">@PClass.StudentCount</td>
 									<td class="text-center">
 										<button type="button" class="btn btn-outline-primary btn-sm"
+												onclick="event.stopPropagation();"
 												data-bs-toggle="modal"
 												data-bs-target="#EditClassModal"
 												data-class-id="@PClass.Id"
@@ -107,6 +110,7 @@
 											<i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
 										</button>
 										<button type="button" class="btn btn-outline-danger btn-sm"
+												onclick="event.stopPropagation();"
 												data-bs-toggle="modal"
 												data-bs-target="#DeleteClassModal"
 												data-class-id="@PClass.Id"
@@ -286,7 +290,6 @@
 	</div>
 </div>
 
-
 <!-- Delete Modal -->
 <div class="modal fade" id="DeleteClassModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
@@ -346,8 +349,15 @@
 	</div>
 </div>
 
-
 <script>
+//Clickable row utilitiy
+	function rowClickHandler(event, url) {
+		// Check if the event is from a button click
+		if (event.target.tagName.toLowerCase() !== 'button' &&
+			event.target.tagName.toLowerCase() !== 'i') {
+			window.location.href = url;
+		}
+	}
 //Add Modal JS
 	document.getElementById('advisorSelect').addEventListener('change', function () {
 		var selectedOption = this.options[this.selectedIndex];

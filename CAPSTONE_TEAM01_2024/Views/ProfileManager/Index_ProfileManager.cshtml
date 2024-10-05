@@ -1,4 +1,5 @@
-﻿@model IEnumerable<CAPSTONE_TEAM01_2024.Models.ProfileManagerModel>
+﻿@using CAPSTONE_TEAM01_2024.Utilities
+@model CAPSTONE_TEAM01_2024.ViewModels.ProfileManagerViewModel
 
 @if (TempData["Message"] != null)
 {
@@ -46,7 +47,7 @@
 				<!-- /.card-header -->
 
 				<td class="card-body">
-					<table class="table table-striped" id=dataTa">
+					<table class="table table-striped">
 						<thead>
 							<tr class="text-center">
 								<th scope="col">#</th>
@@ -60,11 +61,12 @@
 						</thead>
 						<tbody id="periodTable">
 
-
-							@foreach (ProfileManagerModel profile in @Model)
+							@{int number = (Model.PaginatedProfile.PageIndex - 1) * Model.PaginatedProfile.PageSize;}
+							@foreach (var profile in Model.PaginatedProfile)
 							{
+							number++;
 								<tr class="table-row">
-									<th scope="row" class="text-center">@profile.Id</th>
+									<th scope="row" class="text-center">@number</th>
 									<td class="text-center">@profile.Email</td>
 									<td class="text-center">@profile.MaSo</td>
 									<td class="text-center">@profile.TenDayDu</td>
@@ -87,14 +89,11 @@
 									@await Html.PartialAsync("EditProfileManager", @profile)
 
 								</tr>
-								  // Display "Không tìm thấy dữ liệu"
+							}
+							@*    Display "Không tìm thấy dữ liệu" *@
 								<tr id="noResults" style="display: none;">
-								
 									<td colspan="7" style="text-align:center">Không tìm thấy nội dung</td>
 								</tr>
-
-							}
-
 							<!-- Additional rows can go here -->
 						</tbody>
 
@@ -106,7 +105,51 @@
 							@ViewBag.Message
 						</span>
 					}
+					<nav class="mx-auto" aria-label="Page navigation" style=" float:right;">
+						<ul class="pagination">
+							@if (Model.PaginatedProfile.HasPreviousPage)
+							{
+								<li class="page-item">
+									<a class="page-link" asp-action="Index_ProfileManager" asp-route-pageNumber="@(Model.PaginatedProfile.PageIndex - 1)">Previous</a>
+								</li>
+							}
+							else
+							{
+								<li class="page-item disabled">
+									<span class="page-link">Trang Trước</span>
+								</li>
+							}
 
+							@for (int i = 1; i <= Model.PaginatedProfile.TotalPages; i++)
+							{
+								if (i == Model.PaginatedProfile.PageIndex)
+								{
+									<li class="page-item active">
+										<span class="page-link">@i</span>
+									</li>
+								}
+								else
+								{
+									<li class="page-item">
+										<a class="page-link" asp-action="Index_ProfileManager" asp-route-pageNumber="@i">@i</a>
+									</li>
+								}
+							}
+
+							@if (Model.PaginatedProfile.HasNextPage)
+							{
+								<li class="page-item">
+									<a class="page-link" asp-action="Index_ProfileManager" asp-route-pageNumber="@(Model.PaginatedProfile.PageIndex + 1)">Next</a>
+								</li>
+							}
+							else
+							{
+								<li class="page-item disabled">
+									<span class="page-link">Trang Sau</span>
+								</li>
+							}
+						</ul>
+					</nav>
 				</div
 				<!-- /.card-body -->
 			</div>

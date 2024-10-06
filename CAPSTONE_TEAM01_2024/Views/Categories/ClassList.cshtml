@@ -88,7 +88,7 @@
 							@foreach (var PClass in Model.PaginatedClasses)
 							{
 								<tr class="table-row" onclick="rowClickHandler(event, '@Url.Action("StudentList", new { id = PClass.Id })');" style="cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#f1f1f1';" onmouseout="this.style.backgroundColor='';">
-									<td scope="row" class="text-center">@number</td>
+									<td scope="row" class="text-center">@PClass.Id</td>
 									<td class="text-center">@PClass.ClassName</td>
 									<td class="text-center">@PClass.AdvisorName</td>
 									<td class="text-center">@PClass.YearName</td>

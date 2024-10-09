@@ -70,7 +70,7 @@
 									<td class="text-center">@profile.Email</td>
 									<td class="text-center">@profile.MaSo</td>
 									<td class="text-center">@profile.TenDayDu</td>
-									<td class="text-center">@profile.SoDienThoai</td>
+									<td class="text-center">@profile.SoDienThoai.ToString("D10")</td>
 									<td class="text-center">@profile.VaiTro</td>
 									<td class="text-center">
 										<button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="@("#DetailModal-"+@profile.Id)" data-url="@Url.Action($"Detail/{@profile.Id}")">

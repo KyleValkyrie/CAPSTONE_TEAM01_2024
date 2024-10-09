@@ -70,23 +70,23 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         {
 
 			/*bool isFound = _context.ProfileManagers.Where(x => x.Email == model.ProfileManagerModel.Email && x.MaSo == model.ProfileManagerModel.MaSo && x.SoDienThoai == model.ProfileManagerModel.SoDienThoai && x.VaiTro == model.ProfileManagerModel.VaiTro).Any();*/
+			
+			var profile = new ProfileManagerModel
+			{
+				UserId = model.SelectedEmail,
+				Email = _context.Users.FirstOrDefault(u => u.Id == model.SelectedEmail)?.Email,
+				MaSo = model.ProfileManagerModel.MaSo,
+				TenDayDu = model.ProfileManagerModel.TenDayDu,
+				SoDienThoai = model.ProfileManagerModel.SoDienThoai,
+				VaiTro = model.ProfileManagerModel.VaiTro
+			};
 			bool isFound = _context.ProfileManagers
-						   .Any(x => x.UserId == model.ProfileManagerModel.UserId &&
-                                     x.Email == model.ProfileManagerModel.Email &&
-									 x.MaSo == model.ProfileManagerModel.MaSo &&
-									 x.SoDienThoai == model.ProfileManagerModel.SoDienThoai &&
-									 x.VaiTro == model.ProfileManagerModel.VaiTro);
+						   .Where(x => x.UserId == model.ProfileManagerModel.UserId ||
+									 x.Email == model.ProfileManagerModel.Email ||
+									 x.MaSo == model.ProfileManagerModel.MaSo ||
+									 x.SoDienThoai == model.ProfileManagerModel.SoDienThoai ).Any();
 			if (!isFound)
 			{
-				var profile = new ProfileManagerModel
-				{
-					UserId = model.SelectedEmail,
-					Email = _context.Users.FirstOrDefault(u => u.Id == model.SelectedEmail)?.Email,
-					MaSo = model.ProfileManagerModel.MaSo,
-					TenDayDu = model.ProfileManagerModel.TenDayDu,
-					SoDienThoai = model.ProfileManagerModel.SoDienThoai,
-					VaiTro = model.ProfileManagerModel.VaiTro
-				};
 
 				_context.ProfileManagers.Add(profile);
 				await _context.SaveChangesAsync();

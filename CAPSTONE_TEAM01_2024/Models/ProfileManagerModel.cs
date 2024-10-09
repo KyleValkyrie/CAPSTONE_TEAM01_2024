@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CAPSTONE_TEAM01_2024.Models
 {
@@ -8,8 +10,11 @@ namespace CAPSTONE_TEAM01_2024.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Email không được để trống")]
+        public string UserId { get; set; }
         public string? Email { get; set; }
-
+        [ForeignKey("UserId")]
+        public IdentityUser User { get; set; }
+        
         [Required(ErrorMessage = "Mã Số không được để trống")]
         public string? MaSo { get; set; }
 

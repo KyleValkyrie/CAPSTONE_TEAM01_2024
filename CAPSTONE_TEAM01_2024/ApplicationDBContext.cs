@@ -1,10 +1,11 @@
 ﻿using CAPSTONE_TEAM01_2024.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CAPSTONE_TEAM01_2024
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext <IdentityUser>
     {
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
@@ -20,6 +21,11 @@ namespace CAPSTONE_TEAM01_2024
                 .HasOne(c => c.Advisor)
                 .WithMany()
                 .HasForeignKey(c => c.AdvisorId);
+
+            modelBuilder.Entity<ProfileManagerModel>()
+                .HasOne(c => c.User)
+                .WithMany()
+                .HasForeignKey(c => c.UserId);
         }
     }
 }

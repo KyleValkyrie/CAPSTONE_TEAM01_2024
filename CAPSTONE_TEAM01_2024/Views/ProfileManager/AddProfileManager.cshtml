@@ -1,5 +1,7 @@
-﻿@model ProfileManagerModel
+﻿@model CAPSTONE_TEAM01_2024.ViewModels.ProfileManagerViewModel
+
 <div class="modal fade" id="AddClassModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="AddClassModalLabel" aria-hidden="true">
+	
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -7,28 +9,32 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				<form asp-action="Create" method="post" asp->
+				<form asp-action="Create" method="post" >
 					<div class="mb-3">
-						<label asp-for="Email" for="addEmail" class="form-label">Email</label>
-						<input asp-for="Email" type ="email" class="form-control" id="addEmail" required>
+						<label asp-for="ProfileManagerModel.Email" for="addEmail" class="form-label">Email</label>
+						<select  asp-for="SelectedEmail" class="form-select"  asp-items="Model.UserEmail"  required>
+							<option value="" disabled selected>Vui lòng chọn Email</option>
+							
+						</select>
 					</div>
 					<div class="mb-3">
-						<label asp-for="MaSo" for="addId" class="form-label">Mã số</label>
-						<input asp-for="MaSo" type="text" class="form-control" id="addId" required>
+						
+						<label asp-for="ProfileManagerModel.MaSo"  for="addId" class="form-label">Mã số</label>
+						<input asp-for="ProfileManagerModel.MaSo" type="text" class="form-control"  required>
 					</div>
 					<div class="mb-3">
-						<label asp-for="TenDayDu" for="addFullName" class="form-label">Tên đầy đủ</label>
-						<input asp-for="TenDayDu" type="text" class="form-control" id="addFullName" required>
+						<label asp-for="ProfileManagerModel.TenDayDu" for="addFullName" class="form-label">Tên đầy đủ</label>
+						<input asp-for="ProfileManagerModel.TenDayDu" type="text"  class="form-control" id="addFullName" required>
 					</div>
 					<div class="mb-3">
-						<label asp-for="SoDienThoai" for="addPhone" class="form-label">Số điện thoại</label>
-						<input asp-for="SoDienThoai" type="text" class="form-control" id="addPhone" required>
-						<span asp-validation-for="SoDienThoai" class="text-danger"></span>
+						<label asp-for="ProfileManagerModel.SoDienThoai" for="addPhone" class="form-label">Số điện thoại</label>
+						<input asp-for="ProfileManagerModel.SoDienThoai" type="text" class="form-control" id="addPhone" required>
+							<span asp-validation-for="ProfileManagerModel.SoDienThoai"  class="text-danger"></span>
 					</div>
 					<div class="mb-3">
-						<label asp-for="VaiTro" for="addRole" class="form-label">Vai trò</label>
-						<select asp-for="VaiTro" class="form-select" id="addRole" required>
-							<option  value="" disabled selected>Chọn vai trò</option>
+						<label asp-for="ProfileManagerModel.VaiTro" for="addRole" class="form-label">Vai trò</label>
+						<select asp-for="ProfileManagerModel.VaiTro" class="form-select" id="addRole" required>
+							<option value="" disabled selected>Chọn vai trò</option>
 							<option value="Cố vấn học tập">Cố vấn học tập</option>
 							<option value="Sinh viên">Sinh viên</option>
 							<option value="Khoa CNTT">Khoa CNTT</option>

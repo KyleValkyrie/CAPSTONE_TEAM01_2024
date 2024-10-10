@@ -39,7 +39,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 .Select(pm => new SelectListItem
                 {
                     Value = pm.Id.ToString(),
-                    Text = pm.TenDayDu
+                    Text = pm.Email
                 }).ToListAsync();
 
             var years = await _context.AcademicPeriods
@@ -162,7 +162,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 			{
 				advisors = context.ProfileManagers
 								  .Where(p => p.VaiTro == "Cố vấn học tập")
-								  .Select(p => p.TenDayDu) 
+								  .Select(p => p.Email) 
 								  .ToList();
 			}
 			return advisors;
@@ -230,8 +230,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 						}
 
 						// Add sample data
-						worksheet.Cells[6, 1].Value = "PM01";
-						worksheet.Cells[6, 2].Value = "Lý Thị Huyền Châu";
+						worksheet.Cells[6, 1].Value = "71K29CNTT1";
+						worksheet.Cells[6, 2].Value = "quang.187pm20551@vanlanguni.vn";
 						worksheet.Cells[6, 3].Value = "2018 - 2022";
 						worksheet.Cells[6, 4].Value = "7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)";
 						worksheet.Cells[6, 5].Value = "30";
@@ -291,7 +291,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 			var duplicateRecords = 0;
 
 			// Fetch advisor data
-			var advisors = _context.ProfileManagers.ToDictionary(a => a.TenDayDu, a => a.Id);
+			var advisors = _context.ProfileManagers.ToDictionary(a => a.Email, a => a.Id);
 
 			using (var stream = new MemoryStream())
 			{

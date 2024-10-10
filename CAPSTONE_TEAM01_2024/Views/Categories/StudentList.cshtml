@@ -1,7 +1,14 @@
 ﻿@{
 	ViewData["Title"] = "Class Info";
 }
+@if (TempData["MessageAddStudent"] != null)
+{
+	<div class="alert alert-@TempData["MessageAddStudentType"]">
+		@TempData["MessageAddStudent"]
+	</div>
+}
 @using CAPSTONE_TEAM01_2024.Utilities
+@model CAPSTONE_TEAM01_2024.ViewModels.StudentListViewModel
 <div class="content-wrapper" style="min-height: 912.2px;">
 	<!-- Content Header (Page header) -->
 	<header class="content-header">
@@ -57,42 +64,39 @@
 								<th scope="col">Thao Tác</th>
 							</tr>
 						</thead>
-						@* <tbody id="classTable">
+						<tbody id="classTable">
 							@{
-								int number = (Model.PaginatedClasses.PageIndex - 1) * Model.PaginatedClasses.PageSize;
+								int number = (Model.PaginatedStudents.PageIndex - 1) * Model.PaginatedStudents.PageSize;
 							}
-							@foreach (var PClass in Model.PaginatedClasses)
+							@foreach (var Student in Model.PaginatedStudents)
 							{
 								number++;
-								<tr class="table-row"
-									onclick="window.location.href='@Url.Action("ClassInfo", new { id = PClass.Id })';"
-									style="cursor: pointer; transition: background-color 0.3s;"
-									onmouseover="this.style.backgroundColor='#d8d8d8';"
-									onmouseout="this.style.backgroundColor='';">
+								<tr class="table-row">
 									<td scope="row" class="text-center">@number</td>
-									<td class="text-center">@PClass.ClassName</td>
-									<td class="text-center">@PClass.AdvisorName</td>
-									<td class="text-center">@PClass.YearName</td>
-									<td class="text-center">@PClass.Department</td>
-									<td class="text-center">@PClass.StudentCount</td>
+									<td class="text-center">@Student.Id</td>
+									<td class="text-center">@Student.Email</td>
+									<td class="text-center">@Student.FullName</td>
+									<td class="text-center">@Student.DateOfBirth.ToString("dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)</td>
+									<td class="text-center">@Student.Class.ClassName</td>
+									<td class="text-center">@Student.Status</td>
 									<td class="text-center">
 										<button type="button" class="btn btn-outline-primary btn-sm"
 												data-bs-toggle="modal"
-												data-bs-target="#EditClassModal"
-												data-class-id="@PClass.Id"
-												data-class-name="@PClass.ClassName"
-												data-advisor-id="@PClass.AdvisorId"
-												data-advisor-name="@PClass.AdvisorName"
-												data-year-name="@PClass.YearName"
-												data-department="@PClass.Department"
-												data-student-count="@PClass.StudentCount"
-												aria-label="edit class details">
+												data-bs-target="#EditStudentModal"
+												data-student-id="@Student.Id"
+												data-student-email="@Student.Email"
+												data-student-name="@Student.FullName"
+												data-student-DoB="@Student.DateOfBirth"
+												data-student-classID="@Student.ClassId"
+												data-student-status="@Student.Status"
+												data-pm-ID="@Student.ProfileManagerId"
+												aria-label="edit student details">
 											<i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
 										</button>
 										<button type="button" class="btn btn-outline-danger btn-sm"
 												data-bs-toggle="modal"
-												data-bs-target="#DeleteClassModal"
-												data-class-id="@PClass.Id"
+												data-bs-target="#DeleteStudentModal"
+												data-class-id="@Student.Id"
 												aria-label="delete class">
 											<i class="fa-solid fa-trash custom-icon"></i> Xóa
 										</button>
@@ -102,14 +106,14 @@
 							<tr id="noresults" style="display: none;">
 								<td colspan="7" class="text-center">Không tìm thấy nội dung</td>
 							</tr>
-						</tbody> *@
+						</tbody>
 					</table>
-					@* <nav aria-label="Page navigation" style=" float:right;">
+					<nav aria-label="Page navigation" style=" float:right;">
 						<ul class="pagination">
-							@if (Model.PaginatedClasses.HasPreviousPage)
+							@if (Model.PaginatedStudents.HasPreviousPage)
 							{
 								<li class="page-item">
-									<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@(Model.PaginatedClasses.PageIndex - 1)">Trang Trước</a>
+									<a class="page-link" asp-action="StudentList" asp-route-pageNumber="@(Model.PaginatedStudents.PageIndex - 1)">Trang Trước</a>
 								</li>
 							}
 							else
@@ -119,9 +123,9 @@
 								</li>
 							}
 
-							@for (int i = 1; i <= Model.PaginatedClasses.TotalPages; i++)
+							@for (int i = 1; i <= Model.PaginatedStudents.TotalPages; i++)
 							{
-								if (i == Model.PaginatedClasses.PageIndex)
+								if (i == Model.PaginatedStudents.PageIndex)
 								{
 									<li class="page-item active">
 										<span class="page-link">@i</span>
@@ -130,15 +134,15 @@
 								else
 								{
 									<li class="page-item">
-										<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@i">@i</a>
+										<a class="page-link" asp-action="StudentList" asp-route-pageNumber="@i">@i</a>
 									</li>
 								}
 							}
 
-							@if (Model.PaginatedClasses.HasNextPage)
+							@if (Model.PaginatedStudents.HasNextPage)
 							{
 								<li class="page-item">
-									<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@(Model.PaginatedClasses.PageIndex + 1)">Trang Sau</a>
+									<a class="page-link" asp-action="StudentList" asp-route-pageNumber="@(Model.PaginatedStudents.PageIndex + 1)">Trang Sau</a>
 								</li>
 							}
 							else
@@ -148,7 +152,7 @@
 								</li>
 							}
 						</ul>
-					</nav> *@
+					</nav>
 				</div>
 				<!-- /.card-body -->
 			</div>
@@ -156,3 +160,95 @@
 	</main>
 	<!-- /.content -->
 </div>
+
+<!-- Add Student Modal -->
+<div class="modal fade" id="AddStudentModal" tabindex="-1" data-bs-backdrop="false" aria-labelledby="AddStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="AddStudentModalLabel">Thêm Sinh Viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addStudentForm" asp-action="AddStudent" method="post">
+                    <!-- Email Dropdown -->
+                    <div class="mb-3">
+                        <label for="studentEmail" class="form-label">Email</label>
+                        <select class="form-select" id="studentEmail" name="studentEmail" required>
+                            <option value="" disabled selected>Vui lòng chọn email</option>
+                            @foreach (var profileManager in Model.ProfileManagers)
+                            {
+                                <option value="@profileManager.Id" data-email="@profileManager.Email" data-maso="@profileManager.MaSo" data-hovaten="@profileManager.TenDayDu">
+                                    @profileManager.Email
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <input type="hidden" class="form-control" id="profileManagerId" name="profileManagerId" required readonly>
+                    <input type="hidden" class="form-control" id="selectedEmail" name="selectedEmail" required readonly>
+                    <!-- Mã Số SV -->
+                    <div class="mb-3">
+                        <label for="studentId" class="form-label">Mã Số SV</label>
+                        <input type="text" class="form-control" id="studentId" name="studentId" required readonly>
+                    </div>
+                    <!-- Họ và Tên -->
+                    <div class="mb-3">
+                        <label for="studentFullName" class="form-label">Họ và Tên</label>
+                        <input type="text" class="form-control" id="studentFullName" name="studentFullName" required readonly>
+                    </div>
+                    <!-- Ngày Tháng Năm Sinh -->
+                    <div class="mb-3">
+                        <label for="studentDateOfBirth" class="form-label">Ngày Tháng Năm Sinh</label>
+                        <input type="date" class="form-control" id="studentDateOfBirth" name="studentDateOfBirth" required>
+                    </div>
+                    <!-- Mã Lớp -->
+                    <div class="mb-3">
+                        <label for="classId" class="form-label">Mã Lớp</label>
+                        <input type="text" class="form-control" id="className" name="className" value="@Model.Class.ClassName" required readonly>
+                    </div>
+                    <input type="hidden" class="form-control" id="classId" name="classId" value="@Model.Class.Id" required readonly>
+                    <!-- Tình Trạng -->
+                    <div class="mb-3">
+                        <label for="studentStatus" class="form-label">Tình Trạng</label>
+                        <select class="form-select" id="studentStatus" name="studentStatus" required>
+                            <option value="" disabled selected>Vui lòng chọn trạng thái</option>
+                            <option value="Đang học">Đang học</option>
+                            <option value="Bảo Lưu">Bảo Lưu</option>
+                            <option value="Nghỉ Học">Nghỉ Học</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Thêm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    // Get classId from URL and set it in the form
+    var urlParams = new URLSearchParams(window.location.search);
+    var classId = urlParams.get('Id') || window.location.pathname.split('/').pop();
+    document.getElementById('AddStudentModal').addEventListener('show.bs.modal', function (event) {
+        document.getElementById('classId').value = classId;
+        document.getElementById('className').value = '@Model.Class.ClassName';
+    });
+
+    // Fill other fields based on the selected email
+    document.getElementById("studentEmail").addEventListener("change", function() {
+        var selectedOption = this.options[this.selectedIndex];
+        document.getElementById("profileManagerId").value = selectedOption.value; // Set profileManagerId
+        document.getElementById("selectedEmail").value = selectedOption.getAttribute("data-email"); // Set selected email
+        document.getElementById("studentId").value = selectedOption.getAttribute("data-maso");
+        document.getElementById("studentFullName").value = selectedOption.getAttribute("data-hovaten");
+    });
+});
+</script>
+
+
+
+
+

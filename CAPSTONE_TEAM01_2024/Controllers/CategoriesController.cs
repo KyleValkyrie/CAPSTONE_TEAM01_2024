@@ -8,6 +8,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.IO;
 using Microsoft.Extensions.Logging;
+using System.Drawing.Printing;
 
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
@@ -15,10 +16,10 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     {
 // Database Context
         private readonly ApplicationDbContext _context;
-        public CategoriesController(ApplicationDbContext context)
+		public CategoriesController(ApplicationDbContext context)
         {
             _context = context;
-        }
+		}
 //EndSemesterReport actions
         public IActionResult EndSemesterReport()
         {
@@ -41,13 +42,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     Value = pm.Id.ToString(),
                     Text = pm.Email
                 }).ToListAsync();
-
-            var years = await _context.AcademicPeriods
-                .Select(ap => new SelectListItem
-                {
-                    Value = ap.PeriodId.ToString(),
-                    Text = ap.PeriodName
-				}).ToListAsync();
 
             var viewModel = new ClassListViewModel
             {
@@ -462,13 +456,86 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Danh sách lớp.xlsx");
 			}
 		}
-//ClassInfo actions
-	//Render ClassInfo view
-		public IActionResult StudentList(int ClassId)
-        {
-            ViewData["page"] = "ClassInfo";
-            return View(ClassId);
-        }
+		//StudentList actions
+		//Render StudentList view
+		public async Task<IActionResult> StudentList(int Id, int pageNumber = 1, int pageSize = 10)
+		{
+			ViewData["page"] = "StudentList";
+
+			var students = _context.Students
+				.Include(s => s.Class)
+				.Where(s => s.ClassId == Id)
+				.AsQueryable();
+
+			var paginatedStudents = await PaginatedList<Student>.CreateAsync(students.OrderBy(c => c.Id), pageNumber, pageSize);
+
+			var studentIds = await students.Select(s => s.ProfileManagerId).ToListAsync();
+
+			var profileManagers = await _context.ProfileManagers
+				.Where(pm => pm.VaiTro == "Sinh viên" && !studentIds.Contains(pm.Id))
+				.ToListAsync();
+
+			var studentList = profileManagers
+				.Select(pm => new SelectListItem
+				{
+					Value = pm.Id.ToString(),
+					Text = pm.Email
+				}).ToList();
+
+			var classInfo = await _context.Classes.FirstOrDefaultAsync(c => c.Id == Id);
+
+			var viewModel = new StudentListViewModel
+			{
+				Student = new Student(),
+				StudentList = studentList,
+				PaginatedStudents = paginatedStudents,
+				ProfileManagers = profileManagers,
+				Class = classInfo
+			};
+
+			return View(viewModel);
+		}
+		//Add new Student
+		public async Task<IActionResult> AddStudent(string studentId, string selectedEmail, string studentFullName, DateTime studentDateOfBirth, string className, int classId, int profileManagerId, string studentStatus)
+		{
+			// Create a new AcademicPeriod object
+			var newStudent = new Student
+			{
+				Id = studentId,
+				Email = selectedEmail,
+				FullName = studentFullName,
+				DateOfBirth = studentDateOfBirth,
+				ClassId = classId,
+				Status = studentStatus,
+				ProfileManagerId=profileManagerId
+			};
+			// Add the new object to the database
+			bool isFound = _context.Students
+					 .Where(r => r.Id == newStudent.Id &&
+								 r.Email == newStudent.Email &&
+								 r.FullName == newStudent.FullName &&
+								 r.DateOfBirth == newStudent.DateOfBirth &&
+								 r.ClassId == newStudent.ClassId &&
+								 r.ProfileManagerId == newStudent.ProfileManagerId)
+					 .Any();
+			if (!isFound) //Can add
+			{
+				_context.Students.Add(newStudent);
+				await _context.SaveChangesAsync();
+
+				TempData["MessageAddStudent"] = "Thêm sinh viên thành công!";
+				TempData["MessageAddStudentType"] = "success";
+
+				// Redirect to the Page to see update
+				return RedirectToAction("StudentList", new { Id = classId });
+			}
+			else
+			{
+				TempData["MessageAddStudent"] = "Thông tin sinh viên đã tồn tại!";
+				TempData["MessageAddStudentType"] = "danger";
+				return RedirectToAction("StudentList", new { Id = classId });
+			}
+		}
 //SchoolYear actions
 	//Render SchoolYear view
 		public async Task<IActionResult> SchoolYear(int pageNumber = 1, int pageSize = 10)

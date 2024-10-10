@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CAPSTONE_TEAM01_2024.Models
 {
@@ -21,11 +22,18 @@ namespace CAPSTONE_TEAM01_2024.Models
 		public DateTime DateOfBirth { get; set; }
 
 		[Required]
-		[StringLength(10)]
-		public string ClassCode { get; set; }
+		public int ClassId { get; set; }
+
+		// Foreign Key to Class
+		[ForeignKey("ClassId")]
+		public Class Class { get; set; }
 
 		[Required]
-		[StringLength(50)]
 		public string Status { get; set; }
+
+		// Foreign Key to ProfileManager
+		public int ProfileManagerId { get; set; }
+		[ForeignKey("ProfileManagerId")]
+		public ProfileManagerModel ProfileManager { get; set; }
 	}
 }

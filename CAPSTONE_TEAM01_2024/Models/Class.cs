@@ -32,5 +32,7 @@ namespace CAPSTONE_TEAM01_2024.Models
         [Required]
         [Range(0, int.MaxValue)]
         public int StudentCount { get; set; }
-    }
+
+		public ICollection<Student> Students { get; set; } // Collection of Students
+	}
 }

@@ -163,7 +163,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 		}
 		//Download Template
 		[HttpGet]
-		public IActionResult DownloadTemplate()
+		public IActionResult DownloadClassTemplate()
 		{
 			try
 			{
@@ -276,7 +276,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 		}
 		//Import Records
 		[HttpPost]
-		public async Task<IActionResult> ImportFromExcel(IFormFile file)
+		public async Task<IActionResult> ImportClassFromExcel(IFormFile file)
 		{
 			if (file == null || file.Length == 0)
 				return BadRequest("File not selected");
@@ -456,47 +456,53 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Danh sách lớp.xlsx");
 			}
 		}
-//StudentList actions
-	//Render StudentList view
-		public async Task<IActionResult> StudentList(int Id, int pageNumber = 1, int pageSize = 10)
-		{
-			ViewData["page"] = "StudentList";
+        //StudentList actions
+        //Render StudentList view
+        public async Task<IActionResult> StudentList(int Id, int pageNumber = 1, int pageSize = 10)
+        {
+            ViewData["page"] = "StudentList";
 
-			var students = _context.Students
-				.Include(s => s.Class)
-				.Where(s => s.ClassId == Id)
-				.AsQueryable();
+            var studentsInCurrentClass = _context.Students
+                .Include(s => s.Class)
+                .Where(s => s.ClassId == Id)
+                .AsQueryable();
 
-			var paginatedStudents = await PaginatedList<Student>.CreateAsync(students.OrderBy(c => c.Id), pageNumber, pageSize);
+            var paginatedStudents = await PaginatedList<Student>.CreateAsync(studentsInCurrentClass.OrderBy(c => c.Id), pageNumber, pageSize);
 
-			var studentIds = await students.Select(s => s.ProfileManagerId).ToListAsync();
+            // Get IDs of all students assigned to any class
+            var assignedStudentIds = await _context.Students
+                                                  .Where(s => s.ClassId != null)
+                                                  .Select(s => s.ProfileManagerId)
+                                                  .ToListAsync();
 
-			var profileManagers = await _context.ProfileManagers
-				.Where(pm => pm.VaiTro == "Sinh viên" && !studentIds.Contains(pm.Id))
-				.ToListAsync();
+            // Fetch profile managers who are not assigned to any class
+            var profileManagers = await _context.ProfileManagers
+                .Where(pm => pm.VaiTro == "Sinh viên" && !assignedStudentIds.Contains(pm.Id))
+                .ToListAsync();
 
-			var studentList = profileManagers
-				.Select(pm => new SelectListItem
-				{
-					Value = pm.Id.ToString(),
-					Text = pm.Email
-				}).ToList();
+            var studentList = profileManagers
+                .Select(pm => new SelectListItem
+                {
+                    Value = pm.Id.ToString(),
+                    Text = pm.Email
+                }).ToList();
 
-			var classInfo = await _context.Classes.FirstOrDefaultAsync(c => c.Id == Id);
+            var classInfo = await _context.Classes.FirstOrDefaultAsync(c => c.Id == Id);
 
-			var viewModel = new StudentListViewModel
-			{
-				Student = new Student(),
-				StudentList = studentList,
-				PaginatedStudents = paginatedStudents,
-				ProfileManagers = profileManagers,
-				Class = classInfo
-			};
+            var viewModel = new StudentListViewModel
+            {
+                Student = new Student(),
+                StudentList = studentList,
+                PaginatedStudents = paginatedStudents,
+                ProfileManagers = profileManagers,
+                Class = classInfo
+            };
 
-			return View(viewModel);
-		}
-	//Add new Student
-		public async Task<IActionResult> AddStudent(string studentId, string selectedEmail, string studentFullName, DateTime studentDateOfBirth, int classId, int profileManagerId, string studentStatus)
+            return View(viewModel);
+        }
+
+        //Add new Student
+        public async Task<IActionResult> AddStudent(string studentId, string selectedEmail, string studentFullName, DateTime studentDateOfBirth, int classId, int profileManagerId, string studentStatus)
 		{
 			// Create a new AcademicPeriod object
 			var newStudent = new Student
@@ -536,7 +542,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				return RedirectToAction("StudentList", new { Id = classId });
 			}
 		}
-        //Edit Student
+    //Edit Student
         public async Task<IActionResult> EditStudent(string studentId, string studentEmail, string studentFullName, DateTime studentDateOfBirth, int classId, int profileManagerId, string studentStatus)
 		{
             var modifiedStudent = await _context.Students.FindAsync(studentId);
@@ -567,8 +573,126 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("StudentList", new { Id = classId });
             }
         }
-        //SchoolYear actions
-        //Render SchoolYear view
+    //Import xls
+		//Get Data
+
+        //Download Template
+        [HttpGet]
+        public IActionResult DownloadStudentTemplate(string className)
+        {
+            try
+            {
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+                using (var stream = new MemoryStream())
+                {
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        var worksheet = package.Workbook.Worksheets.Add("Template");
+                        // Manually adjust row height to fit content
+                        for (int row = 1; row <= 100; row++)
+                        {
+                            worksheet.Row(row).Height = worksheet.Row(row).Height * 2; // Adjust multiplier as needed
+                        }
+                        worksheet.Cells[6, 1, 100, 5].Style.Font.Size = 14;
+                        worksheet.Cells[1, 1, 100, 5].Style.Font.Name = "Times New Roman";
+                        worksheet.Cells[6, 1, 100, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+                        // Organization name
+                        worksheet.Cells[1, 1].Value = "TRƯỜNG ĐẠI HỌC VĂN LANG";
+                        worksheet.Cells[1, 1].Style.Font.Size = 14;
+
+                        //Department Name
+                        worksheet.Cells[2, 1].Value = "KHOA CÔNG NGHỆ THÔNG TIN";
+                        worksheet.Cells[2, 1].Style.Font.Size = 14;
+                        worksheet.Cells[2, 1].Style.Font.Bold = true;
+
+                        // Document Title
+                        worksheet.Cells[3, 1, 3, 5].Merge = true;
+                        worksheet.Cells[3, 1].Value = "DANH SÁCH SINH VIÊN";
+                        worksheet.Cells[3, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        worksheet.Cells[3, 1].Style.Font.Bold = true;
+                        worksheet.Cells[3, 1].Style.Font.Size = 20;
+
+                        //Document Period
+                        worksheet.Cells[4, 1, 4, 5].Merge = true;
+                        worksheet.Cells[4, 1].Value = "LỚP";
+                        worksheet.Cells[4, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        worksheet.Cells[4, 1].Style.Font.Bold = true;
+                        worksheet.Cells[4, 1].Style.Font.Size = 18;
+
+                        // Define headers
+                        worksheet.Cells[5, 1].Value = "Email";
+                        worksheet.Cells[5, 2].Value = "Mã Số SV";
+                        worksheet.Cells[5, 3].Value = "Họ và Tên";
+                        worksheet.Cells[5, 4].Value = "Ngày Tháng Năm Sinh";
+                        worksheet.Cells[5, 5].Value = "Mã Lớp";
+                        worksheet.Cells[5, 6].Value = "Tình Trạng";
+
+                        // Apply some styling to the headers
+                        using (var range = worksheet.Cells[5, 1, 5, 6])
+                        {
+                            range.Style.Font.Bold = true;
+                            range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+                            range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                            range.Style.Font.Size = 16;
+                        }
+
+                        // Add sample data
+                        worksheet.Cells[6, 1].Value = "bao.187pm06548@vanlanguni.vn";
+                        worksheet.Cells[6, 2].Value = "187pm06548";
+                        worksheet.Cells[6, 3].Value = "Nguyễn Đăng Hồng Bảo";
+                        worksheet.Cells[6, 4].Value = "08/01/1999";
+                        worksheet.Cells[6, 5].Value = className;
+                        worksheet.Cells[6, 6].Value = "Còn học";
+
+                        // Add dropdown list (data validation) to the "Ngành" column
+                        //var validation1 = worksheet.DataValidations.AddListValidation("D6:D100");
+                        //validation1.Formula.Values.Add("7480201 - Công nghệ Thông tin (CTTC)");
+                        //validation1.Formula.Values.Add("7480201 - Công nghệ Thông tin (CTĐB)");
+                        //validation1.Formula.Values.Add("7480104 - Hệ thống Thông tin (CTTC)");
+                        //validation1.Formula.Values.Add("7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)");
+
+                        // Add data validation to limit the value of the "Số lượng SV" column
+                        //var validation2 = worksheet.DataValidations.AddDecimalValidation("E6:E100");
+                        //validation2.Formula.Value = 0; // Minimum value
+                        //validation2.Formula2.Value = 30; // Maximum value
+                        //validation2.ShowErrorMessage = true;
+                        //validation2.ErrorTitle = "Thông tin không hợp lệ";
+                        //validation2.Error = "Sinh viên trong khoảng từ 0 tới 30.";
+
+                        // Add dropdown list (data validation) to the "Cố Vấn Học Tập" column
+                        //var validation3 = worksheet.DataValidations.AddListValidation("B6:B100");
+                        //var advisors = GetAdvisors();
+                        //foreach (var advisor in advisors)
+                        //{
+                        //    validation3.Formula.Values.Add(advisor);
+                        //}
+
+                        // wrap text for entire table
+                        //worksheet.Cells[1, 1, 100, 5].Style.WrapText = true;
+                        // Auto-fit columns to adjust width based on content
+                        worksheet.Cells.AutoFitColumns();
+
+                        package.Save();
+                    }
+
+                    stream.Position = 0;
+                    var content = stream.ToArray();
+                    return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Mẫu Danh Sách SV.xlsx");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception details
+                //_logger.LogError(ex, "Error generating Excel template");;
+                //return RedirectToAction("ClassList");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+//SchoolYear actions
+    //Render SchoolYear view
         public async Task<IActionResult> SchoolYear(int pageNumber = 1, int pageSize = 10)
 		{
 			ViewData["page"] = "SchoolYear";

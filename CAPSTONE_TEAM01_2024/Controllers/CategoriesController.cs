@@ -456,8 +456,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Danh sách lớp.xlsx");
 			}
 		}
-		//StudentList actions
-		//Render StudentList view
+//StudentList actions
+	//Render StudentList view
 		public async Task<IActionResult> StudentList(int Id, int pageNumber = 1, int pageSize = 10)
 		{
 			ViewData["page"] = "StudentList";
@@ -495,8 +495,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
 			return View(viewModel);
 		}
-		//Add new Student
-		public async Task<IActionResult> AddStudent(string studentId, string selectedEmail, string studentFullName, DateTime studentDateOfBirth, string className, int classId, int profileManagerId, string studentStatus)
+	//Add new Student
+		public async Task<IActionResult> AddStudent(string studentId, string selectedEmail, string studentFullName, DateTime studentDateOfBirth, int classId, int profileManagerId, string studentStatus)
 		{
 			// Create a new AcademicPeriod object
 			var newStudent = new Student
@@ -536,9 +536,40 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 				return RedirectToAction("StudentList", new { Id = classId });
 			}
 		}
-//SchoolYear actions
-	//Render SchoolYear view
-		public async Task<IActionResult> SchoolYear(int pageNumber = 1, int pageSize = 10)
+        //Edit Student
+        public async Task<IActionResult> EditStudent(string studentId, string studentEmail, string studentFullName, DateTime studentDateOfBirth, int classId, int profileManagerId, string studentStatus)
+		{
+            var modifiedStudent = await _context.Students.FindAsync(studentId);
+                TempData["MessageEditStudent"] = "Cập nhật sinh viên thành công!";
+                TempData["MessageEditStudentType"] = "success";
+                modifiedStudent.DateOfBirth = studentDateOfBirth;
+                modifiedStudent.Status = studentStatus;
+                await _context.SaveChangesAsync();
+                return RedirectToAction("StudentList", new { Id = classId });    
+        }
+    //Delete Student
+        public async Task<IActionResult> DeleteStudent(string studentId, int classId)
+        {
+            var studentToDelete = await _context.Students.FindAsync(studentId);
+            if (studentToDelete != null)
+            {
+                _context.Students.Remove(studentToDelete);
+                await _context.SaveChangesAsync();
+                // Redirect to the Page to see update
+                TempData["MessageDeleteStudent"] = "Xóa Sinh Viên thành công!";
+                TempData["MessageDeleteStudentType"] = "success";
+                return RedirectToAction("StudentList", new { Id = classId });
+            }
+            else
+            {
+                TempData["MessageDeleteStudent"] = "Xảy ra lỗi khi xóa!";
+                TempData["MessageDeleteStudentType"] = "danger";
+                return RedirectToAction("StudentList", new { Id = classId });
+            }
+        }
+        //SchoolYear actions
+        //Render SchoolYear view
+        public async Task<IActionResult> SchoolYear(int pageNumber = 1, int pageSize = 10)
 		{
 			ViewData["page"] = "SchoolYear";
 			var periods = _context.AcademicPeriods.AsQueryable();

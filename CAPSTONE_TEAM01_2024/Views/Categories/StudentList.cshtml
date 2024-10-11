@@ -7,6 +7,18 @@
 		@TempData["MessageAddStudent"]
 	</div>
 }
+@if (TempData["MessageEditStudent"] != null)
+{
+	<div class="alert alert-@TempData["MessageEditStudentType"]">
+		@TempData["MessageEditStudent"]
+	</div>
+}
+@if (TempData["MessageDeleteStudent"] != null)
+{
+	<div class="alert alert-@TempData["MessageDeleteStudentType"]">
+		@TempData["MessageDeleteStudent"]
+	</div>
+}
 @using CAPSTONE_TEAM01_2024.Utilities
 @model CAPSTONE_TEAM01_2024.ViewModels.StudentListViewModel
 <div class="content-wrapper" style="min-height: 912.2px;">
@@ -81,25 +93,25 @@
 									<td class="text-center">@Student.Status</td>
 									<td class="text-center">
 										<button type="button" class="btn btn-outline-primary btn-sm"
-												data-bs-toggle="modal"
-												data-bs-target="#EditStudentModal"
-												data-student-id="@Student.Id"
-												data-student-email="@Student.Email"
-												data-student-name="@Student.FullName"
-												data-student-DoB="@Student.DateOfBirth"
-												data-student-classID="@Student.ClassId"
-												data-student-status="@Student.Status"
-												data-pm-ID="@Student.ProfileManagerId"
-												aria-label="edit student details">
-											<i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
-										</button>
-										<button type="button" class="btn btn-outline-danger btn-sm"
-												data-bs-toggle="modal"
-												data-bs-target="#DeleteStudentModal"
-												data-class-id="@Student.Id"
-												aria-label="delete class">
-											<i class="fa-solid fa-trash custom-icon"></i> Xóa
-										</button>
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#EditStudentModal"
+                                            data-student-id="@Student.Id"
+                                            data-student-email="@Student.Email"
+                                            data-student-name="@Student.FullName"
+                                            data-student-dob="@Student.DateOfBirth.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)"
+                                            data-student-classid="@Student.ClassId"
+                                            data-student-status="@Student.Status"
+                                            data-pm-id="@Student.ProfileManagerId"
+                                            aria-label="edit student details">
+                                            <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#DeleteStudentModal"
+                                            data-student-id="@Student.Id"
+                                            aria-label="delete student">
+                                            <i class="fa-solid fa-trash custom-icon"></i> Xóa
+                                        </button>
 									</td>
 								</tr>
 							}
@@ -227,7 +239,89 @@
     </div>
 </div>
 
+<!-- Edit Student Modal -->
+<div class="modal fade" id="EditStudentModal" tabindex="-1" data-bs-backdrop="false" aria-labelledby="EditStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="EditStudentModalLabel">Chỉnh sửa Sinh Viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editStudentForm" asp-action="EditStudent" method="post">
+                    <!-- Hidden Field for Student ID -->
+                    <input type="hidden" id="editStudentId" name="studentId">
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="editStudentEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editStudentEmail" name="studentEmail" required readonly>
+                    </div>
+                    <!-- Mã Số SV -->
+                    <div class="mb-3">
+                        <label for="editStudentId" class="form-label">Mã Số SV</label>
+                        <input type="text" class="form-control" id="editStudentMSSV" name="studentMSSV" required readonly>
+                    </div>
+                    <!-- Họ và Tên -->
+                    <div class="mb-3">
+                        <label for="editStudentFullName" class="form-label">Họ và Tên</label>
+                        <input type="text" class="form-control" id="editStudentFullName" name="studentFullName" required readonly>
+                    </div>
+                    <!-- Ngày Tháng Năm Sinh -->
+                    <div class="mb-3">
+                        <label for="editStudentDateOfBirth" class="form-label">Ngày Tháng Năm Sinh</label>
+                        <input type="date" class="form-control" id="editStudentDateOfBirth" name="studentDateOfBirth" required>
+                    </div>
+                    <!-- Mã Lớp -->
+                    <div class="mb-3">
+                        <label for="editClassName" class="form-label">Mã Lớp</label>
+                        <input type="text" class="form-control" id="editClassName" name="className" value="@Model.Class.ClassName" required readonly>
+                    </div>
+                    <input type="hidden" class="form-control" id="editClassId" name="classId" required readonly>
+                    <!-- Tình Trạng -->
+                    <div class="mb-3">
+                        <label for="editStudentStatus" class="form-label">Tình Trạng</label>
+                        <select class="form-select" id="editStudentStatus" name="studentStatus" required>
+                            <option value="" disabled selected>Vui lòng chọn trạng thái</option>
+                            <option value="Đang học">Đang học</option>
+                            <option value="Bảo Lưu">Bảo Lưu</option>
+                            <option value="Nghỉ Học">Nghỉ Học</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Cập Nhật</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Student Modal -->
+<div class="modal fade" id="DeleteStudentModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="DeleteModalLabel">Xóa Sinh Viên</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form asp-action="DeleteStudent" method="post">
+				<div class="modal-body">
+					<input type="hidden" name="studentId"/>
+					<p>Bạn có chắc chắn muốn xóa Sinh Viên này không?</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+					<button type="submit" class="btn btn-danger">Xóa</button>
+				</div>
+                <input type="hidden" class="form-control" id="deleteClassId" name="classId" value ="@Model.Class.Id" required readonly>
+			</form>
+		</div>
+	</div>
+</div>
+
 <script>
+//Add Student JS
 document.addEventListener('DOMContentLoaded', (event) => {
     // Get classId from URL and set it in the form
     var urlParams = new URLSearchParams(window.location.search);
@@ -244,6 +338,43 @@ document.addEventListener('DOMContentLoaded', (event) => {
         document.getElementById("selectedEmail").value = selectedOption.getAttribute("data-email"); // Set selected email
         document.getElementById("studentId").value = selectedOption.getAttribute("data-maso");
         document.getElementById("studentFullName").value = selectedOption.getAttribute("data-hovaten");
+    });
+});
+//Edit Student JS
+function populateEditModal(student) {
+    document.getElementById('editStudentId').value = student.id;
+    document.getElementById('editStudentEmail').value = student.email;
+    document.getElementById('editStudentMSSV').value = student.studentId;
+    document.getElementById('editStudentFullName').value = student.fullName;
+    document.getElementById('editStudentDateOfBirth').value = student.dateOfBirth;
+    document.getElementById('editClassId').value = student.classId;
+    document.getElementById('editStudentStatus').value = student.status;
+    $('#EditStudentModal').modal('show');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[data-bs-target="#EditStudentModal"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const student = {
+                id: this.getAttribute('data-student-id'),
+                email: this.getAttribute('data-student-email'),
+                studentId: this.getAttribute('data-student-id'), // Ensure correct attributes
+                fullName: this.getAttribute('data-student-name'),
+                dateOfBirth: this.getAttribute('data-student-dob'),
+                classId: this.getAttribute('data-student-classid'),
+                status: this.getAttribute('data-student-status')
+            };
+            populateEditModal(student);
+        });
+    });
+});
+//Delete Modal JS
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[data-bs-target="#DeleteStudentModal"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const studentId = this.getAttribute('data-student-id');
+            document.querySelector('#DeleteStudentModal input[name="studentId"]').value = studentId;
+        });
     });
 });
 </script>

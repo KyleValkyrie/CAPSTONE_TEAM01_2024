@@ -19,6 +19,12 @@
 		@TempData["MessageDeleteStudent"]
 	</div>
 }
+@if (TempData["MessageImportStudent"] != null)
+{
+    <div class="alert alert-@TempData["MessageImportStudentType"]">
+        @TempData["MessageImportStudent"]
+    </div>
+}
 @using CAPSTONE_TEAM01_2024.Utilities
 @model CAPSTONE_TEAM01_2024.ViewModels.StudentListViewModel
 <div class="content-wrapper" style="min-height: 912.2px;">
@@ -47,7 +53,7 @@
 							<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ImportExcelModal">
 								<i class="bi bi-upload"></i> Nhập File
 							</button>
-							<a type="button" class="btn btn-secondary" asp-controller="Categories" asp-action="ExportStudentToExcel">
+                            <a type="button" class="btn btn-secondary" asp-controller="Categories" asp-action="ExportStudentToExcel" asp-route-classId="@Model.Class.Id">
 								<i class="bi bi-download"></i> Xuất File
 							</a>
 						</div>
@@ -332,12 +338,12 @@
 				<div class="mb-3">
 					<label for="excelTemplateFile" class="form-label fw-bold"> Tải file Excel mẫu</label>
 					<div id="excelTemplateFile" style="position: relative; display: inline-block; width: 100%; height: calc(1.5em + .75rem + 2px); margin-bottom: 0px;">
-						<a class="btn btn-warning text-dark" asp-controller="Categories" asp-action="DownloadStudentTemplate">
+                        <a class="btn btn-warning text-dark" asp-controller="Categories" asp-action="DownloadStudentTemplate" asp-route-className="@Model.Class.ClassName">
 							<i class="bi bi-download"></i> Tải file mẫu
 						</a>
 					</div>
 				</div>
-				<form id="importExcelForm" asp-action="ImportFromExcel" method="post" enctype="multipart/form-data">
+                <form id="importExcelForm" asp-action="ImportStudentFromExcel" asp-route-classId="@Model.Class.Id" method="post" enctype="multipart/form-data">
 					<div class="mb-3">
 						<label for="excelFile" class="form-label fw-bold"> Chọn file Excel để nhập</label>
 						<div class="custom-file" style="position: relative; display: inline-block; width: 100%; height: calc(1.5em + .75rem + 2px); margin-bottom: 0;">

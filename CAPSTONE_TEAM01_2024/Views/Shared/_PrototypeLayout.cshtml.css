@@ -106,3 +106,7 @@
 .hidden {
     display: none;
 }
+.selected {
+    background-color: #c82333;
+    color: #fff;
+}

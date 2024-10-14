@@ -31,15 +31,15 @@
                     <i class="bi bi-chat-dots"></i>
                 </button>
                 <div class="dropdown" style="position: relative;">
-                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton">
                         <i class="bi bi-person-circle"></i> @User.Identity!.Name
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="background-color: #fff; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);text-align: center; position: absolute; right: 0; padding: 0px">
+                    <ul class="dropdown-menu" id="dropdownMenu" style="background-color: #fff; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); text-align: center; right: 0; padding: 0px; display: none; position:absolute;">
                         <li class="btn-logout">
                             <form class="form-inline" asp-action="logout" asp-controller="users" id="logoutForm">
-                                <button type="submit" class="dropdown-item" href="#" style="color: #333; font-size: 18px;">
+                                <button type="submit" class="dropdown-item" style="color: #333; font-size: 18px;">
                                     <i class="bi bi-box-arrow-right" style="font-size:18px; margin-right:5px"></i>
-                                    <span>Đăng Xuất</span>
+                                    Đăng Xuất
                                 </button>
                             </form>
                         </li>
@@ -52,58 +52,66 @@
     <div class="container-fluid" id="Content_Display">
         <div class="row">
             <!--Side Navbar-->
-            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar" style="position: relative;">
-                <div class="overlay" style="position: absolute; left: 0; top: 0; background-color: #00000094; width: 100%; height:100%;">
-                    <ul class="nav flex-column" style="font-size: 25px; margin-top: 25px;">
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="overlay">
+                    <ul class="nav flex-column" style="font-size: 25px; list-style-type: none;">
                         <li class="nav-item">
-                            <a class="nav-link"
-                               href="/Home/HomePage"
-                                style="text-decoration:none;">
-                                <i class="bi bi-house-door"></i> Trang Chủ
-
+                            <a class="nav-link" href="/Home/HomePage" style="text-decoration:none;">
+                                <i class="bi bi-house-door"></i> TRANG CHỦ
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a b-gqml1abz0e="" class="nav-link bi bi-person-lines-fill" href="/ProfileManager/Index_ProfileManager"> Tài Khoản
+                            <a class="nav-link" data-bs-toggle="collapse" href="#dropdownMenu1" role="button" aria-expanded="false" aria-controls="dropdownMenu1">
+                                <i class="bi bi-people"></i> TÀI KHOẢN
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" 
-                               href="/Statistics/ShowStatistics"
-                               style="text-decoration:none">
-                                <i class="bi bi-graph-up"></i> Thống Kê
-                            </a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="dropdownToggle">
-                                <i class="bi bi-list"></i> Danh Mục
-                            </a>
-                            <ul class="dropdown-menu show" id="dropdownMenu2" style="margin-left: 30px; display:none">
+                            <ul class="collapse" id="dropdownMenu1" style="list-style-type: none; padding-left: 35px;">
                                 <li>
-                                    <a class="dropdown-item" href="/Categories/SchoolYear" style="text-decoration:none">
+                                    <a class="dropdown-item" href="/ProfileManager/StudentProfiles" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;" onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
+                                        <i class="bi bi-person-vcard"></i> Sinh viên
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/ProfileManager/AdvisorProfiles" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;" onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
+                                        <i class="bi bi-person-vcard-fill"></i> Cố vấn
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Statistics/ShowStatistics" style="text-decoration:none;">
+                                <i class="bi bi-graph-up"></i> THỐNG KÊ
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="collapse" href="#dropdownMenu2" role="button" aria-expanded="false" aria-controls="dropdownMenu2">
+                                <i class="bi bi-list"></i> DANH MỤC
+                            </a>
+                            <ul class="collapse" id="dropdownMenu2" style="list-style-type: none; padding-left: 35px;">
+                                <li>
+                                    <a class="dropdown-item" href="/Categories/SchoolYear" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;" onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
                                         <i class="bi bi-calendar"></i> Năm Học
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="/Categories/ClassList" style="text-decoration:none">
+                                    <a class="dropdown-item" href="/Categories/ClassList" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;" onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
                                         <i class="bi bi-person-badge"></i> Lớp Học
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="/Categories/SemesterPlan" style="text-decoration:none">
+                                    <a class="dropdown-item" href="/Categories/SemesterPlan" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;" onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
                                         <i class="bi bi-book"></i> Kế Hoạch
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="/Categories/EndSemesterReport" style="text-decoration:none">
-                                        <i class="bi bi-file-earmark-text"></i> Báo Cáo 
+                                    <a class="dropdown-item" href="/Categories/EndSemesterReport" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;" onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
+                                        <i class="bi bi-file-earmark-text"></i> Báo Cáo
                                     </a>
                                 </li>
                             </ul>
                         </li>
                     </ul>
                 </div>
-            </nav>
+         </nav>
             <!--View's Contents-->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-4 content" id="main-content">
                 @RenderBody()
@@ -123,49 +131,14 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Handle dropdown menu state
-        const categoryContent = document.getElementById("dropdownMenu2");
-        const savedState = sessionStorage.getItem("CategoryVisibility");
-
-        if (savedState) {
-            categoryContent.style.display = savedState;
-        }
-
-        document.getElementById("dropdownToggle").addEventListener("click", function (event) {
-            event.preventDefault();
-            if (categoryContent.style.display === "none" || categoryContent.style.display === "") {
-                categoryContent.style.display = "block";
-                sessionStorage.setItem("CategoryVisibility", "block");
+//Logout Button JS
+        document.getElementById("dropdownMenuButton").addEventListener("click", function () {
+            var dropdownMenu = document.getElementById("dropdownMenu");
+            if (dropdownMenu.style.display === "block") {
+                dropdownMenu.style.display = "none";
             } else {
-                categoryContent.style.display = "none";
-                sessionStorage.setItem("CategoryVisibility", "none");
+                dropdownMenu.style.display = "block";
             }
         });
-
-        // Highlight active menu item
-        var currentUrl = window.location.pathname;
-        var navLinks = document.querySelectorAll('.nav-link, .dropdown-item');
-
-        navLinks.forEach(function (link) {
-            // Remove existing active styles
-            link.classList.remove('active');
-            link.style.border = '';
-
-            // Check if the link matches the current URL or relevant path
-            if (link.getAttribute('href') === currentUrl || 
-                currentUrl.startsWith('/Categories/ClassInfo') && link.getAttribute('href') === '/Categories/ClassList') {
-                link.classList.add('active');
-            }
-        });
-
-        // Clear session data when logout
-        const logoutButton = document.getElementById("logoutForm");
-        if (logoutButton) {
-            logoutButton.addEventListener("click", function () {
-                sessionStorage.clear();
-            });
-        }
-    });
     </script>
 </body>

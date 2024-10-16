@@ -1,4 +1,252 @@
 ﻿@{
     ViewData["Title"] = "Advisor Profiles";
 }
-Advisor Profiles here
+@model CAPSTONE_TEAM01_2024.Utilities.PaginatedList<CAPSTONE_TEAM01_2024.ViewModels.AdvisorProfileViewModel>
+
+<div class="content-wrapper" style="min-height: 912.2px;">
+    <header class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Danh Sách Cố Vấn</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row text-center">
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddAdvisorModal">
+                                <i class="bi bi-plus custom-icon"></i> Thêm Cố Vấn
+                            </button>
+                        </div>
+                        <div class="col">
+                            <nav class="navbar navbar-light bg-light">
+                                <form class="d-flex ms-auto">
+                                    <input class="form-control me-2" type="search" id="searchInput" placeholder="Nhập nội dung cần tìm" aria-label="Search">
+                                </form>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Warning != null)
+                    {
+                        <div class="alert alert-warning">
+                            @ViewBag.Warning
+                        </div>
+                    }
+                    @if (ViewBag.Success != null)
+                    {
+                        <div class="alert alert-success">
+                            @ViewBag.Success
+                        </div>
+                    }
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">
+                            @ViewBag.Error
+                        </div>
+                    }
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr class="text-center">
+                                <th scope="col">#</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Mã Cố Vấn</th>
+                                <th scope="col">Tên Đầy Đủ</th>
+                                <th scope="col">Vai Trò</th>
+                                <th scope="col">Trạng Thái</th>
+                                <th scope="col">Lần Truy Cập Gần Nhất</th>
+                                <th scope="col">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="advisorTable">
+                            @{
+                                int number = (Model.PageIndex - 1) * Model.PageSize;
+                            }
+                            @foreach (var advisor in Model)
+                            {
+                                number++;
+                                <tr>
+                                    <td class="text-center">@number</td>
+                                    <td class="text-center">@advisor.Email</td>
+                                    <td class="text-center">@advisor.SchoolId</td>
+                                    <td class="text-center">@advisor.FullName</td>
+                                    <td class="text-center">@advisor.Role</td>
+                                    <td class="text-center">
+                                        @if (advisor.IsRegistered)
+                                        {
+                                            <span class="badge bg-success text-dark">Đã Kích Hoạt</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">Chưa Kích Hoạt</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">@advisor.LastLoginTime?.ToString("g")</td>
+                                    <td class="text-center">
+                                        @* <button type="button" class="btn btn-outline-primary btn-sm">
+                                            <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
+                                        </button> *@
+                                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteAdvisorModal" data-advisor-id="@advisor.Id">
+                                            <i class="fa-solid fa-trash custom-icon"></i> Xóa
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            <tr id="noresults" style="display: none;">
+                                <td colspan="7" class="text-center">Không tìm thấy nội dung</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Pagination Controls -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-end">
+                            @if (Model.HasPreviousPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="AdvisorProfiles" asp-route-pageIndex="@(Model.PageIndex - 1)" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <a class="page-link" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            }
+
+                            @for (var i = 1; i <= Model.TotalPages; i++)
+                            {
+                                if (i == Model.PageIndex)
+                                {
+                                    <li class="page-item active"><a class="page-link">@i</a></li>
+                                }
+                                else
+                                {
+                                    <li class="page-item"><a class="page-link" asp-action="AdvisorProfiles" asp-route-pageIndex="@i">@i</a></li>
+                                }
+                            }
+
+                            @if (Model.HasNextPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="AdvisorProfiles" asp-route-pageIndex="@(Model.PageIndex + 1)" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <a class="page-link" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Add Advisor Modal -->
+<div class="modal fade" id="AddAdvisorModal" tabindex="-1" data-bs-backdrop="false" aria-labelledby="AddAdvisorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="AddAdvisorModalLabel">Thêm Cố Vấn mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAdvisorForm" asp-action="CreateAdvisorProfile" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="Email" required />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Thêm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Advisor Modal -->
+<div class="modal fade" id="DeleteAdvisorModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DeleteModalLabel">Xóa Cố Vấn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="DeleteAdvisor" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="advisorId" name="advisorId" />
+                    <p>Bạn có chắc chắn muốn xóa cố vấn này không?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+//Delete modal JS
+    var deleteModal = document.getElementById('DeleteAdvisorModal');
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget; // Button that triggered the modal
+        var advisorId = button.getAttribute('data-advisor-id'); // Extract info from data-* attributes
+        var input = deleteModal.querySelector('#advisorId');
+        input.value = advisorId; // Update the modal's content.
+    });
+//Search JS
+    document.getElementById('searchInput').addEventListener('input', function () {
+        var searchValue = this.value.toLowerCase();
+        var rows = document.querySelectorAll('#advisorTable tr');
+        var noResultsRow = document.getElementById('noresults');
+        var hasResults = false;
+
+        rows.forEach(function (row) {
+            var cells = row.getElementsByTagName('td');
+            if (cells.length > 3) {
+                var email = cells[1] ? cells[1].textContent.toLowerCase() : "";
+                var schoolId = cells[2] ? cells[2].textContent.toLowerCase() : "";
+                var fullName = cells[3] ? cells[3].textContent.toLowerCase() : "";
+
+                if (email.includes(searchValue) || schoolId.includes(searchValue) || fullName.includes(searchValue)) {
+                    row.style.display = '';
+                    hasResults = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+
+        if (hasResults) {
+            noResultsRow.style.display = 'none';
+        } else {
+            noResultsRow.style.display = '';
+        }
+    });
+</script>
+
+
+
+

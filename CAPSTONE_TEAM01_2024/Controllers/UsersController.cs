@@ -1,62 +1,57 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using CAPSTONE_TEAM01_2024.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
-    public class UsersController: Controller
+    public class UsersController : Controller
     {
-        // Sign in the user
-        private readonly SignInManager<IdentityUser> signInManager;
-        // Create user if not already in database
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly ApplicationDbContext _context;
 
-        public UsersController(SignInManager<IdentityUser> signInManager, 
-                               UserManager<IdentityUser> userManager)
+        public UsersController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             this.signInManager = signInManager;
             this.userManager = userManager;
+            this._context = context;
         }
 
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Index(string? message = null)
         {
-            //if login error, throw error report
-            if(message is not null)
+            if (message is not null)
             {
                 ViewData["message"] = message;
             }
             return View();
         }
 
-        //redirect to login via 3rd parties
         [AllowAnonymous]
         [HttpGet]
-        public ChallengeResult ExternalLogin(string provider, string? returnUrl = null) 
+        public ChallengeResult ExternalLogin(string provider, string? returnUrl = null)
         {
-            var redirectUrl = Url.Action("RegisterExternalUser", values: new {returnUrl});
+            var redirectUrl = Url.Action("RegisterExternalUser", values: new { returnUrl });
             var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             var challengeResult = new ChallengeResult(provider, properties);
             return challengeResult;
         }
 
-        //register user into our database
         [AllowAnonymous]
-        public async Task<IActionResult> RegisterExternalUser(string? returnURL = null,
-        string? remoteError = null)
+        public async Task<IActionResult> RegisterExternalUser(string? returnURL = null, string? remoteError = null)
         {
             returnURL = returnURL ?? Url.Content("~/");
             var message = "";
-
             if (remoteError != null)
             {
                 message = $"Error from external provider: {remoteError}";
                 return RedirectToAction("Index", routeValues: new { message });
             }
-
             var info = await signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
@@ -64,62 +59,59 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("Index", routeValues: new { message });
             }
 
-            ExternalLogin(info.LoginProvider, "~/");
-            var externalLoginResult = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
-
-            if (externalLoginResult.Succeeded)
-            {
-                return LocalRedirect("~/Home/HomePage");
-            }
-
-            string email = "";
-
-            if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
-            {
-                email = info.Principal.FindFirstValue(ClaimTypes.Email)!;
-            }
-            else
+            string email = info.Principal.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
+            if (string.IsNullOrEmpty(email))
             {
                 message = "Error while reading the email from the provider.";
                 return RedirectToAction("Index", routeValues: new { message });
             }
 
-            var user = new IdentityUser() { Email = email, UserName = email };
-
-            var findUser = await userManager.FindByEmailAsync(email);
-
-            if (findUser != null)
+            var existingUser = await userManager.FindByEmailAsync(email);
+            if (existingUser != null)
             {
-                var loginResult = await userManager.AddLoginAsync(findUser, info);
-
-                if (loginResult.Succeeded || loginResult.Errors.Any(x=>x.Code== "LoginAlreadyAssociated"))
+                var loginResult = await userManager.AddLoginAsync(existingUser, info);
+                if (loginResult.Succeeded || loginResult.Errors.Any(x => x.Code == "LoginAlreadyAssociated"))
                 {
-                    await signInManager.SignInAsync(user, isPersistent: true, info.LoginProvider);
+                    await signInManager.SignInAsync(existingUser, isPersistent: true, info.LoginProvider);
+
+                    var applicationUser = await _context.ApplicationUsers.FirstOrDefaultAsync(au => au.Email == email);
+                    if (applicationUser != null)
+                    {
+                        applicationUser.LastLoginTime = DateTime.UtcNow;
+                        _context.Update(applicationUser);
+                        await _context.SaveChangesAsync();
+                    }
                     return LocalRedirect("~/Home/HomePage");
                 }
-
                 message = "There was an error while logging you in.";
                 return RedirectToAction("Index", routeValues: new { message });
             }
 
-            var createUserResult = await userManager.CreateAsync(user);
+            var newUser = new ApplicationUser
+            {
+                Id = Guid.NewGuid().ToString(), // Ensure unique ID
+                Email = email,
+                UserName = email,
+                IsRegistered = true,
+                LastLoginTime = DateTime.UtcNow,
+            };
+
+            var createUserResult = await userManager.CreateAsync(newUser);
             if (!createUserResult.Succeeded)
             {
                 message = createUserResult.Errors.First().Description;
                 return RedirectToAction("Index", routeValues: new { message });
             }
-
-            var addLoginResult = await userManager.AddLoginAsync(user, info);
-
+            var addLoginResult = await userManager.AddLoginAsync(newUser, info);
             if (addLoginResult.Succeeded)
             {
-                await signInManager.SignInAsync(user, isPersistent: true, info.LoginProvider);
+                await signInManager.SignInAsync(newUser, isPersistent: true, info.LoginProvider);
                 return LocalRedirect("~/Home/HomePage");
             }
-
             message = "There was an error while logging you in.";
             return RedirectToAction("Index", routeValues: new { message });
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Logout()
@@ -128,4 +120,5 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("Index", "Users");
         }
     }
+
 }

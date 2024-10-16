@@ -66,34 +66,37 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("Index", routeValues: new { message });
             }
 
-            var existingUser = await userManager.FindByEmailAsync(email);
+            var existingUser = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == email);
             if (existingUser != null)
             {
+                var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                var applicationUser = await _context.ApplicationUsers.FirstOrDefaultAsync(au => au.Email == email);
+                if (applicationUser != null)
+                {
+                    applicationUser.LastLoginTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
+                    applicationUser.IsRegistered = true;
+                    _context.Update(applicationUser);
+                    await _context.SaveChangesAsync();
+                }
+
                 var loginResult = await userManager.AddLoginAsync(existingUser, info);
                 if (loginResult.Succeeded || loginResult.Errors.Any(x => x.Code == "LoginAlreadyAssociated"))
                 {
                     await signInManager.SignInAsync(existingUser, isPersistent: true, info.LoginProvider);
-
-                    var applicationUser = await _context.ApplicationUsers.FirstOrDefaultAsync(au => au.Email == email);
-                    if (applicationUser != null)
-                    {
-                        applicationUser.LastLoginTime = DateTime.UtcNow;
-                        _context.Update(applicationUser);
-                        await _context.SaveChangesAsync();
-                    }
                     return LocalRedirect("~/Home/HomePage");
                 }
                 message = "There was an error while logging you in.";
                 return RedirectToAction("Index", routeValues: new { message });
             }
 
+            // New user registration
             var newUser = new ApplicationUser
             {
-                Id = Guid.NewGuid().ToString(), // Ensure unique ID
+                Id = Guid.NewGuid().ToString(),
                 Email = email,
                 UserName = email,
                 IsRegistered = true,
-                LastLoginTime = DateTime.UtcNow,
+                LastLoginTime = DateTime.UtcNow
             };
 
             var createUserResult = await userManager.CreateAsync(newUser);
@@ -111,7 +114,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             message = "There was an error while logging you in.";
             return RedirectToAction("Index", routeValues: new { message });
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Logout()

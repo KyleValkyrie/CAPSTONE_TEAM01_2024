@@ -21,25 +21,25 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         public async Task<IActionResult> StudentProfiles(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "StudentProfiles";
-            var studentsQuery = _context.ApplicationUsers
-                .Where(u => u.Email.EndsWith("@vanlanguni.vn"))
-                .Select(user => new StudentProfileViewModel
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    SchoolId = user.SchoolId,
-                    FullName = user.FullName,
-                    IsRegistered = user.IsRegistered,
-                    LastLoginTime = user.LastLoginTime,
-                    Role = "Student"
-                });
+            var studentsQuery = from user in _context.ApplicationUsers
+                                join userRole in _context.UserRoles on user.Id equals userRole.UserId
+                                join role in _context.Roles on userRole.RoleId equals role.Id
+                                where user.Email.EndsWith("@vanlanguni.vn") && (role.NormalizedName != "ADVISOR" && role.NormalizedName != "FACULTY")
+                                select new StudentProfileViewModel
+                                {
+                                    Id = user.Id,
+                                    Email = user.Email,
+                                    SchoolId = user.SchoolId,
+                                    FullName = user.FullName,
+                                    IsRegistered = user.IsRegistered,
+                                    LastLoginTime = user.LastLoginTime,
+                                    Role = role.Name
+                                };
 
             var students = await PaginatedList<StudentProfileViewModel>.CreateAsync(studentsQuery.AsNoTracking(), pageIndex, pageSize);
-
             ViewBag.Warning = TempData["Warning"];
             ViewBag.Success = TempData["Success"];
             ViewBag.Error = TempData["Error"];
-
             return View(students);
         }
     //Add Students
@@ -108,29 +108,28 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
 // AdvisorProfiles actions
     //Render view
-        [HttpGet]
         public async Task<IActionResult> AdvisorProfiles(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "AdvisorProfiles";
-            var advisorsQuery = _context.ApplicationUsers
-                .Where(u => !u.Email.EndsWith("@vanlanguni.vn"))
-                .Select(user => new AdvisorProfileViewModel
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    SchoolId = user.SchoolId,
-                    FullName = user.FullName,
-                    IsRegistered = user.IsRegistered,
-                    LastLoginTime = user.LastLoginTime,
-                    Role = "Advisor"
-                });
+            var advisorsQuery = from user in _context.ApplicationUsers
+                                join userRole in _context.UserRoles on user.Id equals userRole.UserId
+                                join role in _context.Roles on userRole.RoleId equals role.Id
+                                where !user.Email.EndsWith("@vanlanguni.vn") || (user.Email.EndsWith("@vanlanguni.vn") && (role.NormalizedName == "ADVISOR" || role.NormalizedName == "FACULTY"))
+                                select new AdvisorProfileViewModel
+                                {
+                                    Id = user.Id,
+                                    Email = user.Email,
+                                    SchoolId = user.SchoolId,
+                                    FullName = user.FullName,
+                                    IsRegistered = user.IsRegistered,
+                                    LastLoginTime = user.LastLoginTime,
+                                    Role = role.Name
+                                };
 
             var advisors = await PaginatedList<AdvisorProfileViewModel>.CreateAsync(advisorsQuery.AsNoTracking(), pageIndex, pageSize);
-
             ViewBag.Warning = TempData["Warning"];
             ViewBag.Success = TempData["Success"];
             ViewBag.Error = TempData["Error"];
-
             return View(advisors);
         }
     //Add Advisors
@@ -198,6 +197,13 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 TempData["Error"] = "Không tìm thấy cố vấn!";
             }
             return RedirectToAction(nameof(AdvisorProfiles));
+        }
+// PersonalProfile actions
+    //Render view
+        public IActionResult PersonalProfile()
+        {
+            ViewData["page"] = "PersonalProfile";
+            return View();
         }
     }
 }

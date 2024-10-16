@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Enable Controllers in project
 builder.Services.AddControllersWithViews();
-builder.Services.AddSession();
+builder.Services.AddSession(); // Session configuration
 
 // Enable Microsoft Authentication
 builder.Services.AddAuthentication().AddMicrosoftAccount(options =>
@@ -28,8 +28,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
 })
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
 
 // Set EPPlus LicenseContext
 var licenseContext = builder.Configuration["EPPlus:ExcelPackage:LicenseContext"];
@@ -54,18 +54,16 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseSession(); // Ensure it's before UseRouting and only called once
 app.UseRouting();
-
 // Authentication/Authorization
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

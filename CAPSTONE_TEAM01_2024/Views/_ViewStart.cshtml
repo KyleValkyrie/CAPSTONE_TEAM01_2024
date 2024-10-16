@@ -1,4 +1,4 @@
-﻿@{
+﻿@* @{
     switch (ViewData["page"])
     {
         case "Index":
@@ -16,7 +16,28 @@
         case "StudentList":
         case "AdvisorProfiles":
         case "StudentProfiles":
-            Layout = "_PrototypeLayout";
+        case "PersonalProfile":
+            Layout = "_PersonnelLayout";
             break;
     }
+} *@
+
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@using CAPSTONE_TEAM01_2024.Utilities
+@{
+    var user = SignInManager.Context.User;
+    var roles = UserManager.GetRolesAsync(UserManager.GetUserAsync(user).Result).Result;
+
+    if (roles.Contains("Cố Vấn") || roles.Contains("Khoa"))
+    {
+        Layout = "_PersonnelLayout";
+    }
+    else
+    {
+        Layout = "_StudentLayout";
+    }
+
 }
+

@@ -36,10 +36,14 @@
                     </button>
                     <ul class="dropdown-menu" id="dropdownMenu" style="background-color: #fff; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); text-align: center; right: 0; padding: 0px; display: none; position:absolute;">
                         <li class="btn-logout">
+                            <button type="button" class="dropdown-item" style="color: #333; font-size: 18px;" onclick="window.location.href='/ProfileManager/PersonalProfile'">
+                                <i class="bi bi-person" style="font-size:18px; margin-right:5px; float:left;"></i> Thông tin cá nhân
+                            </button>
+                        </li>
+                        <li class="btn-logout">
                             <form class="form-inline" asp-action="logout" asp-controller="users" id="logoutForm" onsubmit="clearSessionStorage()">
                                 <button type="submit" class="dropdown-item" style="color: #333; font-size: 18px;">
-                                    <i class="bi bi-box-arrow-right" style="font-size:18px; margin-right:5px"></i>
-                                    Đăng Xuất
+                                    <i class="bi bi-box-arrow-right" style="font-size:18px; margin-right:5px ; float:left;"></i> Đăng Xuất
                                 </button>
                             </form>
                         </li>
@@ -133,7 +137,7 @@
                 </div>
             </nav>
             <!--View's Contents-->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-4 content p-0 m-0" id="main-content">
+            <main class="col-md-9 ms-sm-auto col-lg-10 content p-0 m-0" id="main-content">
                 @RenderBody()
             </main>
         </div>

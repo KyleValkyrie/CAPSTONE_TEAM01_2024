@@ -1,4 +1,4 @@
-﻿@{
+﻿@* @{
     switch (ViewData["page"])
     {
         case "HomePage":
@@ -16,16 +16,16 @@
             Layout = "_PersonnelLayout";
             break;
     }
-}
+} *@
 
 
-@* @inject IHttpContextAccessor HttpContextAccessor
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
     var rolesString = HttpContextAccessor.HttpContext.Session.GetString("Roles");
     var roles = rolesString?.Split(',') ?? new string[0];
 
-    if (roles.Contains("Cố Vấn") || roles.Contains("Khoa"))
+    if (roles.Contains("Cố Vấn") || roles.Contains("BCN Khoa"))
     {
         Layout = "_PersonnelLayout";
     }
@@ -33,4 +33,4 @@
     {
         Layout = "_StudentLayout";
     }
-} *@
+}

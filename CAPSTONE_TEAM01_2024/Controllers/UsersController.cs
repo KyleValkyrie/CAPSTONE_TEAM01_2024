@@ -79,6 +79,9 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     await _context.SaveChangesAsync();
                 }
 
+                var roles = await userManager.GetRolesAsync(existingUser);
+                HttpContext.Session.SetString("Roles", string.Join(",", roles));
+
                 var loginResult = await userManager.AddLoginAsync(existingUser, info);
                 if (loginResult.Succeeded || loginResult.Errors.Any(x => x.Code == "LoginAlreadyAssociated"))
                 {

@@ -8,7 +8,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Danh Sách Cố Vấn</h1>
+                    <h1 class="m-0">Danh Sách Nhân Sự</h1>
                 </div>
             </div>
         </div>
@@ -20,7 +20,7 @@
                     <div class="row text-center">
                         <div class="col-auto">
                             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddAdvisorModal">
-                                <i class="bi bi-plus custom-icon"></i> Thêm Cố Vấn
+                                <i class="bi bi-plus custom-icon"></i> Thêm Nhân Sự
                             </button>
                         </div>
                         <div class="col">
@@ -57,7 +57,7 @@
                             <tr class="text-center">
                                 <th scope="col">#</th>
                                 <th scope="col">Email</th>
-                                <th scope="col">Mã Cố Vấn</th>
+                                <th scope="col">Mã Nhân Sự</th>
                                 <th scope="col">Tên Đầy Đủ</th>
                                 <th scope="col">Vai Trò</th>
                                 <th scope="col">Trạng Thái</th>
@@ -81,7 +81,7 @@
                                     <td class="text-center">
                                         @if (advisor.IsRegistered)
                                         {
-                                            <span class="badge bg-success text-dark">Đã Kích Hoạt</span>
+                                            <span class="badge bg-success">Đã Kích Hoạt</span>
                                         }
                                         else
                                         {
@@ -90,9 +90,10 @@
                                     </td>
                                     <td class="text-center">@advisor.LastLoginTime?.ToString("g")</td>
                                     <td class="text-center">
-                                        @* <button type="button" class="btn btn-outline-primary btn-sm">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                                onclick="openEditModal('@advisor.Email', '@advisor.Role', '@advisor.Id', '@advisor.SchoolId')">
                                             <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
-                                        </button> *@
+                                        </button>
                                         <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteAdvisorModal" data-advisor-id="@advisor.Id">
                                             <i class="fa-solid fa-trash custom-icon"></i> Xóa
                                         </button>
@@ -175,6 +176,18 @@
                         <label class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="Email" required />
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Vai Trò</label>
+                        <div class="dropdown">
+                            <select class="form-control dropdown-toggle" id="SchoolId" name="SchoolId" onchange="updateRoleId();" required>
+                                <option value="" disabled selected>Chọn vai trò</option>
+                                <option value="ADVISOR">Cố Vấn</option>
+                                <option value="FACULTY">BCN Khoa</option>
+                            </select>
+                            <i class="bi bi-caret-down-fill" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%);"></i>
+                        </div>
+                    </div>
+                    <input type="hidden" id="roleId" name="RoleId" required/>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                         <button type="submit" class="btn btn-primary">Thêm</button>
@@ -184,7 +197,6 @@
         </div>
     </div>
 </div>
-
 <!-- Delete Advisor Modal -->
 <div class="modal fade" id="DeleteAdvisorModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -206,8 +218,80 @@
         </div>
     </div>
 </div>
+<!-- Edit Advisor Modal -->
+<div class="modal fade" id="EditAdvisorModal" tabindex="-1" data-bs-backdrop="false" aria-labelledby="EditAdvisorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="EditAdvisorModalLabel">Cập nhật Cố Vấn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAdvisorForm" asp-action="UpdateAdvisorProfile" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail" name="Email" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Vai Trò</label>
+                        <div class="dropdown">
+                            <select class="form-control dropdown-toggle" id="editVaiTro" name="SchoolId" onchange="updateEditRoleId();" required>
+                                <option value="" disabled>Chọn vai trò</option>
+                                <option value="ADVISOR">Cố Vấn</option>
+                                <option value="FACULTY">BCN Khoa</option>
+                            </select>
+                            <i class="bi bi-caret-down-fill" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%);"></i>
+                        </div>
+                    </div>
+                    <input type="hidden" id="editRoleId" name="RoleId" required readonly />
+                    <input type="hidden" id="editUserId" name="UserId" required readonly/>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Cập nhật</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
+//Add Modal JS
+    function updateRoleId() {
+        var role = document.getElementById('SchoolId').value;
+        var roleIdField = document.getElementById('roleId');
+        // Assign RoleId based on the selected role
+        if (role === 'ADVISOR') {
+            roleIdField.value = '80FC5BAE-C940-433F-B662-115890B72982'; // Use the actual RoleId for Advisor
+        } else if (role === 'FACULTY') {
+            roleIdField.value = '0A65637D-CA3F-403C-9F0D-F5F31FF540C0'; // Use the actual RoleId for Faculty
+        }
+    }
+
+//Edit modal JS
+    function openEditModal(email, role, userId, schoolId) {
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editUserId').value = userId;
+
+        // Log the element to ensure it's found
+        console.log('editVaiTro element:', document.getElementById('editVaiTro'));
+
+        var roleDropdown = document.getElementById('editVaiTro');
+        roleDropdown.value = schoolId; // Ensure the selected value matches the SchoolId
+
+        updateEditRoleId();
+        $('#EditAdvisorModal').modal('show');
+    }
+
+    function updateEditRoleId() {
+        var schoolId = document.getElementById('editVaiTro').value;
+        var roleIdField = document.getElementById('editRoleId');
+        if (schoolId === 'ADVISOR') {
+            roleIdField.value = '80FC5BAE-C940-433F-B662-115890B72982';
+        } else if (schoolId === 'FACULTY') {
+            roleIdField.value = '0A65637D-CA3F-403C-9F0D-F5F31FF540C0';
+        }
+    }
 //Delete modal JS
     var deleteModal = document.getElementById('DeleteAdvisorModal');
     deleteModal.addEventListener('show.bs.modal', function (event) {

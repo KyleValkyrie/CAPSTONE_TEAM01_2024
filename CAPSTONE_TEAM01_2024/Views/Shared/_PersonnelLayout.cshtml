@@ -36,10 +36,14 @@
                     </button>
                     <ul class="dropdown-menu" id="dropdownMenu" style="background-color: #fff; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); text-align: center; right: 0; padding: 0px; display: none; position:absolute;">
                         <li class="btn-logout">
+                            <button type="button" class="dropdown-item" style="color: #333; font-size: 18px;" onclick="window.location.href='/ProfileManager/PersonalProfile'">
+                                <i class="bi bi-person" style="font-size:18px; margin-right:5px; float:left;"></i> Thông tin cá nhân
+                            </button>
+                        </li>
+                        <li class="btn-logout">
                             <form class="form-inline" asp-action="logout" asp-controller="users" id="logoutForm" onsubmit="clearSessionStorage()">
                                 <button type="submit" class="dropdown-item" style="color: #333; font-size: 18px;">
-                                    <i class="bi bi-box-arrow-right" style="font-size:18px; margin-right:5px"></i>
-                                    Đăng Xuất
+                                    <i class="bi bi-box-arrow-right" style="font-size:18px; margin-right:5px ; float:left;"></i> Đăng Xuất
                                 </button>
                             </form>
                         </li>
@@ -66,21 +70,21 @@
                             <a class="nav-link" role="button" aria-expanded="false" aria-controls="dropdownMenu1" id="toggleMenu1"
                                onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
                                onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                <i class="bi bi-people"></i> TÀI KHOẢN <i class="bi bi-caret-down-fill" style="float:right;"></i>
+                                <i class="bi bi-people"></i> NGƯỜI DÙNG <i class="bi bi-caret-down-fill" style="float:right;"></i>
                             </a>
                             <ul class="collapse" id="dropdownMenu1" style="list-style-type: none; padding-left: 35px;">
+                                <li>
+                                    <a class="dropdown-item" href="/ProfileManager/AdvisorProfiles" id="linkAdvisorProfiles" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
+                                       onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
+                                       onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
+                                        <i class="bi bi-person-vcard-fill"></i> Nhân Sự
+                                    </a>
+                                </li>
                                 <li>
                                     <a class="dropdown-item" href="/ProfileManager/StudentProfiles" id="linkStudentProfiles" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
                                        onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
                                        onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
                                         <i class="bi bi-person-vcard"></i> Sinh viên
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="/ProfileManager/AdvisorProfiles" id="linkAdvisorProfiles" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
-                                       onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
-                                       onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                        <i class="bi bi-person-vcard-fill"></i> Cố vấn
                                     </a>
                                 </li>
                             </ul>
@@ -140,7 +144,7 @@
                 </div>
             </nav>
             <!--View's Contents-->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-4 content p-0 m-0" id="main-content">
+            <main class="col-md-9 ms-sm-auto col-lg-10 content p-0 m-0" id="main-content">
                 @RenderBody()
             </main>
         </div>

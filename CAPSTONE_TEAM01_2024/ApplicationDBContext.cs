@@ -11,9 +11,14 @@ namespace CAPSTONE_TEAM01_2024
 		{
 		}
 		public DbSet<AcademicPeriod> AcademicPeriods { get; set; }
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
-		}
+		//Application User Table constraints
+            modelBuilder.Entity<ApplicationUser>()
+            .Property(b => b.IsRegistered)
+            .HasDefaultValue(false);
+        }
 	}
 }

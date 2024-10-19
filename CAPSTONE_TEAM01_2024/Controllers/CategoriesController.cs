@@ -11,6 +11,7 @@ using System.Drawing.Printing;
 using CAPSTONE_TEAM01_2024.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using System.Data;
+using System.Drawing;
 
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
@@ -75,6 +76,15 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     SchoolId = "ADVISOR"
                 };
                 _context.Users.Add(advisor);
+                await _context.SaveChangesAsync();
+
+                // Assign advisor role to the newly created advisor
+                var advisorRole = await _context.Roles.FirstOrDefaultAsync(r => r.NormalizedName == "ADVISOR");
+                _context.UserRoles.Add(new IdentityUserRole<string>
+                {
+                    UserId = advisor.Id,
+                    RoleId = advisorRole.Id
+                });
                 await _context.SaveChangesAsync();
             }
 
@@ -168,6 +178,194 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             }
             return RedirectToAction("ClassList");
         }
+    //Download Excel Template for Class
+        public IActionResult GenerateClassTemplate()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Mẫu Lớp");
+
+                // Define the columns based on the provided fields
+                worksheet.Cells[1, 1].Value = "Mã Lớp";
+                worksheet.Cells[1, 2].Value = "Cố Vấn";
+                worksheet.Cells[1, 3].Value = "Niên Khóa";
+                worksheet.Cells[1, 4].Value = "Ngành";
+                worksheet.Cells[1, 5].Value = "Số Lượng SV";
+
+                // Style the header
+                using (var range = worksheet.Cells[1, 1, 1, 5])
+                {
+                    range.Style.Font.Bold = true;
+                    range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                    range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                }
+
+                // Sample data row (optional)
+                worksheet.Cells[2, 1].Value = "71K27CNTT01";
+                worksheet.Cells[2, 2].Value = "nam.197pm09478@vanlanguni.vn";
+                worksheet.Cells[2, 3].Value = "2022-2025";
+                worksheet.Cells[2, 4].Value = "7480201 - Công nghệ Thông tin (CTTC)";
+                worksheet.Cells[2, 5].Value = "30";
+
+                // Auto fit columns
+                worksheet.Cells.AutoFitColumns();
+
+                var stream = new MemoryStream();
+                package.SaveAs(stream);
+                var content = stream.ToArray();
+
+                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Mẫu Excel DS Lớp.xlsx");
+            }
+        }
+    //Import Excel Template for Class
+        [HttpPost]
+        public async Task<IActionResult> ImportClassExcel(IFormFile ClassExcelFile)
+        {
+            if (ClassExcelFile == null || ClassExcelFile.Length == 0)
+            {
+                TempData["Error"] = "Vui lòng chọn file Excel hợp lệ.";
+                return RedirectToAction("ClassList");
+            }
+
+            try
+            {
+                int successCount = 0;
+                int failCount = 0;
+
+                using (var stream = new MemoryStream())
+                {
+                    await ClassExcelFile.CopyToAsync(stream);
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        var worksheet = package.Workbook.Worksheets[0];
+                        var rowCount = worksheet.Dimension.Rows;
+
+                        for (int row = 2; row <= rowCount; row++)
+                        {
+                            var classId = worksheet.Cells[row, 1].Value?.ToString();
+                            var advisorEmail = worksheet.Cells[row, 2].Value?.ToString();
+                            var term = worksheet.Cells[row, 3].Value?.ToString();
+                            var department = worksheet.Cells[row, 4].Value?.ToString();
+                            var studentCount = worksheet.Cells[row, 5].Value?.ToString();
+
+                            try
+                            {
+                                // Check if class already exists
+                                var existingClass = await _context.Classes.FirstOrDefaultAsync(c => c.ClassId == classId);
+                                if (existingClass != null)
+                                {
+                                    failCount++;
+                                    continue; // Skip existing classes
+                                }
+
+                                // Check if advisor exists and create if necessary
+                                var advisorEntity = await _context.Users.FirstOrDefaultAsync(u => u.Email == advisorEmail);
+                                if (advisorEntity == null)
+                                {
+                                    advisorEntity = new ApplicationUser
+                                    {
+                                        UserName = advisorEmail,
+                                        Email = advisorEmail,
+                                        SchoolId = "ADVISOR"
+                                    };
+                                    _context.Users.Add(advisorEntity);
+                                    await _context.SaveChangesAsync();
+
+                                    // Assign advisor role
+                                    var advisorRole = await _context.Roles.FirstOrDefaultAsync(r => r.NormalizedName == "ADVISOR");
+                                    _context.UserRoles.Add(new IdentityUserRole<string>
+                                    {
+                                        UserId = advisorEntity.Id,
+                                        RoleId = advisorRole.Id
+                                    });
+                                    await _context.SaveChangesAsync();
+                                }
+
+                                // Create new class
+                                var newClass = new Class
+                                {
+                                    ClassId = classId,
+                                    AdvisorId = advisorEntity.Id,
+                                    Term = term,
+                                    Department = department,
+                                    StudentCount = int.Parse(studentCount)
+                                };
+
+                                _context.Classes.Add(newClass);
+                                successCount++;
+                            }
+                            catch (Exception ex)
+                            {
+                                failCount++;
+                                TempData["Error"] = $"Lỗi tại lớp {classId}: {ex.InnerException?.Message ?? ex.Message}";
+                            }
+                        }
+
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+                TempData["Success"] = $"Nhập file Excel thành công! Số bản ghi thành công: {successCount}, số bản ghi thất bại: {failCount}.";
+                return RedirectToAction("ClassList");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Đã xảy ra lỗi khi nhập file Excel: {ex.InnerException?.Message ?? ex.Message}";
+                return RedirectToAction("ClassList");
+            }
+        }
+    //Export Excel file for Class
+        public async Task<IActionResult> ExportClassToExcel()
+        {
+            var classes = await _context.Classes.Include(c => c.Advisor).ToListAsync();
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Danh Sách Lớp");
+
+                // Define columns
+                worksheet.Cells[1, 1].Value = "Mã Lớp";
+                worksheet.Cells[1, 2].Value = "Cố Vấn";
+                worksheet.Cells[1, 3].Value = "Niên Khóa";
+                worksheet.Cells[1, 4].Value = "Ngành";
+                worksheet.Cells[1, 5].Value = "Số Lượng SV";
+
+                // Style the header
+                using (var range = worksheet.Cells[1, 1, 1, 5])
+                {
+                    range.Style.Font.Bold = true;
+                    range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                    range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                }
+
+                // Populate data rows
+                for (int i = 0; i < classes.Count; i++)
+                {
+                    var row = i + 2; // Start from row 2
+                    var classItem = classes[i];
+
+                    worksheet.Cells[row, 1].Value = classItem.ClassId;
+                    worksheet.Cells[row, 2].Value = classItem.Advisor != null ? classItem.Advisor.Email : "Chưa bổ nhiệm";
+                    worksheet.Cells[row, 3].Value = classItem.Term;
+                    worksheet.Cells[row, 4].Value = classItem.Department;
+                    worksheet.Cells[row, 5].Value = classItem.StudentCount;
+                }
+
+                // Auto fit columns
+                worksheet.Cells.AutoFitColumns();
+
+                var stream = new MemoryStream();
+                package.SaveAs(stream);
+                var content = stream.ToArray();
+
+                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "DS Lớp.xlsx");
+            }
+        }
+
 //StudentList actions
 
 //SchoolYear actions

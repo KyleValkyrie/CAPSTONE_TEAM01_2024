@@ -25,6 +25,12 @@
                             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddClassModal">
                                 <i class="bi bi-plus custom-icon"></i> Thêm Lớp
                             </button>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ImportClassExcelModal">
+                                <i class="bi bi-upload"></i> Nhập File
+                            </button>
+                            <a type="button" class="btn btn-secondary" asp-controller="Categories" asp-action="ExportClassToExcel">
+                                <i class="bi bi-download"></i> Xuất File
+                            </a>
                         </div>
                         <div class="col">
                             <nav class="navbar navbar-light bg-light">
@@ -275,6 +281,36 @@
     </div>
 </div>
 
+<!-- Import Class Excel Modal -->
+<div class="modal fade" id="ImportClassExcelModal" tabindex="-1" aria-labelledby="ImportClassExcelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ImportClassExcelModalLabel">Nhập File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <a href="@Url.Action("GenerateClassTemplate", "Categories")" class="btn btn-warning">
+                    Tải file excel mẫu <i class="bi bi-download"></i>
+                </a>
+                <form asp-action="ImportClassExcel" enctype="multipart/form-data">
+                    <div class="mb-3 mt-3">
+                        <label class="form-label">Vui lòng chọn file excel cần nhập:</label>
+                        <div class="input-group">
+                            <input type="file" class="form-control d-none" id="ClassExcelFile" name="ClassExcelFile" accept=".xlsx,.xls" required style="display: none;">
+                            <input type="text" class="form-control" id="customFileUpload" placeholder="Chọn file..." readonly>
+                            <button type="button" class="btn btn-outline-secondary" id="uploadButton"> <i class="bi bi-upload"></i></button>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Nhập</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 //Limit studnet count input
     function validateStudentCount(input) {
@@ -333,4 +369,13 @@
         var noResultsRow = document.getElementById('noresults');
         noResultsRow.style.display = found ? "none" : "table-row";
     });
+//Import Modal JS
+        document.getElementById('uploadButton').addEventListener('click', function() {
+        document.getElementById('ClassExcelFile').click();
+        });
+
+        document.getElementById('ClassExcelFile').addEventListener('change', function() {
+            var fileName = this.files[0].name;
+            document.getElementById('customFileUpload').value = fileName;
+        });
 </script>

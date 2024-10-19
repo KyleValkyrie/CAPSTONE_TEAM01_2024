@@ -1,0 +1,62 @@
+@{
+ViewData["Title"] = "Announcement";
+}
+<div class="content-wrapper" style="min-height: 912.2px;">
+	<!-- Content Header (Page header) -->
+	<header class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h1 class="m-0">Thông Báo</h1>
+				</div><!-- /.col -->
+			</div><!-- /.row -->
+		</div><!-- /.container-fluid -->
+	</header>
+
+	<!-- /.content-header -->
+	<!-- Main content -->
+	<main class="content">
+		<div class="container-fluid">
+			<div class="card">
+				<div class="card-header">
+					<div class="row text-center">
+						<div class="col-auto">
+							<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddAccouncementModal">
+								<i class="bi bi-plus custom-icon"></i> Tạo Thông Báo
+							</button>
+					</div>
+						<div class="col">
+							<nav class="navbar navbar-light bg-light">
+								<form class="d-flex ms-auto">
+									<input class="form-control me-2" type="search" id="searchInput" placeholder="Nhập nội dung cần tìm" aria-label="Search">
+								</form>
+							</nav>
+						</div>
+					</div>
+				</div>
+				<!-- /.card-header -->
+
+				<div class="card-body">
+					<table class="table table-striped">
+						<thead>
+							<tr class="text-center">
+								<th scope="col">#</th>
+								<th scope="col">Nội Dung</th>
+								<th scope="col">Thời Gian Bắt Đầu</th>
+								<th scope="col">Thời Gian Kết Thúc</th>
+								<th scope="col">Loại Kế Hoạch</th>
+								<th scope="col">Thao Tác</th>
+							</tr>
+						</thead>
+						<tbody id="classTable">
+					
+						</tbody>
+					</table>
+				
+				</div>
+				<!-- /.card-body -->
+			</div>
+		</div>
+	</main>
+	<!-- /.content -->
+</div>

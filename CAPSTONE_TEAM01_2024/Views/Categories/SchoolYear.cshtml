@@ -1,154 +1,354 @@
-﻿@{
-	ViewData["Title"] = "School Year";
+﻿@model CAPSTONE_TEAM01_2024.ViewModels.SchoolYearViewModel
+
+@{
+    ViewData["Title"] = "School Year";
+    int number = (Model.AcademicPeriods.PageIndex - 1) * Model.AcademicPeriods.PageSize;
 }
 
 <div class="content-wrapper" style="min-height: 912.2px;">
-	<!-- Content Header (Page header) -->
-	<header class="content-header">
-		<div class="container-fluid">
-			<div class="row mb-2">
-				<div class="col-sm-6">
-					<h1 class="m-0">Danh Sách Lớp</h1>
-				</div><!-- /.col -->
-			</div><!-- /.row -->
-		</div><!-- /.container-fluid -->
-	</header>
+    <header class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Danh Sách Năm Học</h1>
+                </div>
+            </div>
+        </div>
+    </header>
 
-	<!-- /.content-header -->
-	<!-- Main content -->
-	<main class="content">
-		<div class="container-fluid">
-			<div class="card">
-				<div class="card-header">
-					<div class="row text-center">
-						<div class="col-auto">
-							<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddClassModal">
-								<i class="bi bi-plus custom-icon"></i> Thêm Lớp
-							</button>
-							<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ImportExcelModal">
-								<i class="bi bi-upload"></i> Nhập File
-							</button>
-							<a type="button" class="btn btn-secondary" asp-controller="Categories" asp-action="ExportClassToExcel">
-								<i class="bi bi-download"></i> Xuất File
-							</a>
-						</div>
-						<div class="col">
-							<nav class="navbar navbar-light bg-light">
-								<form class="d-flex ms-auto">
-									<input class="form-control me-2" type="search" id="searchInput" placeholder="Nhập nội dung cần tìm" aria-label="Search">
-								</form>
-							</nav>
-						</div>
-					</div>
-				</div>
-				<!-- /.card-header -->
-
-				<div class="card-body">
-					<table class="table table-striped">
-						<thead>
-							<tr class="text-center">
-								<th scope="col">#</th>
-								<th scope="col">Mã Lớp</th>
-								<th scope="col">Cố Vấn Học Tập</th>
-								<th scope="col">Niên Khóa</th>
-								<th scope="col">Ngành</th>
-								<th scope="col">Số lượng SV</th>
-								<th scope="col">Thao Tác</th>
-							</tr>
-						</thead>
-						<tbody id="classTable">
-							@* @{
-								int number = (Model.PaginatedClasses.PageIndex - 1) * Model.PaginatedClasses.PageSize;
-							}
-							@foreach (var PClass in Model.PaginatedClasses)
-							{
-								<tr class="table-row" onclick="rowClickHandler(event, '@Url.Action("StudentList", new { id = PClass.Id })');" style="cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#f1f1f1';" onmouseout="this.style.backgroundColor='';">
-									<td scope="row" class="text-center">@PClass.Id</td>
-									<td class="text-center">@PClass.ClassName</td>
-									<td class="text-center">@PClass.AdvisorName</td>
-									<td class="text-center">@PClass.YearName</td>
-									<td class="text-center">@PClass.Department</td>
-									<td class="text-center">@PClass.StudentCount</td>
-									<td class="text-center">
-										<button type="button" class="btn btn-outline-primary btn-sm"
-												onclick="event.stopPropagation();"
-												data-bs-toggle="modal"
-												data-bs-target="#EditClassModal"
-												data-class-id="@PClass.Id"
-												data-class-name="@PClass.ClassName"
-												data-advisor-id="@PClass.AdvisorId"
-												data-advisor-name="@PClass.AdvisorName"
-												data-year-name="@PClass.YearName"
-												data-department="@PClass.Department"
-												data-student-count="@PClass.StudentCount"
-												aria-label="edit class details">
-											<i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
-										</button>
-										<button type="button" class="btn btn-outline-danger btn-sm"
-												onclick="event.stopPropagation();"
-												data-bs-toggle="modal"
-												data-bs-target="#DeleteClassModal"
-												data-class-id="@PClass.Id"
-												aria-label="delete class">
-											<i class="fa-solid fa-trash custom-icon"></i> Xóa
-										</button>
-									</td>
-								</tr>
-							}
-							<tr id="noresults" style="display: none;">
-								<td colspan="7" class="text-center">Không tìm thấy nội dung</td>
-							</tr> *@
-						</tbody>
-					</table>
-					@* <nav aria-label="Page navigation" style=" float:right;">
-						<ul class="pagination">
-							@if (Model.PaginatedClasses.HasPreviousPage)
-							{
-								<li class="page-item">
-									<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@(Model.PaginatedClasses.PageIndex - 1)">Trang Trước</a>
-								</li>
-							}
-							else
-							{
-								<li class="page-item disabled">
-									<span class="page-link">Trang Trước</span>
-								</li>
-							}
-
-							@for (int i = 1; i <= Model.PaginatedClasses.TotalPages; i++)
-							{
-								if (i == Model.PaginatedClasses.PageIndex)
-								{
-									<li class="page-item active">
-										<span class="page-link">@i</span>
-									</li>
-								}
-								else
-								{
-									<li class="page-item">
-										<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@i">@i</a>
-									</li>
-								}
-							}
-
-							@if (Model.PaginatedClasses.HasNextPage)
-							{
-								<li class="page-item">
-									<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@(Model.PaginatedClasses.PageIndex + 1)">Trang Sau</a>
-								</li>
-							}
-							else
-							{
-								<li class="page-item disabled">
-									<span class="page-link">Trang Sau</span>
-								</li>
-							}
-						</ul>
-					</nav> *@
-				</div>
-				<!-- /.card-body -->
-			</div>
-		</div>
-	</main>
-	<!-- /.content -->
+    <main class="content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row text-center">
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddPeriodModal">
+                                <i class="bi bi-plus custom-icon"></i> Thêm Năm Học
+                            </button>
+                        </div>
+                        <div class="col">
+                            <nav class="navbar navbar-light bg-light">
+                                <form class="d-flex ms-auto">
+                                    <input class="form-control me-2" type="search" id="searchInput" placeholder="Nhập nội dung cần tìm" aria-label="Search">
+                                </form>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["Success"]</div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+                    @if (TempData["Warning"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Warning"]</div>
+                    }
+                    <table class="table table-striped">
+                        <thead>
+                            <tr class="text-center">
+                                <th scope="col">#</th>
+                                <th scope="col">Năm Học</th>
+                                <th scope="col">Thời Gian Bắt Đầu</th>
+                                <th scope="col">Thời Gian Kết Thúc</th>
+                                <th scope="col">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="classTable">
+                            @foreach (var period in Model.AcademicPeriods)
+                            {
+                                number++;
+                                <tr>
+                                    <td class="text-center">@number</td>
+                                    <td class="text-center">@period.PeriodName</td>
+                                    <td class="text-center">@period.PeriodStart.ToString("yyyy-MM-dd")</td>
+                                    <td class="text-center">@period.PeriodEnd.ToString("yyyy-MM-dd")</td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#EditPeriodModal"
+                                                onclick="openEditModal('@period.PeriodId', '@period.PeriodName', '@period.PeriodStart.ToString("yyyy-MM-dd")', '@period.PeriodEnd.ToString("yyyy-MM-dd")')">
+                                            <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#DeletePeriodModal"
+                                                onclick="openDeleteModal('@period.PeriodId')">
+                                            <i class="fa-solid fa-trash custom-icon"></i> Xóa
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            <tr id="noresults" style="display: none;">
+                                <td colspan="5" class="text-center">Không tìm thấy nội dung</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <nav aria-label="Page navigation" style="float:right;">
+                        <ul class="pagination">
+                            @if (Model.AcademicPeriods.HasPreviousPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="SchoolYear" asp-route-pageIndex="@(Model.AcademicPeriods.PageIndex - 1)" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <a class="page-link" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            @for (var i = 1; i <= Model.AcademicPeriods.TotalPages; i++)
+                            {
+                                if (i == Model.AcademicPeriods.PageIndex)
+                                {
+                                    <li class="page-item active">
+                                        <a class="page-link">@i</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="SchoolYear" asp-route-pageIndex="@i">@i</a>
+                                    </li>
+                                }
+                            }
+                            @if (Model.AcademicPeriods.HasNextPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="SchoolYear" asp-route-pageIndex="@(Model.AcademicPeriods.PageIndex + 1)" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <a class="page-link" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
+
+<!-- Add Period Modal -->
+<div class="modal fade" id="AddPeriodModal" tabindex="-1" aria-labelledby="AddPeriodModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="AddPeriodModalLabel">Thêm Năm Học Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="CreatePeriod" method="post" onsubmit="return validateDates()">
+                    <div class="mb-3">
+                        <label class="form-label">Năm Học</label>
+                        <input type="text" class="form-control" id="PeriodName" name="PeriodName" readonly required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời Gian Bắt Đầu</label>
+                        <input type="date" class="form-control" id="PeriodStart" name="PeriodStart" required onchange="updatePeriodName()" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời Gian Kết Thúc</label>
+                        <input type="date" class="form-control" id="PeriodEnd" name="PeriodEnd" required onchange="updatePeriodName()" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Thêm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<<!-- Edit Period Modal -->
+<div class="modal fade" id="EditPeriodModal" tabindex="-1" aria-labelledby="EditPeriodModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="EditPeriodModalLabel">Cập nhật Năm Học</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="UpdatePeriod" method="post" onsubmit="return validateEditDates()">
+                    <input type="hidden" id="EditPeriodId" name="PeriodId" />
+                    <div class="mb-3">
+                        <label class="form-label">Năm Học</label>
+                        <input type="text" class="form-control" id="EditPeriodName" name="PeriodName" readonly required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời Gian Bắt Đầu</label>
+                        <input type="date" class="form-control" id="EditPeriodStart" name="PeriodStart" required onchange="updateEditPeriodName()" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời Gian Kết Thúc</label>
+                        <input type="date" class="form-control" id="EditPeriodEnd" name="PeriodEnd" required onchange="updateEditPeriodName()" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Cập nhật</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Period Modal -->
+<div class="modal fade" id="DeletePeriodModal" tabindex="-1" aria-labelledby="DeletePeriodModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DeletePeriodModalLabel">Xóa Niên Khóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa niên khóa này không?</p>
+                <form id="deletePeriodForm" asp-action="DeletePeriod" method="post">
+                    <input type="hidden" id="DeletePeriodId" name="PeriodId" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger">Xóa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Add Modal JS
+    function updatePeriodName() {
+        var start = document.getElementById('PeriodStart').value;
+        var end = document.getElementById('PeriodEnd').value;
+        var periodNameField = document.getElementById('PeriodName');
+        var endField = document.getElementById('PeriodEnd');
+
+        if (start && end) {
+            var startDate = new Date(start);
+            var endDate = new Date(end);
+
+            if (endDate.getFullYear() > startDate.getFullYear()) {
+                periodNameField.value = startDate.getFullYear() + " - " + endDate.getFullYear();
+                endField.setCustomValidity(''); // Clear custom validity
+            } else {
+                periodNameField.value = ""; // Clear if end year <= start year
+                endField.value = ""; // Clear end date
+                endField.setCustomValidity("Thời gian kết thúc phải lớn hơn thời gian bắt đầu.");
+                endField.reportValidity(); // Show the validation message
+            }
+        } else {
+            periodNameField.value = ""; // Clear if dates are incomplete
+            endField.setCustomValidity(''); // Clear custom validity
+        }
+    }
+
+    function validateDates() {
+        var endField = document.getElementById('PeriodEnd');
+        if (endField.checkValidity()) {
+            return true;
+        }
+        return false;
+    }
+
+// Edit Modal JS
+    function openEditModal(periodId, periodName, periodStart, periodEnd) {
+        document.getElementById('EditPeriodId').value = periodId;
+        document.getElementById('EditPeriodName').value = periodName;
+        document.getElementById('EditPeriodStart').value = periodStart;
+        document.getElementById('EditPeriodEnd').value = periodEnd;
+        $('#EditPeriodModal').modal('show');
+    }
+
+    function updateEditPeriodName() {
+        var start = document.getElementById('EditPeriodStart').value;
+        var end = document.getElementById('EditPeriodEnd').value;
+        var periodNameField = document.getElementById('EditPeriodName');
+        var endField = document.getElementById('EditPeriodEnd');
+
+        if (start && end) {
+            var startDate = new Date(start);
+            var endDate = new Date(end);
+
+            if (endDate.getFullYear() > startDate.getFullYear()) {
+                periodNameField.value = startDate.getFullYear() + " - " + endDate.getFullYear();
+                endField.setCustomValidity(''); // Clear custom validity
+            } else {
+                periodNameField.value = ""; // Clear if end year <= start year
+                endField.value = ""; // Clear end date
+                endField.setCustomValidity("Thời gian kết thúc phải lớn hơn thời gian bắt đầu.");
+                endField.reportValidity(); // Show the validation message
+            }
+        } else {
+            periodNameField.value = ""; // Clear if dates are incomplete
+            endField.setCustomValidity(''); // Clear custom validity
+        }
+    }
+
+    function validateEditDates() {
+        var endField = document.getElementById('EditPeriodEnd');
+        if (endField.checkValidity()) {
+            return true;
+        }
+        return false;
+    }
+
+// Delete Modal JS
+    function openDeleteModal(periodId) {
+        document.getElementById('DeletePeriodId').value = periodId;
+        $('#DeletePeriodModal').modal('show');
+    }
+
+// Search JS
+    document.getElementById('searchInput').addEventListener('keyup', function () {
+        var searchValue = this.value.toLowerCase();
+        var rows = document.getElementById('classTable').getElementsByTagName('tr');
+        var noResultsRow = document.getElementById('noresults');
+
+        var hasResults = false;
+
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            var cells = row.getElementsByTagName('td');
+            var match = false;
+
+            for (var j = 0; j < cells.length; j++) {
+                var cell = cells[j];
+                if (cell.textContent.toLowerCase().includes(searchValue)) {
+                    match = true;
+                    break;
+                }
+            }
+
+            if (match) {
+                row.style.display = '';
+                hasResults = true;
+            } else {
+                row.style.display = 'none';
+            }
+        }
+
+        if (!hasResults) {
+            noResultsRow.style.display = '';
+        } else {
+            noResultsRow.style.display = 'none';
+        }
+    });
+</script>
+

@@ -8,6 +8,7 @@ using OfficeOpenXml.Style;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using System.Drawing.Printing;
+using CAPSTONE_TEAM01_2024.ViewModels;
 
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
@@ -36,98 +37,103 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
 //SchoolYear actions
     //Render SchoolYear view
-        public IActionResult SchoolYear()
+        public async Task<IActionResult> SchoolYear(int pageIndex = 1, int pageSize = 20)
 		{
 			ViewData["page"] = "SchoolYear";
-			return View();
-		}
-	//Edit Academic Year
-		[HttpPost]
-		public async Task<IActionResult> EditPeriod(int periodId, string periodName, DateTime periodStart, DateTime periodEnd)
-		{
-			var modifiedPeriod = await _context.AcademicPeriods.FindAsync(periodId);
-			// Check if another record with the same year and semester exists
-			var existingPeriod = await _context.AcademicPeriods
-				.FirstOrDefaultAsync(ap => ap.PeriodName == periodName && 
-										   ap.PeriodStart == periodStart && 
-										   ap.PeriodEnd == periodEnd &&
-										   ap.PeriodId != periodId);
-			if (modifiedPeriod != null && existingPeriod == null)
-			{
-				TempData["MessageEditYear"] = "Cập nhật thành công!";
-				TempData["MessageEditType"] = "success";
-				modifiedPeriod.PeriodName = periodName;
-				modifiedPeriod.PeriodStart = periodStart;
-				modifiedPeriod.PeriodEnd = periodEnd;
-				await _context.SaveChangesAsync();
-				return RedirectToAction("SchoolYear");
-			}
-			else
-			{
-				TempData["MessageEditYear"] = "Trùng thời gian, cập nhật đã bị hủy!";
-				TempData["MessageEditType"] = "danger";
-				return RedirectToAction("SchoolYear");
-			}
-		}
-	//Delete Academic Year
-		[HttpPost]
-		public async Task<IActionResult> DeletePeriod(int periodId)
-		{
-			var periodToDelete = await _context.AcademicPeriods.FindAsync(periodId);
-			if (periodToDelete != null)
-			{
-				_context.AcademicPeriods.Remove(periodToDelete);
-				await _context.SaveChangesAsync();
-				// Redirect to the Page to see update
-				TempData["MessageDeleteYear"] = "Xóa năm học thành công!";
-				TempData["MessageDeleteType"] = "success";
-				return RedirectToAction("SchoolYear");				
-			}
-			else
-			{
-				TempData["MessageDeleteYear"] = "Xảy ra lỗi khi xóa!";
-				TempData["MessageDeleteType"] = "danger";
-				return RedirectToAction("SchoolYear");
-			}
-			
-		}
-	//Add new Academic Year
-		[HttpPost]
-		public async Task<IActionResult> AddPeriod(string periodName, DateTime periodStart, DateTime periodEnd)
-		{
-			// Create a new AcademicPeriod object
-			var newPeriod = new AcademicPeriod
-			{
-				PeriodName = periodName,
-				PeriodStart = periodStart,
-				PeriodEnd = periodEnd
-			};
-			// Add the new object to the database
-			bool isFound = _context.AcademicPeriods
-					 .Where(r => r.PeriodName == newPeriod.PeriodName && 
-								 r.PeriodStart == newPeriod.PeriodStart &&
-								 r.PeriodEnd == newPeriod.PeriodEnd)
-					 .Any();
-			if (!isFound) //Can add
-			{
-				_context.AcademicPeriods.Add(newPeriod);
-				await _context.SaveChangesAsync();
+            var periods = _context.AcademicPeriods.AsQueryable();
+            var paginatedPeriods = await PaginatedList<AcademicPeriod>.CreateAsync(periods, pageIndex, pageSize);
 
-				TempData["MessageAddYear"] = "Thêm năm học thành công!";
-				TempData["MessageAddType"] = "success";
+            var viewModel = new SchoolYearViewModel
+            {
+                AcademicPeriods = paginatedPeriods
+            };
 
-				// Redirect to the Page to see update
-				return RedirectToAction("SchoolYear");
-			}
-			else
-			{
-				TempData["MessageAddYear"] = "Thông tin năm học đã tồn tại!";
-				TempData["MessageAddType"] = "danger";
-				return RedirectToAction("SchoolYear");
-			}
-		}
+            ViewBag.Warning = TempData["Warning"];
+            ViewBag.Success = TempData["Success"];
+            ViewBag.Error = TempData["Error"];
+            return View(viewModel);
+        }
+    //Add School Year
+        [HttpPost]
+        public async Task<IActionResult> CreatePeriod(AcademicPeriod model)
+        {
+            // Check if the period name already exists
+            var existingPeriod = await _context.AcademicPeriods.FirstOrDefaultAsync(p => p.PeriodName == model.PeriodName);
+            if (existingPeriod != null)
+            {
+                TempData["Error"] = $"Năm học {model.PeriodName} đã tồn tại!";
+                return RedirectToAction("SchoolYear");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.AcademicPeriods.Add(model);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = $"Năm học {model.PeriodName} đã được thêm thành công!";
+                return RedirectToAction("SchoolYear");
+            }
+
+            TempData["Error"] = "Đã xảy ra lỗi khi thêm năm học.";
+            return RedirectToAction("SchoolYear");
+        }
+    //Edit School Year
+        [HttpPost]
+        public async Task<IActionResult> UpdatePeriod(AcademicPeriod model)
+        {
+            // Check if the period name already exists but is not the current period being updated
+            var existingPeriod = await _context.AcademicPeriods
+                .FirstOrDefaultAsync(p => p.PeriodName == model.PeriodName && p.PeriodId != model.PeriodId);
+            if (existingPeriod != null)
+            {
+                TempData["Error"] = $"Năm học {model.PeriodName} đã tồn tại!";
+                return RedirectToAction("SchoolYear");
+            }
+
+            var periodToUpdate = await _context.AcademicPeriods.FirstOrDefaultAsync(p => p.PeriodId == model.PeriodId);
+            if (periodToUpdate == null)
+            {
+                TempData["Error"] = "Năm học không tồn tại!";
+                return RedirectToAction("SchoolYear");
+            }
+
+            string oldPeriodName = periodToUpdate.PeriodName;
+
+            if (ModelState.IsValid)
+            {
+                periodToUpdate.PeriodStart = model.PeriodStart;
+                periodToUpdate.PeriodEnd = model.PeriodEnd;
+                periodToUpdate.PeriodName = model.PeriodName;
+
+                _context.AcademicPeriods.Update(periodToUpdate);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = $"Năm học {oldPeriodName} đã được cập nhật thành {model.PeriodName}!";
+                return RedirectToAction("SchoolYear");
+            }
+
+            TempData["Error"] = "Đã xảy ra lỗi khi cập nhật năm học.";
+            return RedirectToAction("SchoolYear");
+        }
+    //Delete School Year
+        [HttpPost]
+        public async Task<IActionResult> DeletePeriod(int periodId)
+        {
+            var periodToDelete = await _context.AcademicPeriods.FirstOrDefaultAsync(p => p.PeriodId == periodId);
+            if (periodToDelete == null)
+            {
+                TempData["Error"] = "Năm học không tồn tại!";
+                return RedirectToAction("SchoolYear");
+            }
+
+            _context.AcademicPeriods.Remove(periodToDelete);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Năm học {periodToDelete.PeriodName} đã được xóa thành công!";
+            return RedirectToAction("SchoolYear");
+        }
+
 //SemesterPlan actions
-		public IActionResult SemesterPlan()
+        public IActionResult SemesterPlan()
 		{
 			ViewData["page"] = "SemesterPlan";
 			return View();

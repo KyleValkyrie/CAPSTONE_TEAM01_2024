@@ -23,12 +23,16 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         {
             _context = context;
 		}
+
+
 //EndSemesterReport actions
         public IActionResult EndSemesterReport()
         {
             ViewData["page"] = "EndSemesterReport";
             return View();
         }
+
+
 //ClassList actions
     //Render ClassList
         public async Task<IActionResult> ClassList(int pageIndex = 1, int pageSize = 20)
@@ -366,7 +370,169 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             }
         }
 
+
 //StudentList actions
+    //Render StudnetLít view
+        public async Task<IActionResult> StudentList(int pageIndex = 1, int pageSize = 20)
+        {
+            ViewData["page"] = "StudentList";
+
+            var studentsQuery = from user in _context.ApplicationUsers
+                                join userRole in _context.UserRoles on user.Id equals userRole.UserId into userRoles
+                                from userRole in userRoles.DefaultIfEmpty()
+                                join role in _context.Roles on userRole.RoleId equals role.Id into roles
+                                from role in roles.DefaultIfEmpty()
+                                where user.Email.EndsWith("@vanlanguni.vn") && (role == null || (role.NormalizedName != "ADVISOR" && role.NormalizedName != "FACULTY"))
+                                select new StudentListViewModel
+                                {
+                                    Id = user.Id,
+                                    Email = user.Email,
+                                    SchoolId = user.SchoolId,
+                                    FullName = user.FullName,
+                                    DateOfBirth = user.DateOfBirth,
+                                    Status = user.Status,
+                                    ClassId = user.ClassId
+                                };
+
+            var paginatedStudents = await PaginatedList<StudentListViewModel>.CreateAsync(studentsQuery.AsNoTracking(), pageIndex, pageSize);
+
+            ViewBag.Warning = TempData["Warning"];
+            ViewBag.Success = TempData["Success"];
+            ViewBag.Error = TempData["Error"];
+            return View(paginatedStudents);
+        }
+    //Add Student
+        [HttpPost]
+        public async Task<IActionResult> AddStudent(StudentListViewModel model)
+        {
+            // Check if email already exists
+            var existingUser = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == model.Email);
+            if (existingUser != null)
+            {
+                TempData["Warning"] = "Email đã tồn tại!";
+                return RedirectToAction("StudentList");
+            }
+
+            // Check if ClassId exists
+            var classExists = await _context.Classes.AnyAsync(c => c.ClassId == model.ClassId);
+            if (!classExists)
+            {
+                TempData["Warning"] = "Mã Lớp không tồn tại!";
+                return RedirectToAction("StudentList");
+            }
+
+            // Create new student
+            var student = new ApplicationUser
+            {
+                UserName = model.SchoolId,
+                Email = model.Email,
+                SchoolId = model.SchoolId,
+                FullName = model.FullName,
+                DateOfBirth = model.DateOfBirth ?? DateTime.MinValue, // Handle null
+                ClassId = model.ClassId,
+                Status = model.Status,
+                IsRegistered = false,
+                EmailConfirmed = true // or false if you need confirmation
+            };
+
+            // Add student to database
+            _context.ApplicationUsers.Add(student);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+
+                // Assign student role
+                var studentRole = await _context.Roles.FirstOrDefaultAsync(r => r.NormalizedName == "STUDENT");
+                if (studentRole != null)
+                {
+                    _context.UserRoles.Add(new IdentityUserRole<string>
+                    {
+                        UserId = student.Id,
+                        RoleId = studentRole.Id
+                    });
+
+                    await _context.SaveChangesAsync();
+                }
+
+                TempData["Success"] = "Sinh viên đã được thêm thành công!";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Đã xảy ra lỗi khi thêm sinh viên: {ex.Message}";
+            }
+
+            return RedirectToAction("StudentList");
+        }
+    //Edit Student
+        [HttpPost]
+        public async Task<IActionResult> EditStudent(StudentListViewModel model)
+        {
+            // Check if student exists
+            var student = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Id == model.Id);
+            if (student == null)
+            {
+                TempData["Warning"] = "Sinh viên không tồn tại!";
+                return RedirectToAction("StudentList");
+            }
+
+            // Check if ClassId exists
+            var classExists = await _context.Classes.AnyAsync(c => c.ClassId == model.ClassId);
+            if (!classExists)
+            {
+                TempData["Warning"] = "Mã Lớp không tồn tại!";
+                return RedirectToAction("StudentList");
+            }
+
+            // Update student information
+            student.FullName = model.FullName;
+            student.SchoolId = model.SchoolId;
+            student.Email = model.Email;
+            student.DateOfBirth = model.DateOfBirth ?? DateTime.MinValue; // Handle null
+            student.ClassId = model.ClassId;
+            student.Status = model.Status;
+
+            try
+            {
+                // Save changes
+                _context.ApplicationUsers.Update(student);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Thông tin sinh viên đã được cập nhật thành công!";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Đã xảy ra lỗi khi cập nhật thông tin sinh viên: {ex.Message}";
+            }
+
+            return RedirectToAction("StudentList");
+        }
+    //Delete Student
+        [HttpPost]
+        public async Task<IActionResult> DeleteStudent(string id)
+        {
+            // Check if student exists
+            var student = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Id == id);
+            if (student == null)
+            {
+                TempData["Error"] = "Sinh viên không tồn tại!";
+                return RedirectToAction("StudentList");
+            }
+
+            try
+            {
+                // Remove student from database
+                _context.ApplicationUsers.Remove(student);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Sinh viên đã được xóa thành công!";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Đã xảy ra lỗi khi xóa sinh viên: {ex.Message}";
+            }
+
+            return RedirectToAction("StudentList");
+        }
 
 //SchoolYear actions
     //Render SchoolYear view
@@ -464,6 +630,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             TempData["Success"] = $"Năm học {periodToDelete.PeriodName} đã được xóa thành công!";
             return RedirectToAction("SchoolYear");
         }
+
 
 //SemesterPlan actions
         public IActionResult SemesterPlan()

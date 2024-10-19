@@ -16,5 +16,7 @@ namespace CAPSTONE_TEAM01_2024.Models
         public ICollection<Class> AdvisedClasses { get; set; } = new List<Class>(); // Classes they advise
         public string ClassId { get; set; } // Foreign Key to Class
         public Class EnrolledClass { get; set; } // The class the student is enrolled in
+        public DateTime DateOfBirth { get; set; } // Addition field for students
+        public string Status { get; set; } // Addition field for students
     }
 }

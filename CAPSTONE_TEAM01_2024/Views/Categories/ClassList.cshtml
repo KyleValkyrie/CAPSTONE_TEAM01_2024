@@ -1,155 +1,270 @@
-﻿@{
-	ViewData["Title"] = "Class List";
+﻿@model CAPSTONE_TEAM01_2024.ViewModels.ClassListViewModel
+
+@{
+    ViewData["Title"] = "Danh Sách Lớp";
+    int number = (Model.Classes.PageIndex - 1) * Model.Classes.PageSize;
 }
+
 <div class="content-wrapper" style="min-height: 912.2px;">
-	<!-- Content Header (Page header) -->
-	<header class="content-header">
-		<div class="container-fluid">
-			<div class="row mb-2">
-				<div class="col-sm-6">
-					<h1 class="m-0">Danh Sách Lớp</h1>
-				</div><!-- /.col -->
-			</div><!-- /.row -->
-		</div><!-- /.container-fluid -->
-	</header>
+    <header class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Danh Sách Lớp</h1>
+                </div>
+            </div>
+        </div>
+    </header>
 
-	<!-- /.content-header -->
-	<!-- Main content -->
-	<main class="content">
-		<div class="container-fluid">
-			<div class="card">
-				<div class="card-header">
-					<div class="row text-center">
-						<div class="col-auto">
-							<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddClassModal">
-								<i class="bi bi-plus custom-icon"></i> Thêm Lớp
-							</button>
-							<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ImportExcelModal">
-								<i class="bi bi-upload"></i> Nhập File
-							</button>
-							<a type="button" class="btn btn-secondary" asp-controller="Categories" asp-action="ExportClassToExcel">
-								<i class="bi bi-download"></i> Xuất File
-							</a>
-						</div>
-						<div class="col">
-							<nav class="navbar navbar-light bg-light">
-								<form class="d-flex ms-auto">
-									<input class="form-control me-2" type="search" id="searchInput" placeholder="Nhập nội dung cần tìm" aria-label="Search">
-								</form>
-							</nav>
-						</div>
-					</div>
-				</div>
-				<!-- /.card-header -->
-
-				<div class="card-body">
-					<table class="table table-striped">
-						<thead>
-							<tr class="text-center">
-								<th scope="col">#</th>
-								<th scope="col">Mã Lớp</th>
-								<th scope="col">Cố Vấn Học Tập</th>
-								<th scope="col">Niên Khóa</th>
-								<th scope="col">Ngành</th>
-								<th scope="col">Số lượng SV</th>
-								<th scope="col">Thao Tác</th>
-							</tr>
-						</thead>
-						<tbody id="classTable">
-							@* @{
-							int number = (Model.PaginatedClasses.PageIndex - 1) * Model.PaginatedClasses.PageSize;
-							}
-							@foreach (var PClass in Model.PaginatedClasses)
-							{
-							<tr class="table-row" onclick="rowClickHandler(event, '@Url.Action("StudentList", new { id = PClass.Id })');" style="cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#f1f1f1';" onmouseout="this.style.backgroundColor='';">
-							<td scope="row" class="text-center">@PClass.Id</td>
-							<td class="text-center">@PClass.ClassName</td>
-							<td class="text-center">@PClass.AdvisorName</td>
-							<td class="text-center">@PClass.YearName</td>
-							<td class="text-center">@PClass.Department</td>
-							<td class="text-center">@PClass.StudentCount</td>
-							<td class="text-center">
-							<button type="button" class="btn btn-outline-primary btn-sm"
-							onclick="event.stopPropagation();"
-							data-bs-toggle="modal"
-							data-bs-target="#EditClassModal"
-							data-class-id="@PClass.Id"
-							data-class-name="@PClass.ClassName"
-							data-advisor-id="@PClass.AdvisorId"
-							data-advisor-name="@PClass.AdvisorName"
-							data-year-name="@PClass.YearName"
-							data-department="@PClass.Department"
-							data-student-count="@PClass.StudentCount"
-							aria-label="edit class details">
-							<i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
-							</button>
-							<button type="button" class="btn btn-outline-danger btn-sm"
-							onclick="event.stopPropagation();"
-							data-bs-toggle="modal"
-							data-bs-target="#DeleteClassModal"
-							data-class-id="@PClass.Id"
-							aria-label="delete class">
-							<i class="fa-solid fa-trash custom-icon"></i> Xóa
-							</button>
-							</td>
-							</tr>
-							}
-							<tr id="noresults" style="display: none;">
-							<td colspan="7" class="text-center">Không tìm thấy nội dung</td>
-							</tr> *@
-						</tbody>
-					</table>
-					@* <nav aria-label="Page navigation" style=" float:right;">
-					<ul class="pagination">
-					@if (Model.PaginatedClasses.HasPreviousPage)
-					{
-					<li class="page-item">
-					<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@(Model.PaginatedClasses.PageIndex - 1)">Trang Trước</a>
-					</li>
-					}
-					else
-					{
-					<li class="page-item disabled">
-					<span class="page-link">Trang Trước</span>
-					</li>
-					}
-
-					@for (int i = 1; i <= Model.PaginatedClasses.TotalPages; i++)
-					{
-					if (i == Model.PaginatedClasses.PageIndex)
-					{
-					<li class="page-item active">
-					<span class="page-link">@i</span>
-					</li>
-					}
-					else
-					{
-					<li class="page-item">
-					<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@i">@i</a>
-					</li>
-					}
-					}
-
-					@if (Model.PaginatedClasses.HasNextPage)
-					{
-					<li class="page-item">
-					<a class="page-link" asp-action="ClassList" asp-route-pageNumber="@(Model.PaginatedClasses.PageIndex + 1)">Trang Sau</a>
-					</li>
-					}
-					else
-					{
-					<li class="page-item disabled">
-					<span class="page-link">Trang Sau</span>
-					</li>
-					}
-					</ul>
-					</nav> *@
-				</div>
-				<!-- /.card-body -->
-			</div>
-		</div>
-	</main>
-	<!-- /.content -->
+    <main class="content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row text-center">
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddClassModal">
+                                <i class="bi bi-plus custom-icon"></i> Thêm Lớp
+                            </button>
+                        </div>
+                        <div class="col">
+                            <nav class="navbar navbar-light bg-light">
+                                <form class="d-flex ms-auto">
+                                    <input class="form-control me-2" type="search" id="searchInput" placeholder="Nhập nội dung cần tìm" aria-label="Search">
+                                </form>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["Success"]</div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+                    <table class="table table-striped">
+                        <thead>
+                            <tr class="text-center">
+                                <th scope="col">#</th>
+                                <th scope="col">Mã Lớp</th>
+                                <th scope="col">Cố Vấn</th>
+                                <th scope="col">Niên Khóa</th>
+                                <th scope="col">Ngành</th>
+                                <th scope="col">Số Lượng SV</th>
+                                <th scope="col">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="classTable">
+                            @foreach (var classItem in Model.Classes)
+                            {
+                                number++;
+                                <tr>
+                                    <td class="text-center">@number</td>
+                                    <td class="text-center">@classItem.ClassId</td>
+                                    <td class="text-center">@(string.IsNullOrEmpty(classItem.Advisor.FullName) ? classItem.Advisor.Email : classItem.Advisor.FullName)</td>
+                                    <td class="text-center">@classItem.Term</td>
+                                    <td class="text-center">@classItem.Department</td>
+                                    <td class="text-center"> 
+                                        @classItem.Students.Count / @classItem.StudentCount
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-outline-primary btn-sm" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#EditClassModal" 
+                                                onclick="openEditModal('@classItem.ClassId')">
+                                            <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#DeleteClassModal" 
+                                                onclick="openDeleteModal('@classItem.ClassId')">
+                                            <i class="fa-solid fa-trash custom-icon"></i> Xóa
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            <tr id="noresults" style="display: none;">
+                                <td colspan="7" class="text-center">Không tìm thấy nội dung</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <nav aria-label="Page navigation" style="float:right;">
+                        <ul class="pagination">
+                            @if (Model.Classes.HasPreviousPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="ClassList" asp-route-pageIndex="@(Model.Classes.PageIndex - 1)" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <a class="page-link" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            @for (var i = 1; i <= Model.Classes.TotalPages; i++)
+                            {
+                                if (i == Model.Classes.PageIndex)
+                                {
+                                    <li class="page-item active">
+                                        <a class="page-link">@i</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="ClassList" asp-route-pageIndex="@i">@i</a>
+                                    </li>
+                                }
+                            }
+                            @if (Model.Classes.HasNextPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="ClassList" asp-route-pageIndex="@(Model.Classes.PageIndex + 1)" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <a class="page-link" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
 
+<!-- Add Class Modal -->
+<div class="modal fade" id="AddClassModal" tabindex="-1" aria-labelledby="AddClassModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="AddClassModalLabel">Thêm Lớp Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addClassForm" asp-action="CreateClass" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Mã Lớp</label>
+                        <input type="text" class="form-control" name="ClassId" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Niên Khóa</label>
+                        <input type="text" class="form-control" name="Term" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ngành</label>
+                        <select class="form-control" name="Department" required>
+                            <option value="7480201 - Công nghệ Thông tin (CTTC)">7480201 - Công nghệ Thông tin (CTTC)</option>
+                            <option value="7480201 - Công nghệ Thông tin (CTĐB)">7480201 - Công nghệ Thông tin (CTĐB)</option>
+                            <option value="7480104 - Hệ thống Thông tin (CTTC)">7480104 - Hệ thống Thông tin (CTTC)</option>
+                            <option value="7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)">7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cố Vấn</label>
+                        <input type="email" class="form-control" name="AdvisorEmail" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Số Lượng SV</label>
+                        <input type="number" class="form-control" name="StudentCount" required oninput="validateStudentCount(this)" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Thêm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Edit Class Modal -->
+<div class="modal fade" id="EditClassModal" tabindex="-1" aria-labelledby="EditClassModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="EditClassModalLabel">Cập nhật Lớp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="EditClass" method="post">
+                    <input type="hidden" id="EditClassId" name="ClassId" />
+                    <div class="mb-3">
+                        <label class="form-label">Mã Lớp</label>
+                        <input type="text" class="form-control" id="EditClassIdDisplay" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tên Lớp</label>
+                        <input type="text" class="form-control" id="EditClassName" name="ClassName" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Niên Khóa</label>
+                        <input type="text" class="form-control" id="EditTerm" name="Term" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ngành</label>
+                        <input type="text" class="form-control" id="EditDepartment" name="Department" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cố Vấn</label>
+                        <select class="form-control" id="EditAdvisorId" name="AdvisorId" required>
+                            @* Populate this with available advisors *@
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Số Lượng SV</label>
+                        <input type="number" class="form-control" id="EditStudentCount" name="StudentCount" required />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Cập nhật</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Class Modal -->
+<div class="modal fade" id="DeleteClassModal" tabindex="-1" aria-labelledby="DeleteClassModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DeleteClassModalLabel">Xóa Niên Khóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa lớp này không?</p>
+                <form id="deleteClassForm" asp-action="DeleteClass" method="post">
+                    <input type="hidden" id="DeleteClassId" name="id" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger">Xóa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+//Add Modal JS
+    function validateStudentCount(input) {
+        if (input.value < 1) input.value = 1;
+        if (input.value > 30) input.value = 30;
+    }
+</script>

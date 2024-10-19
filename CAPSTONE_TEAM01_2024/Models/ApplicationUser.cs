@@ -11,5 +11,10 @@ namespace CAPSTONE_TEAM01_2024.Models
         public string? FullName { get; set; }
         public string? PhoneNumber { get; set; }
         public DateTime? LastLoginTime { get; set; }
+
+        // Navigation properties
+        public ICollection<Class> AdvisedClasses { get; set; } = new List<Class>(); // Classes they advise
+        public string ClassId { get; set; } // Foreign Key to Class
+        public Class EnrolledClass { get; set; } // The class the student is enrolled in
     }
 }

@@ -9,6 +9,7 @@ using System.IO;
 using Microsoft.Extensions.Logging;
 using System.Drawing.Printing;
 using CAPSTONE_TEAM01_2024.ViewModels;
+using Microsoft.AspNetCore.Identity;
 
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
@@ -27,11 +28,86 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return View();
         }
 //ClassList actions
-    //Render ClassList view
-        public IActionResult ClassList()
+    //Render ClassList
+        public async Task<IActionResult> ClassList(int pageIndex = 1, int pageSize = 20)
         {
-			ViewData["page"] = "ClassList";
-            return View();
+            ViewData["page"] = "ClassList";
+            var classes = _context.Classes
+                .Include(c => c.Advisor)
+                .Include(c => c.Students)
+                .AsQueryable();
+            var paginatedClasses = await PaginatedList<Class>.CreateAsync(classes, pageIndex, pageSize);
+            var viewModel = new ClassListViewModel
+            {
+                Classes = paginatedClasses
+            };
+            ViewBag.Warning = TempData["Warning"];
+            ViewBag.Success = TempData["Success"];
+            ViewBag.Error = TempData["Error"];
+            return View(viewModel);
+        }
+    // Add Class
+        [HttpPost]
+        public async Task<IActionResult> CreateClass(Class model, string AdvisorEmail)
+        {
+            // Check if the advisor exists using DbContext
+            var advisor = await _context.Users.FirstOrDefaultAsync(u => u.Email == AdvisorEmail);
+            if (advisor == null)
+            {
+                // If the advisor doesn't exist, create a new ApplicationUser
+                advisor = new ApplicationUser
+                {
+                    UserName = AdvisorEmail,
+                    Email = AdvisorEmail,
+                    SchoolId = "ADVISOR"
+                };
+                _context.Users.Add(advisor);
+                await _context.SaveChangesAsync();
+            }
+
+            // Assign the AdvisorId to the Class model
+            model.AdvisorId = advisor.Id;
+
+            // Add the class to the database
+            _context.Classes.Add(model);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = $"Lớp {model.ClassId} thuộc cố vấn {AdvisorEmail} phụ trách đã được thêm thành công!";
+            return RedirectToAction("ClassList");
+
+
+            TempData["Error"] = "Đã xảy ra lỗi khi thêm lớp.";
+            return RedirectToAction("ClassList");
+        }
+    // Edit Class
+        [HttpPost]
+        public async Task<IActionResult> EditClass(Class model)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Classes.Update(model);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = $"Lớp {model.ClassId} đã được cập nhật thành công!";
+                return RedirectToAction("ClassList");
+            }
+            TempData["Error"] = "Đã xảy ra lỗi khi cập nhật lớp.";
+            return RedirectToAction("ClassList");
+        }
+    //Delete Class
+        [HttpPost]
+        public async Task<IActionResult> DeleteClass(string id)
+        {
+            var classToDelete = await _context.Classes.FindAsync(id);
+            if (classToDelete != null)
+            {
+                _context.Classes.Remove(classToDelete);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = $"Lớp {classToDelete.ClassId} đã được xóa thành công!";
+            }
+            else
+            {
+                TempData["Error"] = "Đã xảy ra lỗi khi xóa lớp.";
+            }
+            return RedirectToAction("ClassList");
         }
 //StudentList actions
 

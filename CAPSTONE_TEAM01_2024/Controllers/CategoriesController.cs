@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using System.Drawing.Printing;
 using CAPSTONE_TEAM01_2024.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using System.Data;
 
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
@@ -32,11 +33,23 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         public async Task<IActionResult> ClassList(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "ClassList";
-            var classes = _context.Classes
+            var classes = await _context.Classes
                 .Include(c => c.Advisor)
                 .Include(c => c.Students)
-                .AsQueryable();
-            var paginatedClasses = await PaginatedList<Class>.CreateAsync(classes, pageIndex, pageSize);
+                .Select(c => new Class
+                {
+                    ClassId = c.ClassId,
+                    Term = c.Term,
+                    Department = c.Department,
+                    AdvisorId = c.AdvisorId,
+                    Advisor = c.Advisor ?? new ApplicationUser { Email = "N/A", FullName = "Chưa bổ nhiệm" },
+                    StudentCount = c.StudentCount,
+                    Students = c.Students
+                })
+                .ToListAsync();
+
+            var paginatedClasses = PaginatedList<Class>.Create(classes, pageIndex, pageSize);
+
             var viewModel = new ClassListViewModel
             {
                 Classes = paginatedClasses
@@ -65,6 +78,15 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 await _context.SaveChangesAsync();
             }
 
+            // Check if the class already exists using DbContext
+            var existingClass = await _context.Classes.FirstOrDefaultAsync(c => c.ClassId == model.ClassId);
+            if (existingClass != null)
+            {
+                // If the class already exists, throw a warning
+                TempData["Warning"] = $"Lớp {model.ClassId} đã tồn tại!";
+                return RedirectToAction("ClassList");
+            }
+
             // Assign the AdvisorId to the Class model
             model.AdvisorId = advisor.Id;
 
@@ -73,23 +95,60 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             await _context.SaveChangesAsync();
             TempData["Success"] = $"Lớp {model.ClassId} thuộc cố vấn {AdvisorEmail} phụ trách đã được thêm thành công!";
             return RedirectToAction("ClassList");
-
-
-            TempData["Error"] = "Đã xảy ra lỗi khi thêm lớp.";
-            return RedirectToAction("ClassList");
         }
     // Edit Class
         [HttpPost]
-        public async Task<IActionResult> EditClass(Class model)
+        public async Task<IActionResult> EditClass(Class model, string AdvisorEmail)
         {
-            if (ModelState.IsValid)
+            // Find the existing class
+            var classToUpdate = await _context.Classes
+                .Include(c => c.Advisor)
+                .FirstOrDefaultAsync(c => c.ClassId == model.ClassId);
+
+            if (classToUpdate == null)
             {
-                _context.Classes.Update(model);
-                await _context.SaveChangesAsync();
-                TempData["Success"] = $"Lớp {model.ClassId} đã được cập nhật thành công!";
+                TempData["Error"] = "Lớp không tồn tại!";
                 return RedirectToAction("ClassList");
             }
-            TempData["Error"] = "Đã xảy ra lỗi khi cập nhật lớp.";
+
+            // Check if the advisor email has changed or AdvisorId is null
+            if (string.IsNullOrEmpty(classToUpdate.AdvisorId) || classToUpdate.Advisor.Email != AdvisorEmail)
+            {
+                // Find or create the new advisor
+                var advisor = await _context.Users.FirstOrDefaultAsync(u => u.Email == AdvisorEmail);
+                if (advisor == null)
+                {
+                    advisor = new ApplicationUser
+                    {
+                        UserName = AdvisorEmail,
+                        Email = AdvisorEmail,
+                        SchoolId = "ADVISOR"
+                    };
+                    _context.Users.Add(advisor);
+                    await _context.SaveChangesAsync();
+
+                    // Assign advisor role to the newly created advisor
+                    var advisorRole = await _context.Roles.FirstOrDefaultAsync(r => r.NormalizedName == "ADVISOR");
+                    _context.UserRoles.Add(new IdentityUserRole<string>
+                    {
+                        UserId = advisor.Id,
+                        RoleId = advisorRole.Id
+                    });
+                    await _context.SaveChangesAsync();
+                }
+                classToUpdate.AdvisorId = advisor.Id;
+            }
+
+            // Update other class details
+            classToUpdate.Term = model.Term;
+            classToUpdate.Department = model.Department;
+            classToUpdate.StudentCount = model.StudentCount;
+
+            // Save changes
+            _context.Classes.Update(classToUpdate);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Lớp {model.ClassId} đã được cập nhật thành công!";
             return RedirectToAction("ClassList");
         }
     //Delete Class

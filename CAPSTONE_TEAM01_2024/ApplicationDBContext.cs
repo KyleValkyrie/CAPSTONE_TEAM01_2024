@@ -16,23 +16,24 @@ namespace CAPSTONE_TEAM01_2024
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
-		//Application User Table constraints
+            // Application User Table constraints
             modelBuilder.Entity<ApplicationUser>()
-            .Property(b => b.IsRegistered)
-            .HasDefaultValue(false);
+                .Property(b => b.IsRegistered)
+                .HasDefaultValue(false);
 
-        // Configure one-to-many relationship between ApplicationUser and Class for Advisors
-        modelBuilder.Entity<ApplicationUser>()
-            .HasMany(u => u.AdvisedClasses)
-            .WithOne(c => c.Advisor)
-            .HasForeignKey(c => c.AdvisorId);
+            // Configure one-to-many relationship between ApplicationUser and Class for Advisors
+            modelBuilder.Entity<Class>()
+                .HasOne(c => c.Advisor)
+                .WithMany(u => u.AdvisedClasses)
+                .HasForeignKey(c => c.AdvisorId)
+                .OnDelete(DeleteBehavior.SetNull); // Ensure AdvisorId can be null and removal of Advisor does not delete Class
 
-        // Configure one-to-many relationship between ApplicationUser and Class for Students
-        modelBuilder.Entity<Class>()
-            .HasMany(c => c.Students)
-            .WithOne(u => u.EnrolledClass)
-            .HasForeignKey(u => u.ClassId)
-            .OnDelete(DeleteBehavior.Restrict); // Ensure no cascading delete
+            // Configure one-to-many relationship between ApplicationUser and Class for Students
+            modelBuilder.Entity<Class>()
+                .HasMany(c => c.Students)
+                .WithOne(u => u.EnrolledClass)
+                .HasForeignKey(u => u.ClassId)
+                .OnDelete(DeleteBehavior.Restrict); // Ensure no cascading delete
         }
-	}
+    }
 }

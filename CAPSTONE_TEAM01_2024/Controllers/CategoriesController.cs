@@ -373,7 +373,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
 //StudentList actions
     //Render StudnetLít view
-        public async Task<IActionResult> StudentList(int pageIndex = 1, int pageSize = 20)
+        public async Task<IActionResult> StudentList(int pageIndex = 1, int pageSize = 30)
         {
             ViewData["page"] = "StudentList";
 
@@ -533,10 +533,232 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return RedirectToAction("StudentList");
         }
+    //Download Excel Template for Student
+        public IActionResult GenerateStudentTemplate()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Mẫu Sinh Viên");
+
+                // Define columns
+                worksheet.Cells[1, 1].Value = "Mã Số SV";
+                worksheet.Cells[1, 2].Value = "Email";
+                worksheet.Cells[1, 3].Value = "Họ và Tên";
+                worksheet.Cells[1, 4].Value = "Ngày tháng năm sinh";
+                worksheet.Cells[1, 5].Value = "Mã Lớp";
+                worksheet.Cells[1, 6].Value = "Tình Trạng";
+
+                // Style the header
+                using (var range = worksheet.Cells[1, 1, 1, 6])
+                {
+                    range.Style.Font.Bold = true;
+                    range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                    range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                }
+
+                // Sample data row (optional)
+                worksheet.Cells[2, 1].Value = "2174802010856";
+                worksheet.Cells[2, 2].Value = "duc.2174802010856@vanlanguni.vn";
+                worksheet.Cells[2, 3].Value = "Nguyễn Bùi Minh Đức";
+                worksheet.Cells[2, 4].Value = DateTime.Now.ToString("26/01/2003");
+                worksheet.Cells[2, 5].Value = "71K27CNTT30";
+                worksheet.Cells[2, 6].Value = "Đang học";
+
+                // Auto fit columns
+                worksheet.Cells.AutoFitColumns();
+
+                var stream = new MemoryStream();
+                package.SaveAs(stream);
+                var content = stream.ToArray();
+
+                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Mẫu excel danh sách SV.xlsx");
+            }
+        }
+    //Import Excel Template for Student
+        [HttpPost]
+        public async Task<IActionResult> ImportStudentExcel(IFormFile StudentExcelFile)
+        {
+            if (StudentExcelFile == null || StudentExcelFile.Length == 0)
+            {
+                TempData["Error"] = "Vui lòng chọn file Excel hợp lệ.";
+                return RedirectToAction("StudentList");
+            }
+
+            try
+            {
+                int successCount = 0;
+                int failCount = 0;
+                var failureDetails = new List<string>();
+
+                using (var stream = new MemoryStream())
+                {
+                    await StudentExcelFile.CopyToAsync(stream);
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        var worksheet = package.Workbook.Worksheets[0];
+                        var rowCount = worksheet.Dimension.Rows;
+
+                        for (int row = 2; row <= rowCount; row++)
+                        {
+                            var schoolId = worksheet.Cells[row, 1].Value?.ToString();
+                            var email = worksheet.Cells[row, 2].Value?.ToString();
+                            var fullName = worksheet.Cells[row, 3].Value?.ToString();
+                            var dobString = worksheet.Cells[row, 4].Value?.ToString();
+                            var classId = worksheet.Cells[row, 5].Value?.ToString();
+                            var status = worksheet.Cells[row, 6].Value?.ToString();
+
+                            DateTime dateOfBirth;
+                            if (!DateTime.TryParseExact(dobString, new[] { "dd/MM/yyyy", "M/d/yyyy h:mm:ss tt" }, null, System.Globalization.DateTimeStyles.None, out dateOfBirth))
+                            {
+                                failCount++;
+                                failureDetails.Add($"Dòng {row}: Ngày sinh không hợp lệ '{dobString}'.");
+                                continue; // Skip rows with invalid date
+                            }
+
+                            try
+                            {
+                                // Check if email already exists
+                                var existingUser = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == email);
+                                if (existingUser != null)
+                                {
+                                    failCount++;
+                                    failureDetails.Add($"Dòng {row}: Email đã tồn tại '{email}'.");
+                                    continue; // Skip existing users
+                                }
+
+                                // Check if ClassId exists
+                                var classExists = await _context.Classes.AnyAsync(c => c.ClassId == classId);
+                                if (!classExists)
+                                {
+                                    failCount++;
+                                    failureDetails.Add($"Dòng {row}: Mã Lớp không tồn tại '{classId}'.");
+                                    continue; // Skip rows with non-existing ClassId
+                                }
+
+                                // Create new student
+                                var student = new ApplicationUser
+                                {
+                                    UserName = schoolId,
+                                    Email = email,
+                                    SchoolId = schoolId,
+                                    FullName = fullName,
+                                    DateOfBirth = dateOfBirth,
+                                    ClassId = classId,
+                                    Status = status,
+                                    IsRegistered = false,
+                                    EmailConfirmed = true // or false if you need confirmation
+                                };
+
+                                // Add student to database
+                                _context.ApplicationUsers.Add(student);
+                                await _context.SaveChangesAsync();
+
+                                // Assign student role
+                                var studentRole = await _context.Roles.FirstOrDefaultAsync(r => r.NormalizedName == "STUDENT");
+                                if (studentRole != null)
+                                {
+                                    _context.UserRoles.Add(new IdentityUserRole<string>
+                                    {
+                                        UserId = student.Id,
+                                        RoleId = studentRole.Id
+                                    });
+
+                                    await _context.SaveChangesAsync();
+                                }
+
+                                successCount++;
+                            }
+                            catch (Exception ex)
+                            {
+                                failCount++;
+                                failureDetails.Add($"Dòng {row}: Lỗi hệ thống - {ex.Message}");
+                            }
+                        }
+                    }
+                }
+
+                TempData["Success"] = $"Nhập file Excel thành công! Số bản ghi thành công: {successCount}, số bản ghi thất bại: {failCount}.";
+                if (failCount > 0)
+                {
+                    TempData["Error"] = $"Chi tiết lỗi: {string.Join("; ", failureDetails)}";
+                }
+                return RedirectToAction("StudentList");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Đã xảy ra lỗi khi nhập file Excel: {ex.Message}";
+                return RedirectToAction("StudentList");
+            }
+        }
+    //Export Excel file for Student
+        [HttpPost]
+        public async Task<IActionResult> ExportStudentsByClass(string ClassId)
+        {
+            var students = await _context.ApplicationUsers
+                .Where(u => u.ClassId == ClassId)
+                .ToListAsync();
+
+            if (!students.Any())
+            {
+                TempData["Error"] = "Không có sinh viên nào trong mã lớp này!";
+                return RedirectToAction("StudentList");
+            }
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Danh Sách Sinh Viên");
+
+                // Define columns
+                worksheet.Cells[1, 1].Value = "Mã Số SV";
+                worksheet.Cells[1, 2].Value = "Email";
+                worksheet.Cells[1, 3].Value = "Họ và Tên";
+                worksheet.Cells[1, 4].Value = "Ngày tháng năm sinh";
+                worksheet.Cells[1, 5].Value = "Mã Lớp";
+                worksheet.Cells[1, 6].Value = "Tình Trạng";
+
+                // Style the header
+                using (var range = worksheet.Cells[1, 1, 1, 6])
+                {
+                    range.Style.Font.Bold = true;
+                    range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                    range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                }
+
+                // Populate data rows
+                for (int i = 0; i < students.Count; i++)
+                {
+                    var row = i + 2; // Start from row 2
+                    var student = students[i];
+
+                    worksheet.Cells[row, 1].Value = student.SchoolId;
+                    worksheet.Cells[row, 2].Value = student.Email;
+                    worksheet.Cells[row, 3].Value = student.FullName;
+                    worksheet.Cells[row, 4].Value = student.DateOfBirth.ToString("dd/MM/yyyy") ?? "N/A"; 
+                    worksheet.Cells[row, 5].Value = student.ClassId;
+                    worksheet.Cells[row, 6].Value = student.Status;
+                }
+
+                // Auto fit columns
+                worksheet.Cells.AutoFitColumns();
+
+                var stream = new MemoryStream();
+                package.SaveAs(stream);
+                var content = stream.ToArray();
+
+                // Dynamically set the file name to include ClassId
+                var fileName = $"Danh Sách SV lớp {ClassId}.xlsx";
+                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+        }
+
 
 //SchoolYear actions
     //Render SchoolYear view
-        public async Task<IActionResult> SchoolYear(int pageIndex = 1, int pageSize = 20)
+    public async Task<IActionResult> SchoolYear(int pageIndex = 1, int pageSize = 20)
 		{
 			ViewData["page"] = "SchoolYear";
             var periods = _context.AcademicPeriods.AsQueryable();

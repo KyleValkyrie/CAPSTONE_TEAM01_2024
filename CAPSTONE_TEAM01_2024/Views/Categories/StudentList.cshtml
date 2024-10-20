@@ -27,9 +27,9 @@
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ImportStudentExcelModal">
                                 <i class="bi bi-upload"></i> Nhập File
                             </button>
-                            <a type="button" class="btn btn-secondary" asp-controller="Categories" asp-action="ExportStudentToExcel">
-                                <i class="bi bi-download"></i> Xuất File
-                            </a>
+                            <button type="button" class="btn btn-secondary" onclick="openExportModal()">
+                                <i class="bi bi-download"></i> Xuất File Theo Lớp
+                            </button>
                         </div>
                         <div class="col">
                             <nav class="navbar navbar-light bg-light">
@@ -286,6 +286,61 @@
     </div>
 </div>
 
+<!-- Import Student Excel Modal -->
+<div class="modal fade" id="ImportStudentExcelModal" tabindex="-1" aria-labelledby="ImportStudentExcelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ImportStudentExcelModalLabel">Nhập File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <a href="@Url.Action("GenerateStudentTemplate", "Categories")" class="btn btn-warning">
+                    Tải file excel mẫu <i class="bi bi-download"></i>
+                </a>
+                <form asp-action="ImportStudentExcel" enctype="multipart/form-data">
+                    <div class="mb-3 mt-3">
+                        <label class="form-label">Vui lòng chọn file excel cần nhập:</label>
+                        <div class="input-group">
+                            <input type="file" class="form-control d-none" id="StudentExcelFile" name="StudentExcelFile" accept=".xlsx,.xls" required>
+                            <input type="text" class="form-control" id="customFileUpload" placeholder="Chọn file...">
+                            <button type="button" class="btn btn-outline-secondary" id="uploadButton"> <i class="bi bi-upload"></i></button>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Nhập</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Students Modal -->
+<div class="modal fade" id="ExportStudentsModal" tabindex="-1" aria-labelledby="ExportStudentsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ExportStudentsModalLabel">Xuất File Sinh Viên Theo Lớp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="ExportStudentsByClass" method="post">
+                    <div class="mb-3">
+                        <label for="ClassId" class="form-label">Mã Lớp</label>
+                        <input type="text" class="form-control" id="ClassId" name="ClassId" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Xuất File</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 //Edit Modal JS
     function editStudent(button) {
@@ -356,4 +411,17 @@ function deleteStudent(button) {
         var noResultsRow = document.getElementById('noresults');
         noResultsRow.style.display = noResults ? "table-row" : "none";
     });
+// Import Modal JS
+     document.getElementById('uploadButton').addEventListener('click', function() {
+            document.getElementById('StudentExcelFile').click();
+        });
+
+        document.getElementById('StudentExcelFile').addEventListener('change', function() {
+            var fileName = this.files[0].name;
+            document.getElementById('customFileUpload').value = fileName;
+        });
+//Export Modal JS
+    function openExportModal() {
+        $('#ExportStudentsModal').modal('show');
+    }
 </script>

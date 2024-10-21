@@ -1,8 +1,12 @@
-﻿@model CAPSTONE_TEAM01_2024.ViewModels.ClassListViewModel
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@model CAPSTONE_TEAM01_2024.ViewModels.ClassListViewModel
 
 @{
     ViewData["Title"] = "Danh Sách Lớp";
     int number = (Model.Classes.PageIndex - 1) * Model.Classes.PageSize;
+    var rolesString = HttpContextAccessor.HttpContext.Session.GetString("Roles");
+    var roles = rolesString?.Split(',') ?? new string[0];
+    bool isNotStudent = !roles.Contains("Sinh Viên");
 }
 
 <div class="content-wrapper" style="min-height: 912.2px;">
@@ -22,15 +26,18 @@
                 <div class="card-header">
                     <div class="row text-center">
                         <div class="col-auto">
-                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddClassModal">
-                                <i class="bi bi-plus custom-icon"></i> Thêm Lớp
-                            </button>
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ImportClassExcelModal">
-                                <i class="bi bi-upload"></i> Nhập File
-                            </button>
-                            <a type="button" class="btn btn-secondary" asp-controller="Categories" asp-action="ExportClassToExcel">
-                                <i class="bi bi-download"></i> Xuất File
-                            </a>
+                            @if (isNotStudent)
+                            {
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddClassModal">
+                                    <i class="bi bi-plus custom-icon"></i> Thêm Lớp
+                                </button>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ImportClassExcelModal">
+                                    <i class="bi bi-upload"></i> Nhập File
+                                </button>
+                                <a type="button" class="btn btn-secondary" asp-controller="Categories" asp-action="ExportClassToExcel">
+                                    <i class="bi bi-download"></i> Xuất File
+                                </a>
+                            }
                         </div>
                         <div class="col">
                             <nav class="navbar navbar-light bg-light">
@@ -63,7 +70,10 @@
                                 <th scope="col">Niên Khóa</th>
                                 <th scope="col">Ngành</th>
                                 <th scope="col">Số Lượng SV</th>
-                                <th scope="col">Thao Tác</th>
+                                @if (isNotStudent)
+                                {
+                                    <th scope="col">Thao Tác</th>
+                                }
                             </tr>
                         </thead>
                         <tbody id="classTable">
@@ -83,26 +93,29 @@
                                     <td class="text-center"> 
                                         @classItem.Students.Count / @classItem.StudentCount
                                     </td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#EditClassModal"
-                                                data-class-id="@classItem.ClassId"
-                                                data-term="@classItem.Term"
-                                                data-department="@classItem.Department"
-                                                data-advisor-email="@classItem.Advisor.Email"
-                                                data-student-count="@classItem.StudentCount"
-                                                onclick="openEditModal(this)">
-                                            <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
-                                        </button>
-                                        <button type="button" class="btn btn-outline-danger btn-sm"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#DeleteClassModal"
-                                                data-class-id="@classItem.ClassId"
-                                                onclick="openDeleteModal(this)">
-                                            <i class="fa-solid fa-trash custom-icon"></i> Xóa
-                                        </button>
-                                    </td>
+                                    @if (isNotStudent)
+                                    {
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#EditClassModal"
+                                                    data-class-id="@classItem.ClassId"
+                                                    data-term="@classItem.Term"
+                                                    data-department="@classItem.Department"
+                                                    data-advisor-email="@classItem.Advisor.Email"
+                                                    data-student-count="@classItem.StudentCount"
+                                                    onclick="openEditModal(this)">
+                                                <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#DeleteClassModal"
+                                                    data-class-id="@classItem.ClassId"
+                                                    onclick="openDeleteModal(this)">
+                                                <i class="fa-solid fa-trash custom-icon"></i> Xóa
+                                            </button>
+                                        </td>
+                                    }
                                 </tr>
                             }
                             <tr id="noresults" style="display: none;">

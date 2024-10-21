@@ -24,6 +24,7 @@
     display: block;
     width: 100%;
     padding-left: 0; /* No extra padding for alignment */
+    font-size:15px;
 }
 
     .dropdown-menu .dropdown-item {
@@ -31,6 +32,7 @@
         background-color: transparent;
         font-weight: normal; /* Lighter font weight */
         padding-left: 20px; /* Indent dropdown items */
+   
     }
 
         .dropdown-menu .dropdown-item.active,
@@ -59,7 +61,7 @@
     .sidebar .nav-link {
         color: #fff;
         border-radius: 5px;
-        font-size: 20px;
+        font-size: 17px;
         font-weight: bold;
     }
 

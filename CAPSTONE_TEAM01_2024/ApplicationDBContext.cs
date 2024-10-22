@@ -14,6 +14,7 @@ namespace CAPSTONE_TEAM01_2024
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<Announcement> Announcements { get; set; }
+        public DbSet<UserAnnouncement> UserAnnouncements { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);

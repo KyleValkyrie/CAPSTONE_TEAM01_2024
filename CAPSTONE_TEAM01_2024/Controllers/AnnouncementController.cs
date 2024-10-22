@@ -12,6 +12,7 @@ using CAPSTONE_TEAM01_2024.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using System.Data;
 using System.Drawing;
+using System.Security.Claims;
 
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
@@ -34,30 +35,69 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 			ViewBag.Error = TempData["Error"];
 			return View(paginatedAnnouncements);
 		}
-	//Add Announcement
-		[HttpPost]
-		public async Task<IActionResult> CreateAnnouncement(Announcement model)
-		{
-			var existingAnnouncement = await _context.Announcements.FirstOrDefaultAsync(a =>
-												a.Detail == model.Detail &&
-												a.StartTime == model.StartTime &&
-												a.EndTime == model.EndTime &&
-												a.Type == model.Type);
-			if (existingAnnouncement == null)
-			{
-				_context.Announcements.Add(model);
-				await _context.SaveChangesAsync();
-				TempData["Success"] = $"Thông báo '{model.Detail}' đã được tạo thành công!";
-				return RedirectToAction("AnnouncementList");
-			}
-			else
-			{
-				TempData["Warning"] = "Thông báo đã tồn tại trong hệ thống";
-				return RedirectToAction("AnnouncementList");
-			}
-		}
-	//Edit Announcement
-		[HttpPost]
+    //Add Announcement
+        [HttpPost]
+        public async Task<IActionResult> CreateAnnouncement(Announcement model)
+        {
+            var existingAnnouncement = await _context.Announcements.FirstOrDefaultAsync(a =>
+                a.Detail == model.Detail &&
+                a.StartTime == model.StartTime &&
+                a.EndTime == model.EndTime &&
+                a.Type == model.Type);
+
+            if (existingAnnouncement == null)
+            {
+                _context.Announcements.Add(model);
+                await _context.SaveChangesAsync();
+
+                // Fetch all classes
+                var classes = await _context.Classes.Include(c => c.Advisor).ToListAsync();
+
+                // Convert year terms to DateTime
+                var relevantAdvisors = classes
+                    .Where(c =>
+                    {
+                        var termParts = c.Term.Split('-');
+                        if (termParts.Length == 2 &&
+                            int.TryParse(termParts[0], out int termStartYear) &&
+                            int.TryParse(termParts[1], out int termEndYear))
+                        {
+                            var termStart = new DateTime(termStartYear, 1, 1);
+                            var termEnd = new DateTime(termEndYear, 12, 31);
+                            return termStart <= model.StartTime && termEnd >= model.StartTime;
+                        }
+                        return false;
+                    })
+                    .Select(c => c.Advisor)
+                    .Where(a => a != null) // Ensure advisors are not null
+                    .Distinct()
+                    .ToList();
+
+                foreach (var advisor in relevantAdvisors)
+                {
+                    if (advisor != null)
+                    {
+                        var userAnnouncement = new UserAnnouncement
+                        {
+                            UserId = advisor.Id,
+                            AnnouncementId = model.Id,
+                            IsRead = false,
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        _context.UserAnnouncements.Add(userAnnouncement);
+                    }
+                }
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = $"Thông báo '{model.Detail}' đã được tạo thành công và thông báo cho cố vấn liên quan!";
+                return RedirectToAction("AnnouncementList");
+            }
+
+            TempData["Error"] = "Thông báo trùng lặp hoặc đã xảy ra lỗi.";
+            return RedirectToAction("AnnouncementList");
+        }
+    //Edit Announcement
+        [HttpPost]
 		public async Task<IActionResult> EditAnnouncement(Announcement model)
 		{
 			var similarAnnouncement = await _context.Announcements.AnyAsync(a =>
@@ -116,5 +156,46 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 			var announcements = await _context.Announcements.OrderByDescending(a => a.StartTime).ToListAsync();
 			return PartialView("_AnnouncementTable", announcements);
 		}
-	}
+	//Notification system
+		public async Task<IActionResult> GetNewAnnouncementsCount()
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var newAnnouncementsCount = await _context.UserAnnouncements
+				.Where(ua => ua.UserId == userId && !ua.IsRead)
+				.CountAsync();
+			return Json(new { count = newAnnouncementsCount });
+		}
+        [HttpPost]
+        public async Task<IActionResult> MarkAnnouncementAsRead(int announcementId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userAnnouncement = await _context.UserAnnouncements
+                .FirstOrDefaultAsync(ua => ua.UserId == userId && ua.AnnouncementId == announcementId);
+
+            if (userAnnouncement != null)
+            {
+                userAnnouncement.IsRead = true;
+                await _context.SaveChangesAsync();
+            }
+
+            return Json(new { success = true });
+        }
+        [HttpPost]
+        public async Task<IActionResult> MarkAllAnnouncementsAsRead()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userAnnouncements = await _context.UserAnnouncements
+                .Where(ua => ua.UserId == userId && !ua.IsRead)
+                .ToListAsync();
+
+            foreach (var ua in userAnnouncements)
+            {
+                ua.IsRead = true;
+            }
+
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
+        }
+
+    }
 }

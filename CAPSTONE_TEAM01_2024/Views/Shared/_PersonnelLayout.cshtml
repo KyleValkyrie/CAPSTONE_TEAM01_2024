@@ -100,14 +100,14 @@
                                     <a class="dropdown-item" href="/Announcement/AnnouncementList" id="linkAnnouncement" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
                                        onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
                                        onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                        <i class="bi bi-journal-text"></i> Danh Sách
+                                        <i class="bi bi-person-badge"></i> Của Tôi
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" href="#" id="linkMyAnnouncement" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
                                        onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
                                        onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                        <i class="bi bi-person-badge"></i> Của Tôi
+                                        <i class="bi bi-journal-text"></i> Danh Sách
                                     </a>
                                 </li>
                             </ul>
@@ -218,7 +218,7 @@
             }
 
             // Load dropdown state from session storage
-            const dropdownMenus = ['dropdownMenu1', 'dropdownMenu2'];
+            const dropdownMenus = ['dropdownMenu1', 'dropdownMenu2', 'dropdownMenu3'];
             dropdownMenus.forEach(menuId => {
                 const menuState = sessionStorage.getItem(menuId);
                 const menu = document.getElementById(menuId);

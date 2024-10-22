@@ -5,14 +5,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CAPSTONE_TEAM01_2024
 {
-	public class ApplicationDbContext : IdentityDbContext<IdentityUser>
-	{
-		public ApplicationDbContext(DbContextOptions options) : base(options)
-		{
-		}
-		public DbSet<AcademicPeriod> AcademicPeriods { get; set; }
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+    {
+        public ApplicationDbContext(DbContextOptions options) : base(options)
+        {
+        }
+        public DbSet<AcademicPeriod> AcademicPeriods { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Class> Classes { get; set; }
+        public DbSet<Announcement> Announcements { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);

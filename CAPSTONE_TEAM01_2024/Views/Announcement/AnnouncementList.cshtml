@@ -1,3 +1,5 @@
+@model CAPSTONE_TEAM01_2024.Utilities.PaginatedList<CAPSTONE_TEAM01_2024.Models.Announcement>
+
 @{
 ViewData["Title"] = "Announcement";
 }
@@ -21,7 +23,7 @@ ViewData["Title"] = "Announcement";
 				<div class="card-header">
 					<div class="row text-center">
 						<div class="col-auto">
-							<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddAccouncementModal">
+							<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddAnnouncementModal">
 								<i class="bi bi-plus custom-icon"></i> Tạo Thông Báo
 							</button>
 					</div>
@@ -37,6 +39,18 @@ ViewData["Title"] = "Announcement";
 				<!-- /.card-header -->
 
 				<div class="card-body">
+					@if (TempData["Success"] != null)
+					{
+						<div class="alert alert-success">@TempData["Success"]</div>
+					}
+					@if (TempData["Error"] != null)
+					{
+						<div class="alert alert-danger">@TempData["Error"]</div>
+					}
+					@if (TempData["Warning"] != null)
+					{
+						<div class="alert alert-danger">@TempData["Warning"]</div>
+					}
 					<table class="table table-striped">
 						<thead>
 							<tr class="text-center">
@@ -49,10 +63,89 @@ ViewData["Title"] = "Announcement";
 							</tr>
 						</thead>
 						<tbody id="classTable">
-					
+							@foreach (var announcement in Model)
+							{
+							<tr>
+								<td class="text-center">@announcement.Id</td>
+								<td class ="text-center">@announcement.Detail</td>
+								<td class="text-center">@announcement.StartTime.ToString("dd-MM-yyyy")</td>
+								<td class="text-center">@announcement.EndTime.ToString("dd-MM-yyyy")</td>
+								<td class="text-center">@announcement.Type</td>
+								<td class="text-center">
+									<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#EditAnnouncementModal"
+											data-id="@announcement.Id"
+											data-detail="@announcement.Detail"
+											data-starttime="@announcement.StartTime.ToString("yyyy-MM-dd")"
+											data-endtime="@announcement.EndTime.ToString("yyyy-MM-dd")"
+											data-type="@announcement.Type"
+											onclick="editAnnouncement(this)">
+										<i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
+									</button>
+									<button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteAnnouncementModal"
+											data-id="@announcement.Id"
+											onclick="deleteAnnouncement(this)">
+										<i class="fa-solid fa-trash custom-icon"></i> Xóa
+									</button>
+								</td>
+							</tr>
+							}
+							<tr id="noresults" style="display: none;">
+								<td colspan="6" class="text-center">Không tìm thấy nội dung</td>
+							</tr>
 						</tbody>
 					</table>
-				
+					<nav aria-label="Page navigation" style="float:right;">
+						<ul class="pagination">
+							@if (Model.HasPreviousPage)
+							{
+								<li class="page-item">
+									<a class="page-link" asp-action="AnnouncementList" asp-route-pageIndex="@(Model.PageIndex - 1)" aria-label="Previous">
+										<span aria-hidden="true">&laquo;</span>
+									</a>
+								</li>
+							}
+							else
+							{
+								<li class="page-item disabled">
+									<a class="page-link" aria-label="Previous">
+										<span aria-hidden="true">&laquo;</span>
+									</a>
+								</li>
+							}
+							@for (var i = 1; i <= Model.TotalPages; i++)
+							{
+								if (i == Model.PageIndex)
+								{
+									<li class="page-item active">
+										<a class="page-link">@i</a>
+									</li>
+								}
+								else
+								{
+									<li class="page-item">
+										<a class="page-link" asp-action="AnnouncementList" asp-route-pageIndex="@i">@i</a>
+									</li>
+								}
+							}
+							@if (Model.HasNextPage)
+							{
+								<li class="page-item">
+									<a class="page-link" asp-action="AnnouncementList" asp-route-pageIndex="@(Model.PageIndex + 1)" aria-label="Next">
+										<span aria-hidden="true">&raquo;</span>
+									</a>
+								</li>
+							}
+							else
+							{
+								<li class="page-item disabled">
+									<a class="page-link" aria-label="Next">
+										<span aria-hidden="true">&raquo;</span>
+									</a>
+								</li>
+							}
+						</ul>
+					</nav>
+
 				</div>
 				<!-- /.card-body -->
 			</div>
@@ -60,3 +153,155 @@ ViewData["Title"] = "Announcement";
 	</main>
 	<!-- /.content -->
 </div>
+
+<!-- Add Announcement Modal -->
+<div class="modal fade" id="AddAnnouncementModal" tabindex="-1" aria-labelledby="AddAnnouncementModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="AddAnnouncementModalLabel">Tạo Thông Báo</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form id="AddAnnouncementForm" asp-controller="Announcement" asp-action="CreateAnnouncement" method="post">
+					<div class="mb-3">
+						<label for="Detail" class="form-label">Nội Dung</label>
+						<textarea class="form-control" id="Detail" name="Detail" required></textarea>
+					</div>
+					<div class="mb-3">
+						<label for="StartTime" class="form-label">Thời Gian Bắt Đầu</label>
+						<input type="date" class="form-control" id="StartTime" name="StartTime" required>
+					</div>
+					<div class="mb-3">
+						<label for="EndTime" class="form-label">Thời Gian Kết Thúc</label>
+						<input type="date" class="form-control" id="EndTime" name="EndTime" required>
+					</div>
+					<div class="mb-3">
+						<label for="Type" class="form-label">Loại Kế Hoạch</label>
+						<input type="text" class="form-control" id="Type" name="Type" required>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+						<button type="submit" class="btn btn-primary">Tạo Thông Báo</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Edit Announcement Modal -->
+<div class="modal fade" id="EditAnnouncementModal" tabindex="-1" aria-labelledby="EditAnnouncementModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="EditAnnouncementModalLabel">Cập nhật Thông Báo</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form id="EditAnnouncementForm" asp-action="EditAnnouncement" method="post">
+					<input type="hidden" id="EditAnnouncementId" name="Id" />
+					<div class="mb-3">
+						<label for="EditDetail" class="form-label">Nội Dung</label>
+						<textarea class="form-control" id="EditDetail" name="Detail" required></textarea>
+					</div>
+					<div class="mb-3">
+						<label for="EditStartTime" class="form-label">Thời Gian Bắt Đầu</label>
+						<input type="date" class="form-control" id="EditStartTime" name="StartTime" required>
+					</div>
+					<div class="mb-3">
+						<label for="EditEndTime" class="form-label">Thời Gian Kết Thúc</label>
+						<input type="date" class="form-control" id="EditEndTime" name="EndTime" required>
+					</div>
+					<div class="mb-3">
+						<label for="EditType" class="form-label">Loại Kế Hoạch</label>
+						<input type="text" class="form-control" id="EditType" name="Type" required>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+						<button type="submit" class="btn btn-primary">Cập nhật</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Delete Announcement Modal -->
+<div class="modal fade" id="DeleteAnnouncementModal" tabindex="-1" aria-labelledby="DeleteAnnouncementModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="DeleteAnnouncementModalLabel">Xóa Thông Báo</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<p>Bạn có chắc chắn muốn xóa thông báo này không?</p>
+				<form id="DeleteAnnouncementForm" asp-action="DeleteAnnouncement" method="post">
+					<input type="hidden" id="DeleteAnnouncementId" name="Id" />
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+						<button type="submit" class="btn btn-danger">Xóa</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+//Edit Modal JS
+	function editAnnouncement(button) {
+		var id = button.getAttribute('data-id');
+		var detail = button.getAttribute('data-detail');
+		var startTime = button.getAttribute('data-starttime');
+		var endTime = button.getAttribute('data-endtime');
+		var type = button.getAttribute('data-type');
+
+		document.getElementById('EditAnnouncementId').value = id;
+		document.getElementById('EditDetail').value = detail;
+		document.getElementById('EditStartTime').value = startTime;
+		document.getElementById('EditEndTime').value = endTime;
+		document.getElementById('EditType').value = type;
+	}
+//Delete Modal JS
+	function deleteAnnouncement(button) {
+		var id = button.getAttribute('data-id');
+		document.getElementById('DeleteAnnouncementId').value = id;
+	}
+//Search JS
+	document.getElementById('searchInput').addEventListener('input', function () {
+		var query = this.value;
+
+		if (query.trim() === "") {
+			// If the query is empty, reload the entire table
+			fetch('@Url.Action("AnnouncementListPartial", "Announcement")')
+				.then(response => response.text())
+				.then(data => {
+					document.getElementById('classTable').innerHTML = data;
+					toggleNoResults();
+				});
+		} else {
+			// Otherwise, perform the search
+			$.ajax({
+				type: "GET",
+				url: '@Url.Action("SearchAnnouncements", "Announcement")',
+				data: { query: query },
+				success: function (data) {
+					document.getElementById('classTable').innerHTML = data;
+					toggleNoResults();
+				},
+				error: function () {
+					alert('Lỗi khi tìm kiếm. Vui lòng thử lại.');
+				}
+			});
+		}
+	});
+
+	function toggleNoResults() {
+		var rows = document.getElementById('classTable').getElementsByTagName('tr');
+		var visibleRows = Array.from(rows).filter(row => row.style.display !== 'none' && row.id !== 'noresults');
+		var noResultsRow = document.getElementById('noresults');
+		noResultsRow.style.display = (visibleRows.length === 0) ? "table-row" : "none";
+	}
+</script>

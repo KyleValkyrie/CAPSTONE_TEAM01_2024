@@ -1,0 +1,41 @@
+﻿@model IEnumerable<CAPSTONE_TEAM01_2024.Models.Announcement>
+
+<tbody id="classTable">
+    @if (Model.Any())
+    {
+        @foreach (var announcement in Model)
+        {
+            <tr>
+                <td class="text-center">@announcement.Id</td>
+                <td class="text-center">@announcement.Detail</td>
+                <td class="text-center">@announcement.StartTime.ToString("yyyy-MM-dd")</td>
+                <td class="text-center">@announcement.EndTime.ToString("yyyy-MM-dd")</td>
+                <td class="text-center">@announcement.Type</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#EditAnnouncementModal"
+                            data-id="@announcement.Id"
+                            data-detail="@announcement.Detail"
+                            data-starttime="@announcement.StartTime.ToString("yyyy-MM-dd")"
+                            data-endtime="@announcement.EndTime.ToString("yyyy-MM-dd")"
+                            data-type="@announcement.Type"
+                            onclick="editAnnouncement(this)">
+                        <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#DeleteAnnouncementModal"
+                            onclick="openDeleteModal('@announcement.Id')">
+                        <i class="fa-solid fa-trash custom-icon"></i> Xóa
+                    </button>
+                </td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr id="noresults">
+            <td colspan="6" class="text-center">Không tìm thấy nội dung</td>
+        </tr>
+    }
+</tbody>
+

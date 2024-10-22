@@ -31,8 +31,12 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             ViewData["page"] = "EndSemesterReport";
             return View();
         }
-
-
+//SemesterPlanDetail actions
+        public IActionResult SemesterPlanDetail()
+        {
+            ViewData["page"] = "SemesterPlanDetail";
+            return View();
+        }
 //ClassList actions
     //Render ClassList
         public async Task<IActionResult> ClassList(int pageIndex = 1, int pageSize = 20)

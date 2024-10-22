@@ -1,0 +1,216 @@
+@{
+    ViewData["Title"] = "Semester Plan Detail";
+}
+<style>
+
+    .content-wrapper {
+        max-width: 1200px; /* Giới hạn chiều rộng của content */
+        margin: 0 auto; /* Căn giữa nội dung */
+        padding: 20px; /* Thêm khoảng cách cho đẹp hơn */
+    }
+
+    .table {
+        width: 100%; /* Đảm bảo bảng chiếm đúng chiều rộng của container */
+        table-layout: fixed; /* Cố định layout bảng để các cột không bị co giãn */
+        overflow-x: auto; /* Thêm thanh cuộn ngang nếu cần */
+        margin: 10px 0; /* Khoảng cách giữa bảng và các phần tử khác */
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+        word-wrap: break-word; /* Xuống dòng nếu nội dung quá dài */
+    }
+
+    .align-column, .column-dinh-luong {
+        height: 130px;
+        width: 100%; /* Đảm bảo các ô vừa khít */
+    }
+
+    .card {
+        overflow: hidden; /* Tránh phần tử con tràn ra ngoài */
+    }
+
+    .btn-equal-width {
+        width: 120px;
+    }
+
+
+</style>
+<div class="content-wrapper" style="min-height: 912.2px;">
+        <!-- Content Header (Page header) -->
+        <header class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Kế Hoạch CVHT 2024-2025</h1>
+                    </div>
+                </div>
+            </div>
+        </header>
+    
+        <!-- Main content -->
+        <main class="content">
+            <div class="container-fluid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Thông Tin Kế Hoạch</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="planForm">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="column-ma-ke-hoach" style="width: 70px;">Mã Kế Hoạch</th>
+                                        <th class="column-tieu-chi">Tiêu Chí</th>
+                                        <th class="column-mo-ta-cong-viec">Mô Tả Công Việc</th>
+                                        <th>Cách Thực Hiện</th>
+                                        <th>Định Lượng</th>
+                                        <th>Thời Gian</th>
+                                        <th>Ghi Chú</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Row 1 -->
+                                    <tr>
+                                        <td class="column-ma-ke-hoach"><strong>1</strong></td>
+                                        <td class="column-tieu-chi"><strong>Một số nội dung cơ bản của nhiệm vụ CVHT</strong></td>
+                                        <td class="align-column">
+                                            <div style="max-height: 100px" class="align-column form-control" >Kế hoạch CVHT</div>
+                                            <div style="max-height: 100px; overflow-y: scroll" class="align-column form-control mt-1" >Họp lớp tập trung triển khai các quy chế tổ chức đào tạo, cấu trúc lưu đồ của CTĐT, quy định tiếng Anh, mục tiêu đào tạo, chuẩn đầu ra, bầu ban cán sự lớp, hướng dẫn sv lập kế hoạch học tập …</div>
+                                            <div style="max-height: 100px" class="align-column form-control mt-1 ">Lịch để CVHT tư vấn cá nhân cho sinh viên</div>
+    
+                                        </td>
+                                        
+                                        <td class="align-column">
+                                            <textarea style="max-height: 100px" class="align-column form-control" placeholder="Cách Thực Hiện"></textarea>
+                                            <textarea style="max-height: 100px" class="align-column form-control mt-1" placeholder="Cách Thực Hiện"></textarea>
+                                            <textarea style="max-height: 100px" class="align-column form-control mt-1" placeholder="Cách Thực Hiện"></textarea>
+                                        </td>
+                                        <td style="max-width: 110px;" class="column-dinh-luong">
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control" placeholder="Định Lượng"></textarea>
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control mt-1" placeholder="Định Lượng"></textarea>
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control mt-1" placeholder="Định Lượng"></textarea>
+                                        </td>
+                                        <td style="max-width: 110px;" class="column-dinh-luong">
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control" placeholder="Thời Gian"></textarea>
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control mt-1" placeholder="Thời Gian"></textarea>
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control mt-1" placeholder="Thời Gian"></textarea>
+                                        </td>
+                                        <td style="max-width: 110px;" class="column-dinh-luong">
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control">Có lập kế hoạch CVHT theo TB</textarea>
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control mt-1">Tổ chức 100% các buổi họp tập trung online</textarea>
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control mt-1">Có TB lịch cho SV và trực theo đúng lịch đã công bố</textarea>
+                                        </td>
+                                    </tr>
+                                    <!-- Row 2 -->
+                                    <tr>
+                                        <td class="column-ma-ke-hoach"><strong>2</strong></td>
+                                        <td class="column-tieu-chi"><strong>Hướng dẫn sinh viên lập và đăng ký kế hoạch học tập (KHHT)</strong></td>
+                                        <td class="align-column">
+                                            <div style="max-height: 100px" class="align-column form-control">Hướng dẫn sinh viên lập và đăng ký KHHT</div>
+                                            <div style="max-height: 100px" class="align-column form-control mt-1">Hướng dẫn sinh viên ĐKHP</div>
+                                        </td>
+                                        <td class="align-column">
+                                            <textarea style="max-height: 100px" class="align-column form-control" placeholder="Cách Thực Hiện"></textarea>
+                                            <textarea style="max-height: 100px" class="align-column form-control mt-1" placeholder="Cách Thực Hiện"></textarea>
+                                        </td>
+                                        <td style="max-width: 110px;" class="column-dinh-luong">
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control" placeholder="Định Lượng"></textarea>
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control mt-1" placeholder="Định Lượng"></textarea>
+                                        </td>
+                                        <td style="max-width: 110px;" class="column-dinh-luong">
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control" placeholder="Thời Gian"></textarea>
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control mt-1" placeholder="Thời Gian"></textarea>
+                                        </td>
+                                        <td style="max-width: 110px;" class="column-dinh-luong">
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control">Có ít nhất 70% SV lập và đăng ký KHHT ở mỗi học kỳ</textarea>
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control mt-1">Có ít nhất 70% SV lập và đăng ký KHHT ở mỗi học kỳ</textarea>
+                                        </td>
+                                    </tr>
+                                    <!-- Row 3 -->
+                                    <tr>
+                                        <td class="column-ma-ke-hoach"><strong>3</strong></td>
+                                        <td class="column-tieu-chi"><strong>Đăng ký học phần (ĐKHP)</strong></td>
+                                        <td class="align-column">
+                                            <div style="max-height: 100px" class="align-column form-control">Tư vấn phương pháp học tập</div>
+                                            <div style="max-height: 100px" class="align-column form-control mt-1">Tổ chức cho sinh viên chia sẻ kinh nghiệm học tập</div>
+                                        </td>
+                                        <td class="align-column">
+                                            <textarea style="max-height: 100px" class="align-column form-control" placeholder="Cách Thực Hiện"></textarea>
+                                            <textarea style="max-height: 100px" class="align-column form-control mt-1" placeholder="Cách Thực Hiện"></textarea>
+                                        </td>
+                                        <td style="max-width: 110px;" class="column-dinh-luong">
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control" placeholder="Định Lượng"></textarea>
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control mt-1" placeholder="Định Lượng"></textarea>
+                                        </td>
+                                        <td style="max-width: 110px;" class="column-dinh-luong">
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control" placeholder="Thời Gian"></textarea>
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control mt-1" placeholder="Thời Gian"></textarea>
+                                        </td>
+                                        <td style="max-width: 110px;" class="column-dinh-luong">
+                                            <textarea style="max-height:100px" class="column-dinh-luong form-control">Có ít nhất 70% SV học đúng lộ trình của năm học</textarea>
+                                        </td>
+                                    </tr>
+                                    <!-- Row 4 -->
+                                    <tr>
+                                        <td class="column-ma-ke-hoach"><strong>4</strong></td>
+                                        <td class="column-tieu-chi"><strong>Tư vấn phương pháp học tập, tổ chức cho sinh viên chia sẻ kinh nghiệm học tập</strong></td>
+                                        <td class="align-column">
+                                            <div style="max-height: 100px" class="align-column form-control">Xử lý học vụ</div>
+                                            <div style="max-height: 100px" class="align-column form-control mt-1">Cảnh báo sớm</div>
+                                        </td>
+                                        <td class="align-column">
+                                            <textarea style="max-height: 100px" class="align-column form-control" placeholder="Cách Thực Hiện"></textarea>
+                                            <textarea style="max-height: 100px" class="align-column form-control mt-1" placeholder="Cách Thực Hiện"></textarea>
+                                        </td>
+                                        <td style="max-width: 310px;"  class="column-dinh-luong">
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control" placeholder="Định Lượng"></textarea>
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control mt-1" placeholder="Định Lượng"></textarea>
+                                        </td>
+                                        <td style="max-width: 110px;" class="column-dinh-luong">
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control" placeholder="Thời Gian"></textarea>
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control mt-1" placeholder="Thời Gian"></textarea>
+                                        </td>
+                                        <td style="max-width: 110px;" class="column-dinh-luong">
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control">Không quá 10% SV bỏ học hằng năm</textarea>
+                                        </td>
+                                    </tr>
+                                    <!-- Row 5 -->
+                                    <tr>
+                                        <td class="column-ma-ke-hoach"><strong>5</strong></td>
+                                        <td class="column-tieu-chi"><strong>Chăm sóc sinh viên diện đặc biệt; Công tác phối hợp để thực hiện nhiệm vụ CVHT</strong></td>
+                                        <td class="align-column">
+                                            <div style="max-height: 100px; overflow-y: scroll" class="align-column form-control mt-1">Phối hợp với Trợ lý CTSV Khoa/Thư ký Khoa/Phụ trách học vụ để xử lý kịp thời, đầy đủ các đề xuất/khiếu nại (nếu có) của sinh viên</div>
+                                        </td>
+                                        <td class="align-column">
+                                            <textarea style="max-height: 100px" class="align-column form-control" placeholder="Cách Thực Hiện"></textarea>
+                                        </td>
+                                        <td style="max-width: 110px;" class="column-dinh-luong">
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control" placeholder="Định Lượng"></textarea>
+                                        </td>
+                                        <td style="max-width: 300px;" class="column-dinh-luong">
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control" placeholder="Thời Gian"></textarea>
+                                        </td>
+                                        <td style="max-width: 250px;" class="column-dinh-luong">
+                                            <textarea style="max-height: 100px" class="column-dinh-luong form-control">Có sự hợp tác chặt chẽ</textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="row col-12">
+                                <div class="row col-12">
+                                <div class="col-sm-12 text-end">
+                                  <button type="Back" class="btn btn-secondary btn-equal-width me-2">Quay Lại</button>
+                                  <button type="SaveDraft" class="btn btn-success btn-equal-width me-2">Lưu Nháp</button>
+                                  <button type="Save" class="btn btn-primary btn-equal-width">Lưu</button>
+                                </div>
+                              </div>
+                            </div>
+    
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>

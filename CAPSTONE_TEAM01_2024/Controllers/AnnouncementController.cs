@@ -197,5 +197,25 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return Json(new { success = true });
         }
 
+//My Announcements actions
+    //Render the view
+        public async Task<IActionResult> MyAnnouncements(int pageIndex = 1, int pageSize = 20)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var myAnnouncementsQuery = _context.UserAnnouncements
+                .Where(ua => ua.UserId == userId)
+                .Include(ua => ua.Announcement)
+                .OrderByDescending(ua => ua.Announcement.StartTime)
+                .AsQueryable();
+
+            var paginatedMyAnnouncements = await PaginatedList<UserAnnouncement>.CreateAsync(myAnnouncementsQuery, pageIndex, pageSize);
+
+            ViewBag.Warning = TempData["Warning"];
+            ViewBag.Success = TempData["Success"];
+            ViewBag.Error = TempData["Error"];
+
+            return View(paginatedMyAnnouncements);
+        }
+
     }
 }

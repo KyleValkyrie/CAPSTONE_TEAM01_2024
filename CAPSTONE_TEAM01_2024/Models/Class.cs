@@ -10,8 +10,7 @@ namespace CAPSTONE_TEAM01_2024.Models
         public string Term { get; set; } // Nien Khoa, e.g., 2022-2026
         [Required]
         public string Department { get; set; } // Nganh, e.g., Information Technology
-        [Required]
-        public string AdvisorId { get; set; } // Foreign Key to ApplicationUser
+        public string? AdvisorId { get; set; } // Foreign Key to ApplicationUser
         public ApplicationUser Advisor { get; set; }
         [Required]
         public int StudentCount { get; set; } // Maximum number of students

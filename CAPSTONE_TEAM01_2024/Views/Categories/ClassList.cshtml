@@ -25,6 +25,12 @@
                             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddClassModal">
                                 <i class="bi bi-plus custom-icon"></i> Thêm Lớp
                             </button>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ImportClassExcelModal">
+                                <i class="bi bi-upload"></i> Nhập File
+                            </button>
+                            <a type="button" class="btn btn-secondary" asp-controller="Categories" asp-action="ExportClassToExcel">
+                                <i class="bi bi-download"></i> Xuất File
+                            </a>
                         </div>
                         <div class="col">
                             <nav class="navbar navbar-light bg-light">
@@ -43,6 +49,10 @@
                     @if (TempData["Error"] != null)
                     {
                         <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+                    @if (TempData["Warning"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Warning"]</div>
                     }
                     <table class="table table-striped">
                         <thead>
@@ -63,23 +73,33 @@
                                 <tr>
                                     <td class="text-center">@number</td>
                                     <td class="text-center">@classItem.ClassId</td>
-                                    <td class="text-center">@(string.IsNullOrEmpty(classItem.Advisor.FullName) ? classItem.Advisor.Email : classItem.Advisor.FullName)</td>
+                                    <td class="text-center">
+                                        @(classItem.Advisor != null ?
+                                            (string.IsNullOrEmpty(classItem.Advisor.FullName) ? classItem.Advisor.Email : classItem.Advisor.FullName) :
+                                            "Chưa bổ nhiệm")
+                                    </td>
                                     <td class="text-center">@classItem.Term</td>
                                     <td class="text-center">@classItem.Department</td>
                                     <td class="text-center"> 
                                         @classItem.Students.Count / @classItem.StudentCount
                                     </td>
                                     <td class="text-center">
-                                        <button type="button" class="btn btn-outline-primary btn-sm" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#EditClassModal" 
-                                                onclick="openEditModal('@classItem.ClassId')">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#EditClassModal"
+                                                data-class-id="@classItem.ClassId"
+                                                data-term="@classItem.Term"
+                                                data-department="@classItem.Department"
+                                                data-advisor-email="@classItem.Advisor.Email"
+                                                data-student-count="@classItem.StudentCount"
+                                                onclick="openEditModal(this)">
                                             <i class="fa-solid fa-pen-to-square custom-icon"></i> Cập nhật
                                         </button>
-                                        <button type="button" class="btn btn-outline-danger btn-sm" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#DeleteClassModal" 
-                                                onclick="openDeleteModal('@classItem.ClassId')">
+                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#DeleteClassModal"
+                                                data-class-id="@classItem.ClassId"
+                                                onclick="openDeleteModal(this)">
                                             <i class="fa-solid fa-trash custom-icon"></i> Xóa
                                         </button>
                                     </td>
@@ -167,7 +187,8 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Ngành</label>
-                        <select class="form-control" name="Department" required>
+                        <select class="form-select" name="Department" required>
+                            <option value="" disabled selected>Xin hãy chọn ngành</option>
                             <option value="7480201 - Công nghệ Thông tin (CTTC)">7480201 - Công nghệ Thông tin (CTTC)</option>
                             <option value="7480201 - Công nghệ Thông tin (CTĐB)">7480201 - Công nghệ Thông tin (CTĐB)</option>
                             <option value="7480104 - Hệ thống Thông tin (CTTC)">7480104 - Hệ thống Thông tin (CTTC)</option>
@@ -201,15 +222,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form asp-action="EditClass" method="post">
+                <form id="editClassForm" asp-action="EditClass" method="post">
                     <input type="hidden" id="EditClassId" name="ClassId" />
                     <div class="mb-3">
                         <label class="form-label">Mã Lớp</label>
                         <input type="text" class="form-control" id="EditClassIdDisplay" readonly />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tên Lớp</label>
-                        <input type="text" class="form-control" id="EditClassName" name="ClassName" required />
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Niên Khóa</label>
@@ -217,17 +234,20 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Ngành</label>
-                        <input type="text" class="form-control" id="EditDepartment" name="Department" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Cố Vấn</label>
-                        <select class="form-control" id="EditAdvisorId" name="AdvisorId" required>
-                            @* Populate this with available advisors *@
+                        <select class="form-select" id="EditDepartment" name="Department" required>
+                            <option value="7480201 - Công nghệ Thông tin (CTTC)">7480201 - Công nghệ Thông tin (CTTC)</option>
+                            <option value="7480201 - Công nghệ Thông tin (CTĐB)">7480201 - Công nghệ Thông tin (CTĐB)</option>
+                            <option value="7480104 - Hệ thống Thông tin (CTTC)">7480104 - Hệ thống Thông tin (CTTC)</option>
+                            <option value="7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)">7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)</option>
                         </select>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Cố Vấn</label>
+                        <input type="email" class="form-control" id="EditAdvisorEmail" name="AdvisorEmail" required />
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Số Lượng SV</label>
-                        <input type="number" class="form-control" id="EditStudentCount" name="StudentCount" required />
+                        <input type="number" class="form-control" id="EditStudentCount" name="StudentCount" min="1" max="30" required oninput="validateStudentCount(this)" />
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -244,7 +264,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="DeleteClassModalLabel">Xóa Niên Khóa</h5>
+                <h5 class="modal-title" id="DeleteClassModalLabel">Xóa Lớp</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -261,10 +281,101 @@
     </div>
 </div>
 
+<!-- Import Class Excel Modal -->
+<div class="modal fade" id="ImportClassExcelModal" tabindex="-1" aria-labelledby="ImportClassExcelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ImportClassExcelModalLabel">Nhập File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <a href="@Url.Action("GenerateClassTemplate", "Categories")" class="btn btn-warning">
+                    Tải file excel mẫu <i class="bi bi-download"></i>
+                </a>
+                <form asp-action="ImportClassExcel" enctype="multipart/form-data">
+                    <div class="mb-3 mt-3">
+                        <label class="form-label">Vui lòng chọn file excel cần nhập:</label>
+                        <div class="input-group">
+                            <input type="file" class="form-control d-none" id="ClassExcelFile" name="ClassExcelFile" accept=".xlsx,.xls" required style="display: none;">
+                            <input type="text" class="form-control" id="customFileUpload" placeholder="Chọn file..." readonly>
+                            <button type="button" class="btn btn-outline-secondary" id="uploadButton"> <i class="bi bi-upload"></i></button>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Nhập</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
-//Add Modal JS
+//Limit studnet count input
     function validateStudentCount(input) {
         if (input.value < 1) input.value = 1;
         if (input.value > 30) input.value = 30;
     }
+//Edit Modal JS
+    function openEditModal(button) {
+        var classId = button.getAttribute('data-class-id');
+        var term = button.getAttribute('data-term');
+        var department = button.getAttribute('data-department');
+        var advisorEmail = button.getAttribute('data-advisor-email');
+        var studentCount = button.getAttribute('data-student-count');
+    
+        document.getElementById('EditClassId').value = classId;
+        document.getElementById('EditClassIdDisplay').value = classId;
+        document.getElementById('EditTerm').value = term;
+        document.getElementById('EditDepartment').value = department;
+        document.getElementById('EditAdvisorEmail').value = advisorEmail;
+        document.getElementById('EditStudentCount').value = studentCount;
+    
+        $('#EditClassModal').modal('show');
+    }
+//Delete Modal JS
+    function openDeleteModal(button) {
+            var classId = button.getAttribute('data-class-id');
+            document.getElementById('DeleteClassId').value = classId;
+            $('#DeleteClassModal').modal('show');
+        }
+// Search JS
+    document.getElementById('searchInput').addEventListener('input', function () {
+        var input, filter, table, tr, td, i, txtValue, found;
+        input = document.getElementById('searchInput');
+        filter = input.value.toUpperCase();
+        table = document.getElementById('classTable');
+        tr = table.getElementsByTagName('tr');
+        found = false; // Initialize found as false
+    
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName('td');
+            if (td.length > 0) { // Ensure td elements exist
+                let match = false;
+                for (let j = 0; j < td.length; j++) {
+                    txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        match = true;
+                        break;
+                    }
+                }
+                tr[i].style.display = match ? "" : "none";
+                found = found || match;
+            }
+        }
+    
+        // Display 'không tìm thấy nội dung' if nothing is found
+        var noResultsRow = document.getElementById('noresults');
+        noResultsRow.style.display = found ? "none" : "table-row";
+    });
+//Import Modal JS
+        document.getElementById('uploadButton').addEventListener('click', function() {
+        document.getElementById('ClassExcelFile').click();
+        });
+
+        document.getElementById('ClassExcelFile').addEventListener('change', function() {
+            var fileName = this.files[0].name;
+            document.getElementById('customFileUpload').value = fileName;
+        });
 </script>

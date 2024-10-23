@@ -91,23 +91,26 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" role="button" aria-expanded="false" aria-controls="dropdownMenu3" id="toggleMenu3"
+                               data-bs-toggle="collapse" data-bs-target="#dropdownMenu3"
                                onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
                                onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                <i class="bi bi-exclamation-circle"></i> THÔNG BÁO <i class="bi bi-caret-down-fill" style="float:right;"></i>
+                                <i class="bi bi-exclamation-circle"></i> THÔNG BÁO 
+                                <span id="announcementCount" class="badge rounded-pill bg-danger" style="display:none;"></span>
+                                <i class="bi bi-caret-down-fill" style="float:right;"></i>
                             </a>
                             <ul class="collapse" id="dropdownMenu3" style="list-style-type: none; padding-left: 35px;">
                                 <li>
                                     <a class="dropdown-item" href="/Announcement/AnnouncementList" id="linkAnnouncement" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
                                        onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
                                        onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                        <i class="bi bi-person-badge"></i> Của Tôi
+                                        <i class="bi bi-journal-text"></i> Danh Sách <span id="totalAnnouncementCount" class="badge rounded-pill bg-danger " style="display:none;"></span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="#" id="linkMyAnnouncement" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
+                                    <a class="dropdown-item" href="/Announcement/MyAnnouncements" id="linkMyAnnouncement" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
                                        onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
                                        onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                        <i class="bi bi-journal-text"></i> Danh Sách
+                                        <i class="bi bi-person-badge"></i> Của Tôi <span id="myAnnouncementCount" class="badge rounded-pill bg-danger " style="display:none;"></span>
                                     </a>
                                 </li>
                             </ul>
@@ -186,7 +189,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
-        // Logout menu JS
+// Logout menu JS
         document.getElementById("dropdownMenuButton").addEventListener("click", function () {
             var dropdownMenu = document.getElementById("dropdownMenu");
             if (dropdownMenu.style.display === "block") {
@@ -196,7 +199,7 @@
             }
         });
 
-        // Dropdown and Selected Effect JS
+// Dropdown and Selected Effect JS
         document.addEventListener("DOMContentLoaded", function () {
             const currentUrl = window.location.pathname;
 
@@ -252,9 +255,74 @@
             }
         }
 
-        // Clear session storage on logout
+// Clear session storage on logout
         function clearSessionStorage() {
             sessionStorage.clear();
         }
+//Notification JS
+        //Pill badge display
+        document.addEventListener('DOMContentLoaded', function() {
+        fetch('@Url.Action("GetNewAnnouncementsCount", "Announcement")')
+            .then(response => response.json())
+            .then(data => {
+                if (data.count > 0) {
+                    document.getElementById('announcementCount').innerText = data.count;
+                    document.getElementById('announcementCount').style.display = 'inline-block';
+
+                    document.getElementById('totalAnnouncementCount').innerText = data.count;
+                    document.getElementById('totalAnnouncementCount').style.display = 'inline-block';
+
+                    document.getElementById('myAnnouncementCount').innerText = data.count;
+                    document.getElementById('myAnnouncementCount').style.display = 'inline-block';
+                } else {
+                    document.getElementById('announcementCount').style.display = 'none';
+                    document.getElementById('totalAnnouncementCount').style.display = 'none';
+                    document.getElementById('myAnnouncementCount').style.display = 'none';
+                }
+            });
+        });
+        //Update read count
+            document.addEventListener('DOMContentLoaded', function() {
+            fetch('@Url.Action("GetNewAnnouncementsCount", "Announcement")')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.count > 0) {
+                        document.getElementById('announcementCount').innerText = data.count;
+                        document.getElementById('announcementCount').style.display = 'inline-block';
+
+                        document.getElementById('totalAnnouncementCount').innerText = data.count;
+                        document.getElementById('totalAnnouncementCount').style.display = 'inline-block';
+
+                        document.getElementById('myAnnouncementCount').innerText = data.count;
+                        document.getElementById('myAnnouncementCount').style.display = 'inline-block';
+                    } else {
+                        document.getElementById('announcementCount').style.display = 'none';
+                        document.getElementById('totalAnnouncementCount').style.display = 'none';
+                        document.getElementById('myAnnouncementCount').style.display = 'none';
+                    }
+                });
+            });
+
+            document.getElementById('linkAnnouncement').addEventListener('click', function() {
+                markAllAsRead();
+            });
+
+            document.getElementById('linkMyAnnouncement').addEventListener('click', function() {
+                markAllAsRead();
+            });
+
+            function markAllAsRead() {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("MarkAllAnnouncementsAsRead", "Announcement")',
+                    success: function(response) {
+                        if (response.success) {
+                            document.getElementById('announcementCount').style.display = 'none';
+                            document.getElementById('totalAnnouncementCount').style.display = 'none';
+                            document.getElementById('myAnnouncementCount').style.display = 'none';
+                        }
+                    }
+                });
+            }
     </script>
 </body>

@@ -176,12 +176,12 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     }
 
                     await transaction.CommitAsync();
-                    TempData["Success"] = $"Cố Vấn {applicationUser.Email} đã được thêm thành công!";
+                    TempData["Success"] = $"CVHT {applicationUser.Email} đã được thêm thành công!";
                 }
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    TempData["Error"] = $"Xảy ra lỗi khi thêm Cố Vấn: {ex.Message}";
+                    TempData["Error"] = $"Xảy ra lỗi khi thêm CVHT: {ex.Message}";
                 }
             }
 
@@ -248,11 +248,11 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             {
                 _context.Users.Remove(advisor);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = $"Cố vấn {advisor.Email} đã được xóa thành công!";
+                TempData["Success"] = $"CVHT {advisor.Email} đã được xóa thành công!";
             }
             else
             {
-                TempData["Error"] = "Không tìm thấy cố vấn!";
+                TempData["Error"] = "Không tìm thấy CVHT!";
             }
             return RedirectToAction(nameof(AdvisorProfiles));
         }

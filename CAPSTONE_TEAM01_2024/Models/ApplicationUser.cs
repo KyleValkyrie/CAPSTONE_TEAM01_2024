@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace CAPSTONE_TEAM01_2024.Models
 {
@@ -13,8 +14,10 @@ namespace CAPSTONE_TEAM01_2024.Models
         public DateTime? LastLoginTime { get; set; }
 
         // Navigation properties
+        [JsonIgnore]
         public ICollection<Class> AdvisedClasses { get; set; } = new List<Class>(); // Classes they advise
         public string ClassId { get; set; } // Foreign Key to Class
+        [JsonIgnore]
         public Class EnrolledClass { get; set; } // The class the student is enrolled in
         public DateTime DateOfBirth { get; set; } // Addition field for students
         public string Status { get; set; } // Addition field for students

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace CAPSTONE_TEAM01_2024.Models
 {
@@ -12,5 +13,7 @@ namespace CAPSTONE_TEAM01_2024.Models
 		public DateTime PeriodStart { get; set; }
 		[Required]
 		public DateTime PeriodEnd { get; set; }
-	}
+        [JsonIgnore]
+        public ICollection<SemesterPlan> SemesterPlans { get; set; }
+    }
 }

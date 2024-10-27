@@ -15,6 +15,7 @@ namespace CAPSTONE_TEAM01_2024
         public DbSet<Class> Classes { get; set; }
         public DbSet<Announcement> Announcements { get; set; }
         public DbSet<UserAnnouncement> UserAnnouncements { get; set; }
+        public DbSet<SemesterPlan> SemesterPlans { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
@@ -36,6 +37,17 @@ namespace CAPSTONE_TEAM01_2024
                 .WithOne(u => u.EnrolledClass)
                 .HasForeignKey(u => u.ClassId)
                 .OnDelete(DeleteBehavior.Restrict); // Ensure no cascading delete
+
+            modelBuilder.Entity<SemesterPlan>()
+                .HasOne(sp => sp.AcademicPeriod)
+                .WithMany(ap => ap.SemesterPlans)
+                .HasForeignKey(sp => sp.PeriodId);
+
+            modelBuilder.Entity<SemesterPlan>()
+                .HasOne(sp => sp.Class)
+                .WithMany(c => c.SemesterPlans)
+                .HasForeignKey(sp => sp.ClassId);
+
         }
     }
 }

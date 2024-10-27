@@ -4,6 +4,7 @@ using CAPSTONE_TEAM01_2024;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CAPSTONE_TEAM01_2024.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241025172121_AllowMultipleFilesUpload")]
+    partial class AllowMultipleFilesUpload
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,6 +100,32 @@ namespace CAPSTONE_TEAM01_2024.Migrations
                     b.ToTable("Classes");
                 });
 
+            modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.Proof", b =>
+                {
+                    b.Property<int>("ProofId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProofId"), 1L, 1);
+
+                    b.Property<byte[]>("FileData")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SemesterPlanId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProofId");
+
+                    b.HasIndex("SemesterPlanId");
+
+                    b.ToTable("Proof");
+                });
+
             modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.SemesterPlan", b =>
                 {
                     b.Property<int>("PlanId")
@@ -126,12 +154,6 @@ namespace CAPSTONE_TEAM01_2024.Migrations
 
                     b.Property<string>("PlanType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("ProofFile")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("ProofFileName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
@@ -426,6 +448,17 @@ namespace CAPSTONE_TEAM01_2024.Migrations
                     b.Navigation("Advisor");
                 });
 
+            modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.Proof", b =>
+                {
+                    b.HasOne("CAPSTONE_TEAM01_2024.Models.SemesterPlan", "SemesterPlan")
+                        .WithMany("ProofFiles")
+                        .HasForeignKey("SemesterPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SemesterPlan");
+                });
+
             modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.SemesterPlan", b =>
                 {
                     b.HasOne("CAPSTONE_TEAM01_2024.Models.Class", "Class")
@@ -536,6 +569,11 @@ namespace CAPSTONE_TEAM01_2024.Migrations
                     b.Navigation("SemesterPlans");
 
                     b.Navigation("Students");
+                });
+
+            modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.SemesterPlan", b =>
+                {
+                    b.Navigation("ProofFiles");
                 });
 
             modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.ApplicationUser", b =>

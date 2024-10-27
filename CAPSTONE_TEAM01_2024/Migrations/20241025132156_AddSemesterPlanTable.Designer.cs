@@ -4,6 +4,7 @@ using CAPSTONE_TEAM01_2024;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CAPSTONE_TEAM01_2024.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241025132156_AddSemesterPlanTable")]
+    partial class AddSemesterPlanTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,6 +108,9 @@ namespace CAPSTONE_TEAM01_2024.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlanId"), 1L, 1);
 
+                    b.Property<int>("AcademicPeriodPeriodId")
+                        .HasColumnType("int");
+
                     b.Property<string>("AdvisorName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -129,10 +134,8 @@ namespace CAPSTONE_TEAM01_2024.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("ProofFile")
+                        .IsRequired()
                         .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("ProofFileName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -140,9 +143,9 @@ namespace CAPSTONE_TEAM01_2024.Migrations
 
                     b.HasKey("PlanId");
 
-                    b.HasIndex("ClassId");
+                    b.HasIndex("AcademicPeriodPeriodId");
 
-                    b.HasIndex("PeriodId");
+                    b.HasIndex("ClassId");
 
                     b.ToTable("SemesterPlans");
                 });
@@ -428,15 +431,15 @@ namespace CAPSTONE_TEAM01_2024.Migrations
 
             modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.SemesterPlan", b =>
                 {
-                    b.HasOne("CAPSTONE_TEAM01_2024.Models.Class", "Class")
-                        .WithMany("SemesterPlans")
-                        .HasForeignKey("ClassId")
+                    b.HasOne("CAPSTONE_TEAM01_2024.Models.AcademicPeriod", "AcademicPeriod")
+                        .WithMany()
+                        .HasForeignKey("AcademicPeriodPeriodId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CAPSTONE_TEAM01_2024.Models.AcademicPeriod", "AcademicPeriod")
-                        .WithMany("SemesterPlans")
-                        .HasForeignKey("PeriodId")
+                    b.HasOne("CAPSTONE_TEAM01_2024.Models.Class", "Class")
+                        .WithMany()
+                        .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -526,15 +529,8 @@ namespace CAPSTONE_TEAM01_2024.Migrations
                     b.Navigation("EnrolledClass");
                 });
 
-            modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.AcademicPeriod", b =>
-                {
-                    b.Navigation("SemesterPlans");
-                });
-
             modelBuilder.Entity("CAPSTONE_TEAM01_2024.Models.Class", b =>
                 {
-                    b.Navigation("SemesterPlans");
-
                     b.Navigation("Students");
                 });
 

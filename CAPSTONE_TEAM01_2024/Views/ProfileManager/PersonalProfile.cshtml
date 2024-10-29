@@ -1,4 +1,68 @@
-﻿@{
-    ViewData["Title"] = "Personal Profile";
+﻿@model CAPSTONE_TEAM01_2024.Models.ApplicationUser
+@{
+ViewData["Title"] = "Personal Profile";
 }
-personal profile here
+
+<style>
+    .profile-container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .profile-img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #007bff;
+        margin-bottom: 20px;
+    }
+    .profile-info {
+        margin-bottom: 20px;
+    }
+    .profile-info label {
+        font-weight: bold;
+    }
+</style>
+
+<div class="container profile-container">
+    <form id="profileForm" asp-action="UpdateProfile" method="post">
+        <div class="profile-info">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" name="Email" value="@Model.Email" class="form-control" readonly>
+            </div>
+
+            <div class="mb-3">
+                <label for="fullname" class="form-label">Tên đầy đủ</label>
+                <input type="text" id="fullname" name="FullName" value="@Model.FullName" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label for="schoolId" class="form-label">Mã số</label>
+                <input type="text" id="schoolId" name="SchoolId" value="@Model.SchoolId" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Số điện thoại</label>
+                <input type="text" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" class="form-control" >
+            </div>
+
+
+            <div class="mb-3">
+                <label for="dateOfBirth" class="form-label">Ngày sinh</label>
+                <input type="date" id="dateOfBirth" name="DateOfBirth" value="@Model.DateOfBirth.ToString("yyyy-MM-dd")"
+                       class="form-control">
+            </div>
+
+           
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Cập nhật</button>
+        </div>
+    </form>
+</div>

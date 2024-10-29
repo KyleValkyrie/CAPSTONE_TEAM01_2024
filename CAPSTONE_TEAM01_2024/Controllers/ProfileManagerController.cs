@@ -1,4 +1,5 @@
-﻿using CAPSTONE_TEAM01_2024.Models;
+﻿using System.Linq; 
+using CAPSTONE_TEAM01_2024.Models;
 using CAPSTONE_TEAM01_2024.Utilities;
 using CAPSTONE_TEAM01_2024.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -12,39 +13,46 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     {
         // Database Context
         private readonly ApplicationDbContext _context;
+
         public ProfileManagerController(ApplicationDbContext context)
         {
             _context = context;
         }
+
 // StudentProfiles actions
-    //Render view
+        //Render view
         public async Task<IActionResult> StudentProfiles(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "StudentProfiles";
 
             var studentsQuery = from user in _context.ApplicationUsers
-                                join userRole in _context.UserRoles on user.Id equals userRole.UserId into userRoles
-                                from userRole in userRoles.DefaultIfEmpty()
-                                join role in _context.Roles on userRole.RoleId equals role.Id into roles
-                                from role in roles.DefaultIfEmpty()
-                                where user.Email.EndsWith("@vanlanguni.vn") && (role == null || (role.NormalizedName != "ADVISOR" && role.NormalizedName != "FACULTY"))
-                                select new StudentProfileViewModel
-                                {
-                                    Id = user.Id,
-                                    Email = user.Email,
-                                    SchoolId = user.SchoolId,
-                                    FullName = user.FullName,
-                                    IsRegistered = user.IsRegistered,
-                                    LastLoginTime = user.LastLoginTime,
-                                    Role = role != null ? role.Name : "Chưa phân quyền"
-                                };
+                join userRole in _context.UserRoles on user.Id equals userRole.UserId into userRoles
+                from userRole in userRoles.DefaultIfEmpty()
+                join role in _context.Roles on userRole.RoleId equals role.Id into roles
+                from role in roles.DefaultIfEmpty()
+                where user.Email.EndsWith("@vanlanguni.vn") && (role == null ||
+                                                                (role.NormalizedName != "ADVISOR" &&
+                                                                 role.NormalizedName != "FACULTY"))
+                select new StudentProfileViewModel
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    SchoolId = user.SchoolId,
+                    FullName = user.FullName,
+                    IsRegistered = user.IsRegistered,
+                    LastLoginTime = user.LastLoginTime,
+                    Role = role != null ? role.Name : "Chưa phân quyền"
+                };
 
-            var students = await PaginatedList<StudentProfileViewModel>.CreateAsync(studentsQuery.AsNoTracking(), pageIndex, pageSize);
+            var students =
+                await PaginatedList<StudentProfileViewModel>.CreateAsync(studentsQuery.AsNoTracking(), pageIndex,
+                    pageSize);
             ViewBag.Warning = TempData["Warning"];
             ViewBag.Success = TempData["Success"];
             ViewBag.Error = TempData["Error"];
             return View(students);
         }
+
         //Add Students
         [HttpPost]
         public async Task<IActionResult> CreateStudentProfile(ApplicationUser applicationUser)
@@ -91,7 +99,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return RedirectToAction(nameof(StudentProfiles));
         }
-    //Delete Students
+
+        //Delete Students
         [HttpPost]
         public async Task<IActionResult> DeleteStudent(string studentId)
         {
@@ -106,39 +115,45 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             {
                 TempData["Error"] = "Không tìm thấy Sinh Viên!";
             }
+
             return RedirectToAction(nameof(StudentProfiles));
         }
 
 // AdvisorProfiles actions
-    //Render view
+        //Render view
         public async Task<IActionResult> AdvisorProfiles(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "AdvisorProfiles";
 
             var advisorsQuery = from user in _context.ApplicationUsers
-                                join userRole in _context.UserRoles on user.Id equals userRole.UserId into userRoles
-                                from userRole in userRoles.DefaultIfEmpty()
-                                join role in _context.Roles on userRole.RoleId equals role.Id into roles
-                                from role in roles.DefaultIfEmpty()
-                                where !user.Email.EndsWith("@vanlanguni.vn") || (role != null && (role.NormalizedName == "ADVISOR" || role.NormalizedName == "FACULTY"))
-                                select new AdvisorProfileViewModel
-                                {
-                                    Id = user.Id,
-                                    Email = user.Email,
-                                    SchoolId = user.SchoolId,
-                                    FullName = user.FullName,
-                                    IsRegistered = user.IsRegistered,
-                                    LastLoginTime = user.LastLoginTime,
-                                    Role = role != null ? role.Name : "Chưa phân quyền"
-                                };
+                join userRole in _context.UserRoles on user.Id equals userRole.UserId into userRoles
+                from userRole in userRoles.DefaultIfEmpty()
+                join role in _context.Roles on userRole.RoleId equals role.Id into roles
+                from role in roles.DefaultIfEmpty()
+                where !user.Email.EndsWith("@vanlanguni.vn") || (role != null &&
+                                                                 (role.NormalizedName == "ADVISOR" ||
+                                                                  role.NormalizedName == "FACULTY"))
+                select new AdvisorProfileViewModel
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    SchoolId = user.SchoolId,
+                    FullName = user.FullName,
+                    IsRegistered = user.IsRegistered,
+                    LastLoginTime = user.LastLoginTime,
+                    Role = role != null ? role.Name : "Chưa phân quyền"
+                };
 
-            var advisors = await PaginatedList<AdvisorProfileViewModel>.CreateAsync(advisorsQuery.AsNoTracking(), pageIndex, pageSize);
+            var advisors =
+                await PaginatedList<AdvisorProfileViewModel>.CreateAsync(advisorsQuery.AsNoTracking(), pageIndex,
+                    pageSize);
             ViewBag.Warning = TempData["Warning"];
             ViewBag.Success = TempData["Success"];
             ViewBag.Error = TempData["Error"];
             return View(advisors);
         }
-    //Add Advisors
+
+        //Add Advisors
         [HttpPost]
         public async Task<IActionResult> CreateAdvisorProfile(ApplicationUser applicationUser, string RoleId)
         {
@@ -187,9 +202,11 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return RedirectToAction(nameof(AdvisorProfiles));
         }
-    //Edit Advisors
+
+        //Edit Advisors
         [HttpPost]
-        public async Task<IActionResult> UpdateAdvisorProfile(string Email, string RoleId, string UserId, string SchoolId)
+        public async Task<IActionResult> UpdateAdvisorProfile(string Email, string RoleId, string UserId,
+            string SchoolId)
         {
 
             var existingUser = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Id == UserId);
@@ -204,7 +221,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                         _context.Users.Update(existingUser);
                         await _context.SaveChangesAsync();
 
-                        var currentRole = await _context.UserRoles.FirstOrDefaultAsync(ur => ur.UserId == existingUser.Id);
+                        var currentRole =
+                            await _context.UserRoles.FirstOrDefaultAsync(ur => ur.UserId == existingUser.Id);
                         if (currentRole != null)
                         {
                             _context.UserRoles.Remove(currentRole);
@@ -239,7 +257,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return RedirectToAction(nameof(AdvisorProfiles));
         }
-    //Delete Advisor
+
+        //Delete Advisor
         [HttpPost]
         public async Task<IActionResult> DeleteAdvisor(string advisorId)
         {
@@ -254,14 +273,74 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             {
                 TempData["Error"] = "Không tìm thấy CVHT!";
             }
+
             return RedirectToAction(nameof(AdvisorProfiles));
         }
 // PersonalProfile actions
-    //Render view
-        public IActionResult PersonalProfile()
+        //Render view
+
+        public async Task<IActionResult> PersonalProfile()
         {
             ViewData["page"] = "PersonalProfile";
-            return View();
+
+            
+            var currentUserEmail = User.Identity.Name;
+
+            
+            var user = await _context.Users
+                .OfType<ApplicationUser>() 
+                .Where(u => u.Email == currentUserEmail)
+                .Select(u => new ApplicationUser  
+                {
+                    Email = u.Email,
+                    SchoolId = u.SchoolId,
+                    FullName = u.FullName,
+                    PhoneNumber = u.PhoneNumber,
+                    DateOfBirth = u.DateOfBirth, 
+                   
+                })
+                .FirstOrDefaultAsync();
+
+            
+            return View(user);
         }
+
+        // Cập nhật thông tin người dùng
+        
+        [HttpPost]
+        public async Task<IActionResult> UpdateProfile(ApplicationUser model)
+        {
+            
+            var user = await _context.Users
+                .OfType<ApplicationUser>()
+                .FirstOrDefaultAsync(u => u.Email == model.Email);
+
+            if (user == null)
+            {
+                TempData["Error"] = "Không tìm thấy người dùng.";
+                return RedirectToAction("PersonalProfile");
+            }
+
+           
+            user.FullName = model.FullName;
+            user.SchoolId = model.SchoolId;
+            user.PhoneNumber = model.PhoneNumber; 
+
+            try
+            {
+               
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync(); 
+
+                TempData["Success"] = "Cập nhật thông tin thành công!";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Có lỗi xảy ra: {ex.Message}";
+            }
+
+            return RedirectToAction("PersonalProfile");
+        }
+
     }
 }

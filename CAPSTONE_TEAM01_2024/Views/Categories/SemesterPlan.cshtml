@@ -2,6 +2,94 @@
 @{
 ViewData["Title"] = "Semester Plan";
 }
+<style>
+    .modal-dialog {
+        max-width: 90%;
+        width: 100%; 
+    }
+
+    textarea {
+        resize: none; 
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-footer {
+        justify-content: flex-end;
+        display: flex;
+        width: 100%;
+        align-items: center;
+        padding-top: 10px;
+        border-top: 1px solid #ddd;
+    }
+
+   
+    .fields-row {
+        display: flex;
+        width: 100%;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 5px;
+        gap: 10px;
+        font-weight: bold;
+        align-items: center;
+    }
+
+       .header-cell {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 60px;
+        min-width: 100px;
+        box-sizing: border-box;
+        padding: 0 15px; 
+        text-align: center;
+    }
+    select {
+        width: 100%;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        font-size: 14px;
+    }
+
+   
+    .row-container > div {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+   
+    .btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+
+       .btn:hover {
+        opacity: 0.9;
+    }
+</style>
+
+
 
 <div class="content-wrapper" style="min-height: 912.2px;">
     <!-- Content Header (Page header) -->
@@ -106,32 +194,33 @@ ViewData["Title"] = "Semester Plan";
                 <h5 class="modal-title" id="AddSemesterPlanModalLabel">Thêm Kế Hoạch Học Kỳ</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" style="overflow-y: auto; max-height: 80vh;">
-                <!-- Row for Kế Hoạch CVHT and Dropdown -->
-                <div class="fields-row" style="display: flex; align-items: center; gap: 10px; width: 100%; font-weight: bold; padding-bottom: 5px;">
-                    <div style="flex: 1; text-align: center;">KeHoachCVHT</div>
-                    <div style="flex: 1; text-align: center;">
-                        <select id="schoolyear" name="SelectedSchoolYear" style="width: 100%;">
-                            @foreach (var item in Model.SchoolYears)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                    </div>
+            <div class="fields-row" style="display: flex; align-items: center; gap: 10px; width: 100%; font-weight: bold; padding-bottom: 5px;">
+                <div style="flex: 1; text-align: center;">KeHoachCVHT</div>
+                <div style="flex: 1; text-align: center;">
+                    <select id="schoolyear" name="SelectedSchoolYear" style="width: 100%;">
+                        @foreach (var item in Model.SchoolYears)
+                        {
+                        <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
                 </div>
-                <!-- Header Row for Fields -->
-                <div class="fields-row" style="display: flex; align-items: center; gap: 10px; width: 100%; font-weight: bold; border-bottom: 2px solid #ccc; padding-bottom: 5px;">
-                    <div style="flex: 1; text-align: center;">Tiêu Chí</div>
-                    <div style="flex: 2; text-align: center;">Mô Tả Công Việc</div>
-                    <div style="flex: 1; text-align: center;">Cách Thực Hiện</div>
-                    <div style="flex: 1; text-align: center;">Định Lượng</div>
-                    <div style="flex: 1; text-align: center;">Thời Gian</div>
-                    <div style="flex: 1; text-align: center;">Ghi Chú</div>
-                </div>
-                
-                <!-- Rows for Tiêu Chí 1 -->
+            </div>
+
+            <!-- Header Row for Fields -->
+            <div class="fields-row">
+                <div class="header-cell">Tiêu Chí</div>
+                <div class="header-cell">Mô Tả Công Việc</div>
+                <div class="header-cell">Cách Thực Hiện</div>
+                <div class="header-cell">Định Lượng</div>
+                <div class="header-cell">Thời Gian</div>
+                <div class="header-cell">Ghi Chú</div>
+            </div>
+
+
+
+            <!-- Rows for Tiêu Chí 1 -->
                 <div style="display: flex; width: 100%;">
-                    <textarea name="tieuChi1" style="flex: 1; min-width: 200px; height: 200px; font-weight: bold;">Một số nội dung cơ bản của nhiệm vụ CVHT</textarea>
+                    <textarea name="tieuChi1" style="flex: 1; min-width: 200px; height: 200px; font-weight: bold;">1.Một số nội dung cơ bản của nhiệm vụ CVHT</textarea>
                     <div style="flex: 2; display: flex; flex-direction: column; gap: 10px;">
                         <textarea name="moTaCongViec1-1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;">Kế hoạch CVHT</textarea>
                         <textarea name="moTaCongViec1-2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;">Họp lớp tập trung</textarea>
@@ -158,18 +247,124 @@ ViewData["Title"] = "Semester Plan";
                         <textarea name="ghiChu1-3" style="flex: 1; min-width: 100px; height: 50px;">Có TB lịch cho SV và trực theo lịch đã công bố</textarea>
                     </div>
                 </div>
+                <!-- Rows for Tiêu Chí 2 -->
+                <div style="display: flex; width: 100%;">
+                    <textarea name="tieuChi2" style="flex: 1; min-width: 200px; height: 200px; font-weight: bold;">2.Hướng dẫn sinh viên lập và đăng ký kế hoạch học tập (KHHT)</textarea>
+                    <div style="flex: 2; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="moTaCongViec2-1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;">Hướng dẫn sinh viên lập và đăng ký KHHT</textarea>
+                        <textarea name="moTaCongViec2-2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;">Hướng dẫn sinh viên ĐKHP</textarea>
 
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="cachThucHien2-1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+                        <textarea name="cachThucHien2-2" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
 
-                <!-- Modal Footer -->
-                <div class="modal-footer" style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary save">Save</button>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="dinhLuong2-1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+                        <textarea name="dinhLuong2-2" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="thoiGian2-1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+                        <textarea name="thoiGian2-2" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="ghiChu2-1" style="flex: 1; min-width: 100px; height: 50px;">Có ít nhất 70% SV lập và đăng ký KHHT ở mỗi học kỳ</textarea>
+                        <textarea name="ghiChu2-2" style="flex: 1; min-width: 100px; height: 50px;">Có ít nhất 70% SV lập và đăng ký KHHT ở mỗi học kỳ</textarea>
+
+                    </div>
                 </div>
+                <!-- Rows for Tiêu Chí 3 -->
+                <div style="display: flex; width: 100%;">
+                    <textarea name="tieuChi3" style="flex: 1; min-width: 200px; height: 200px; font-weight: bold;">3.Đăng ký học phần (ĐKHP)</textarea>
+                    <div style="flex: 2; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="moTaCongViec3-1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;">Tư vấn phương pháp học tập</textarea>
+                        <textarea name="moTaCongViec3-2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;">Tổ chức cho sinh viên chia sẻ kinh nghiệm học tập</textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="cachThucHien3-1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+                        <textarea name="cachThucHien3-2" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="dinhLuong3-1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+                        <textarea name="dinhLuong3-2" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="thoiGian3-1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+                        <textarea name="thoiGian3-2" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="ghiChu3-1" style="flex: 1; min-width: 100px; height: 50px;">Có ít nhất 70% SV học đúng lộ trình của năm học</textarea>
+
+                    </div>
+                </div>
+                <!-- Rows for Tiêu Chí 4 -->
+                <div style="display: flex; width: 100%;">
+                    <textarea name="tieuChi4" style="flex: 1; min-width: 200px; height: 200px; font-weight: bold;">4.Tư vấn phương pháp học tập, tổ chức cho sinh viên chia sẻ kinh nghiệm học tập</textarea>
+                    <div style="flex: 2; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="moTaCongViec4-1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;">Xử lý học vụ</textarea>
+                        <textarea name="moTaCongViec4-2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;">Cảnh báo sớm</textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="cachThucHien4-1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+                        <textarea name="cachThucHien4-2" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="dinhLuong4-1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+                        <textarea name="dinhLuong4-2" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="thoiGian4-1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+                        <textarea name="thoiGian4-2" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="ghiChu4-1" style="flex: 1; min-width: 100px; height: 50px;">Không quá 10% SV bỏ học hằng năm</textarea>
+
+                    </div>
+                </div>
+                <!-- Rows for Tiêu Chí 5 -->
+                <div style="display: flex; width: 100%;">
+                    <textarea name="tieuChi5" style="flex: 1; min-width: 200px; height: 200px; font-weight: bold;">5.Chăm sóc sinh viên diện đặc biệt; Công tác phối hợp để thực hiện nhiệm vụ CVHT</textarea>
+                    <div style="flex: 2; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="moTaCongViec5-1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;">Phối hợp với Trợ lý CTSV Khoa/Thư ký Khoa/Phụ trách học vụ để xử lý kịp thời, đầy đủ các đề xuất/khiếu nại (nếu có) của sinh viên</textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="cachThucHien5-1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="dinhLuong5-1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="thoiGian5-1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="ghiChu5-1" style="flex: 1; min-width: 100px; height: 50px;">Có sự hợp tác chặt chẽ</textarea>
+
+                    </div>
+                </div>
+                <!-- Modal Footer -->
+                <div class="modal-footer" style="display: flex; justify-content: flex-end; width: 100%; align-items: center;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary save" style="margin-left: 10px;">Lưu</button>
+                </div>
+
             </div>
         </div>
     </div>
-</div>
-
 
 
 <script>

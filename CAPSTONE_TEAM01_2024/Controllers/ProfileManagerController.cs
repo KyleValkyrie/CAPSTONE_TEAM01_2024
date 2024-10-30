@@ -11,7 +11,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 {
     public class ProfileManagerController : Controller
     {
-        // Database Context
+// Database Context
         private readonly ApplicationDbContext _context;
 
         public ProfileManagerController(ApplicationDbContext context)
@@ -20,7 +20,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         }
 
 // StudentProfiles actions
-        //Render view
+    //Render view
         public async Task<IActionResult> StudentProfiles(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "StudentProfiles";
@@ -53,7 +53,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return View(students);
         }
 
-        //Add Students
+    //Add Students
         [HttpPost]
         public async Task<IActionResult> CreateStudentProfile(ApplicationUser applicationUser)
         {
@@ -100,7 +100,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction(nameof(StudentProfiles));
         }
 
-        //Delete Students
+    //Delete Students
         [HttpPost]
         public async Task<IActionResult> DeleteStudent(string studentId)
         {
@@ -120,7 +120,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         }
 
 // AdvisorProfiles actions
-        //Render view
+    //Render view
         public async Task<IActionResult> AdvisorProfiles(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "AdvisorProfiles";
@@ -153,7 +153,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return View(advisors);
         }
 
-        //Add Advisors
+    //Add Advisors
         [HttpPost]
         public async Task<IActionResult> CreateAdvisorProfile(ApplicationUser applicationUser, string RoleId)
         {
@@ -203,7 +203,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction(nameof(AdvisorProfiles));
         }
 
-        //Edit Advisors
+    //Edit Advisors
         [HttpPost]
         public async Task<IActionResult> UpdateAdvisorProfile(string Email, string RoleId, string UserId,
             string SchoolId)
@@ -258,7 +258,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction(nameof(AdvisorProfiles));
         }
 
-        //Delete Advisor
+    //Delete Advisor
         [HttpPost]
         public async Task<IActionResult> DeleteAdvisor(string advisorId)
         {
@@ -277,7 +277,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction(nameof(AdvisorProfiles));
         }
 // PersonalProfile actions
-        //Render view
+    //Render view
 
         public async Task<IActionResult> PersonalProfile()
         {
@@ -287,7 +287,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             var currentUserEmail = User.Identity.Name;
 
             
-            var user = await _context.Users
+            var user = await _context.ApplicationUsers
                 .OfType<ApplicationUser>() 
                 .Where(u => u.Email == currentUserEmail)
                 .Select(u => new ApplicationUser  
@@ -301,16 +301,17 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 })
                 .FirstOrDefaultAsync();
 
-            
+            ViewBag.Warning = TempData["Warning"];
+            ViewBag.Success = TempData["Success"];
+            ViewBag.Error = TempData["Error"];
             return View(user);
         }
 
-        // Cập nhật thông tin người dùng
-        
+        //Edit Personal Profile
+
         [HttpPost]
         public async Task<IActionResult> UpdateProfile(ApplicationUser model)
         {
-            
             var user = await _context.Users
                 .OfType<ApplicationUser>()
                 .FirstOrDefaultAsync(u => u.Email == model.Email);
@@ -321,26 +322,28 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("PersonalProfile");
             }
 
-           
             user.FullName = model.FullName;
             user.SchoolId = model.SchoolId;
-            user.PhoneNumber = model.PhoneNumber; 
+            user.PhoneNumber = model.PhoneNumber;
+            user.DateOfBirth = model.DateOfBirth;
 
-            try
+            using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-               
-                _context.Users.Update(user);
-                await _context.SaveChangesAsync(); 
-
-                TempData["Success"] = "Cập nhật thông tin thành công!";
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = $"Có lỗi xảy ra: {ex.Message}";
+                try
+                {
+                    _context.Users.Update(user);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    TempData["Success"] = "Cập nhật thông tin thành công!";
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    TempData["Error"] = $"Có lỗi xảy ra: {ex.Message}";
+                }
             }
 
             return RedirectToAction("PersonalProfile");
         }
-
     }
 }

@@ -27,8 +27,26 @@ ViewData["Title"] = "Personal Profile";
         font-weight: bold;
     }
 </style>
-
 <div class="container profile-container">
+    <h1 class="m-0 text-center">Thông tin cá nhân</h1>
+    @if (ViewBag.Warning != null)
+    {
+        <div class="alert alert-warning">
+            @ViewBag.Warning
+        </div>
+    }
+    @if (ViewBag.Success != null)
+    {
+        <div class="alert alert-success">
+            @ViewBag.Success
+        </div>
+    }
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    }
     <form id="profileForm" asp-action="UpdateProfile" method="post">
         <div class="profile-info">
             <div class="mb-3">

@@ -278,7 +278,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         }
 // PersonalProfile actions
     //Render view
-
         public async Task<IActionResult> PersonalProfile()
         {
             ViewData["page"] = "PersonalProfile";
@@ -307,8 +306,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return View(user);
         }
 
-        //Edit Personal Profile
-
+    //Edit Personal Profile
         [HttpPost]
         public async Task<IActionResult> UpdateProfile(ApplicationUser model)
         {

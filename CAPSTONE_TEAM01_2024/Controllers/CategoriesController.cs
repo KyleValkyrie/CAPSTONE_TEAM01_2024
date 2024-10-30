@@ -862,174 +862,23 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 .OrderByDescending(sp => sp.CreationTime)
                 .AsQueryable();
 
-            var paginatedSemesterPlans = await PaginatedList<SemesterPlan>.CreateAsync(semesterPlansQuery, pageIndex, pageSize);
+            var schoolYears = await _context.AcademicPeriods.Select(sy => new SelectListItem { Value = sy.PeriodName, Text = sy.PeriodName}).ToListAsync();
 
+            var paginatedSemesterPlans = await PaginatedList<SemesterPlan>.CreateAsync(semesterPlansQuery, pageIndex, pageSize);
+            var viewModel = new SemesterPlanViewModel { SemesterPlans = paginatedSemesterPlans, SchoolYears = schoolYears };
             ViewBag.Warning = TempData["Warning"];
             ViewBag.Success = TempData["Success"];
             ViewBag.Error = TempData["Error"];
 
-            return View(paginatedSemesterPlans);
+            return View(viewModel);
         }
-        [HttpGet]
-        public IActionResult GetImage(int id)
-        {
-            var proof = _context.SemesterPlans
-                                .Where(sp => sp.PlanId == id)
-                                .Select(sp => sp.ProofFile)
-                                .FirstOrDefault();
-
-            if (proof == null)
-            {
-                return NotFound();
-            }
-
-            return File(proof, "image/jpeg");
-        }
-
+        
     //Add Plan
-        [HttpPost]
-        public async Task<IActionResult> AddSemesterPlan(SemesterPlan semesterPlan, IFormFile ProofFile)
-        {
-            var advisor = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == semesterPlan.AdvisorName);
-            if (advisor == null)
-            {
-                TempData["Error"] = "Không tìm thấy cố vấn với email đã nhập.";
-                return RedirectToAction(nameof(SemesterPlan));
-            }
-
-            var period = await _context.AcademicPeriods.FirstOrDefaultAsync(ap => ap.PeriodName == semesterPlan.PeriodName);
-            if (period == null)
-            {
-                TempData["Error"] = "Không tìm thấy kỳ học với tên đã nhập.";
-                return RedirectToAction(nameof(SemesterPlan));
-            }
-
-            semesterPlan.PeriodId = period.PeriodId;
-            semesterPlan.AdvisorName = advisor.Email;
-            semesterPlan.CreationTime = DateTime.Now;
-            semesterPlan.Status = "Nháp";  // Set status to "Nháp"
-
-            if (ProofFile != null && ProofFile.Length > 0)
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    await ProofFile.CopyToAsync(memoryStream);
-                    memoryStream.Seek(0, SeekOrigin.Begin);
-
-                    byte[] compressedImage;
-                    int quality = 85;
-                    long maxSize = 200 * 1024; // 200 KB
-
-                    do
-                    {
-                        memoryStream.Seek(0, SeekOrigin.Begin);
-                        using (var image = SixLabors.ImageSharp.Image.Load(memoryStream))
-                        {
-                            image.Mutate(x => x.Resize(new ResizeOptions
-                            {
-                                Mode = ResizeMode.Max,
-                                Size = new SixLabors.ImageSharp.Size(800, 800)
-                            }));
-
-                            var encoder = new JpegEncoder
-                            {
-                                Quality = quality
-                            };
-
-                            using (var compressedStream = new MemoryStream())
-                            {
-                                image.Save(compressedStream, encoder);
-                                compressedImage = compressedStream.ToArray();
-                            }
-                        }
-
-                        quality -= 5;
-                    } while (compressedImage.Length > maxSize && quality > 0);
-
-                    semesterPlan.ProofFile = compressedImage;
-                    semesterPlan.ProofFileName = ProofFile.FileName;
-                }
-            }
-
-            _context.SemesterPlans.Add(semesterPlan);
-            await _context.SaveChangesAsync();
-            TempData["Success"] = "Kế hoạch đã được thêm thành công!";
-            return RedirectToAction(nameof(SemesterPlan));
-        }
+        
     //Edit Plan
-        [HttpGet]
-        public async Task<IActionResult> GetSemesterPlan(int id)
-        {
-            var plan = await _context.SemesterPlans
-                .Where(sp => sp.PlanId == id)
-                .Select(sp => new
-                {
-                    sp.PlanId,
-                    sp.PeriodName,
-                    sp.PlanType,
-                    sp.ClassId,
-                    sp.AdvisorName,
-                    sp.ProofFileName  // Include the file name if necessary
-                })
-                .FirstOrDefaultAsync();
-
-            if (plan == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(plan);
-        }
-
-        //Edit Plan
-        //[HttpPost]
-        //public async Task<IActionResult> EditSemesterPlan(SemesterPlan semesterPlan, IFormFile ProofFile)
-        //{
-        //    var existingPlan = await _context.SemesterPlans.FindAsync(semesterPlan.PlanId);
-        //    if (existingPlan == null)
-        //    {
-        //        TempData["Warning"] = "Không tìm thấy kế hoạch.";
-        //        return RedirectToAction(nameof(SemesterPlan));
-        //    }
-
-        //    var advisor = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == semesterPlan.AdvisorName);
-        //    if (advisor == null)
-        //    {
-        //        TempData["Warning"] = "Không tìm thấy cố vấn với email đã nhập.";
-        //        return RedirectToAction(nameof(SemesterPlan));
-        //    }
-
-        //    var period = await _context.AcademicPeriods.FirstOrDefaultAsync(ap => ap.PeriodName == semesterPlan.PeriodName);
-        //    if (period == null)
-        //    {
-        //        TempData["Warning"] = "Không tìm thấy kỳ học với tên đã nhập.";
-        //        return RedirectToAction(nameof(SemesterPlan));
-        //    }
-
-        //    existingPlan.PeriodName = semesterPlan.PeriodName;
-        //    existingPlan.PlanType = semesterPlan.PlanType;
-        //    existingPlan.ClassId = semesterPlan.ClassId;
-        //    existingPlan.AdvisorName = advisor.Email;
-        //    existingPlan.Status = semesterPlan.Status;
-        //    existingPlan.PeriodId = period.PeriodId;
-
-        //    if (ProofFile != null && ProofFile.Length > 0)
-        //    {
-        //        using (var memoryStream = new MemoryStream())
-        //        {
-        //            await ProofFile.CopyToAsync(memoryStream);
-        //            existingPlan.ProofFile = memoryStream.ToArray();
-        //        }
-        //    }
-
-        //    _context.Update(existingPlan);
-        //    await _context.SaveChangesAsync();
-        //    TempData["Success"] = "Kế hoạch đã được cập nhật thành công!";
-        //    return RedirectToAction(nameof(SemesterPlan));
-        //}
-
-        //SemesterPlanDetail actions
-        //Render View 
+           
+//SemesterPlanDetail actions
+    //Render View 
         public IActionResult SemesterPlanDetail()
         {
             ViewData["page"] = "SemesterPlanDetail";

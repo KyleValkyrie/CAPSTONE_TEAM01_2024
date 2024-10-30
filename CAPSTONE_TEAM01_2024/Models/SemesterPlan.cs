@@ -24,10 +24,6 @@ namespace CAPSTONE_TEAM01_2024.Models
         [Required]
         public DateTime CreationTime { get; set; }  // Creation time of the plan
 
-        public byte[]? ProofFile { get; set; }  // File data directly in SemesterPlan
-
-        public string? ProofFileName { get; set; }  // Store file name for referenc
-
         [Required]
         public string Status { get; set; }  // Status of the plan ("Đã Nộp", "Chưa Nộp", "Nháp")
 

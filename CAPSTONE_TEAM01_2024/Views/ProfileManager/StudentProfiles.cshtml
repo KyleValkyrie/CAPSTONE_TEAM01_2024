@@ -169,12 +169,13 @@
                 <h5 class="modal-title" id="AddStudentModalLabel">Thêm Sinh Viên mới</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form asp-action="CreateStudentProfile" method="post">
+            <form asp-action="CreateStudentProfile" method="post" id="emailForm">
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="Email" required />
-                    </div>
+					<div class="mb-3">
+						<label class="form-label">Email</label>
+						<input type="email" class="form-control" id="email" name="Email" required />
+						<span id="emailError" class="text-danger"></span>
+					</div>
                     <div class="mb-3">
                         <input type="hidden" class="form-control" id="schoolId" name="SchoolId" readonly />
                     </div>
@@ -212,23 +213,64 @@
 
 <!-- Script to Pass ID to Delete Modal -->
 <script>
+  /*  document.getElementById('emailForm').addEventListener('input', function(event) {
+    event.preventDefault(); // Ngăn chặn form submit mặc định
+
+    var emailInput = document.getElementById('email');
+    var emailError = document.getElementById('emailError');
+		var emailPattern = /vanlanguni\.vn$/;
+
+    if (!emailPattern.test(emailInput.value)) {
+        emailError.textContent = 'Địa chỉ email không hợp lệ. Vui lòng nhập email có định dạng vanlanguni.vn';
+    } else {
+		
+			var email = this.value;
+			var schoolIdField = document.getElementById('schoolId');
+
+			var parts = email.split('vanlanguni.vn'); // Split based on the domain
+			if (parts.length > 1) {
+				var idPart = parts[0].split('.'); // Get the part before the domain
+				if (idPart.length > 1) {
+					var schoolId = idPart[1];
+					schoolIdField.value = schoolId.slice(0, -1); // Trim the last character
+				} else {
+					schoolIdField.value = '';
+				}
+			} else {
+				schoolIdField.value = '';
+			
+		});
+    }
+});*/
 //Add Student JS
     document.getElementById('email').addEventListener('input', function () {
-        var email = this.value;
-        var schoolIdField = document.getElementById('schoolId');
+        //Start Check Email vanlanguni
+		var emailInput = document.getElementById('email');
+		var emailError = document.getElementById('emailError');
+		var emailPattern = /vanlanguni\.vn$/;
 
-        var parts = email.split('vanlanguni.vn'); // Split based on the domain
-        if (parts.length > 1) {
-            var idPart = parts[0].split('.'); // Get the part before the domain
-            if (idPart.length > 1) {
-                var schoolId = idPart[1];
-                schoolIdField.value = schoolId.slice(0, -1); // Trim the last character
-            } else {
-                schoolIdField.value = '';
-            }
+        if (!emailPattern.test(emailInput.value)) {
+            emailError.textContent = 'Địa chỉ email không hợp lệ. Vui lòng nhập email có định dạng vanlanguni.vn';
+            
         } else {
-            schoolIdField.value = '';
-        }
+            // End
+			var email = this.value;
+			var schoolIdField = document.getElementById('schoolId');
+
+			var parts = email.split('vanlanguni.vn'); // Split based on the domain
+			if (parts.length > 1) {
+				var idPart = parts[0].split('.'); // Get the part before the domain
+				if (idPart.length > 1) {
+					var schoolId = idPart[1];
+					schoolIdField.value = schoolId.slice(0, -1); // Trim the last character
+				} else {
+					schoolIdField.value = '';
+				}
+			} else {
+				schoolIdField.value = '';
+			}
+}
+       
     });
 //Delete Modal JS
     var deleteModal = document.getElementById('DeleteStudentModal');

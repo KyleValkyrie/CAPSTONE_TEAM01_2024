@@ -32,5 +32,9 @@ namespace CAPSTONE_TEAM01_2024.Models
         public int PeriodId { get; set; }
         [JsonIgnore]
         public AcademicPeriod AcademicPeriod { get; set; }
+
+        // Navigation property for PlanDetails
+        public ICollection<PlanDetail> PlanDetails { get; set; } = new List<PlanDetail>();
     }
+
 }

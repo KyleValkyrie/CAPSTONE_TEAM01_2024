@@ -865,7 +865,20 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             var schoolYears = await _context.AcademicPeriods.Select(sy => new SelectListItem { Value = sy.PeriodName, Text = sy.PeriodName}).ToListAsync();
 
             var paginatedSemesterPlans = await PaginatedList<SemesterPlan>.CreateAsync(semesterPlansQuery, pageIndex, pageSize);
-            var viewModel = new SemesterPlanViewModel { SemesterPlans = paginatedSemesterPlans, SchoolYears = schoolYears };
+
+            var currentUser = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == User.Identity.Name);
+
+            var targetClass = await _context.Classes
+                .Where(c => c.AdvisorId == currentUser.Id) // Filter by current user's AdvisorId
+                .Select(c => new SelectListItem
+                {
+                    Value = c.ClassId,
+                    Text = c.ClassId
+                })
+                .ToListAsync();
+
+            var viewModel = new SemesterPlanViewModel { SemesterPlans = paginatedSemesterPlans, SchoolYears = schoolYears, Class = targetClass};
+
             ViewBag.Warning = TempData["Warning"];
             ViewBag.Success = TempData["Success"];
             ViewBag.Error = TempData["Error"];

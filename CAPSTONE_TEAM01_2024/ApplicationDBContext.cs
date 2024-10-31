@@ -1,4 +1,5 @@
 ﻿using CAPSTONE_TEAM01_2024.Models;
+using Humanizer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,8 @@ namespace CAPSTONE_TEAM01_2024
         public DbSet<Announcement> Announcements { get; set; }
         public DbSet<UserAnnouncement> UserAnnouncements { get; set; }
         public DbSet<SemesterPlan> SemesterPlans { get; set; }
+        public DbSet<PlanDetail> PlanDetails { get; set; }
+        public DbSet<Criterion> Criterions { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
@@ -47,6 +50,12 @@ namespace CAPSTONE_TEAM01_2024
                 .HasOne(sp => sp.Class)
                 .WithMany(c => c.SemesterPlans)
                 .HasForeignKey(sp => sp.ClassId);
+
+            modelBuilder.Entity<SemesterPlan>()
+                .HasMany(sp => sp.PlanDetails) // A SemesterPlan can have many PlanDetails
+                .WithOne(pd => pd.SemesterPlan) // Each PlanDetail belongs to one SemesterPlan
+                .HasForeignKey(pd => pd.PlanId) // Foreign key in PlanDetail referencing SemesterPlan
+                .OnDelete(DeleteBehavior.Cascade); // If a SemesterPlan is deleted, delete all related PlanDetails
 
         }
     }

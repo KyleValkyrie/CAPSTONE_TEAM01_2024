@@ -17,7 +17,12 @@
 </head>
 <body>
     <!--Page's Head-->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom: 0px; height: 100%;">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="
+                            position: fixed;
+                            width: 100%;
+                            z-index: 1000;
+                            margin-bottom: 0px;
+                            height: 8%;margin-bottom: 0px; ">
         <div class="container-fluid">
             <a class="navbar-brand" href="#" style="text-transform: uppercase; color: #fff; font-weight: 600; font-size: 25px;">
                 <img src="https://insacmau.com/wp-content/uploads/2023/02/logo-van-lang.png" alt="Logo Đại học Văn Lang">
@@ -56,8 +61,8 @@
     <div class="container-fluid" id="Content_Display">
         <div class="row">
             <!--Side Navbar-->
-            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
-                <div class="overlay">
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar" style="border-radius:0px; margin-top:60px">
+                <div class="overlay" style="position:fixed">
                     <ul class="nav flex-column" style="font-size: 25px; list-style-type: none;">
                         <li class="nav-item">
                             <a class="nav-link" href="/Home/HomePage" id="linkHome" style="text-decoration:none;"
@@ -95,7 +100,7 @@
                 </div>
             </nav>
             <!--View's Contents-->
-            <main class="col-md-9 ms-sm-auto col-lg-10 content p-0 m-0" id="main-content">
+            <main class="col-md-9 ms-sm-auto col-lg-10 content p-0 m-0" id="main-content" style="position:relative">
                 @RenderBody()
             </main>
         </div>

@@ -9,40 +9,49 @@
 	 style="height:inherit;
             width:inherit;
             overflow: hidden;">
-	<video disablePictureInPicture class="embed-responsive-item embed-responsive-16by9 align-self-center mr-0"
-		   autoplay="" loop="" muted=""
-		   style="height: 85vh;width: auto; z-index:-1;">
-		<source src="~/Resources/Video/background_VLU.mp4" type="video/mp4">
-	</video>
-	<div class="container text-center"
-		 style="position:absolute;
+    <video disablePictureInPicture class="embed-responsive-item embed-responsive-16by9 align-self-center mr-0"
+           autoplay="" loop="" muted="" 
+           style="width: auto;z-index: -1;
+                position: absolute;
+                top: 50%;
+                height: 100%;
+                left: 50%;
+                transform: translate(-50%, -50%);">
+        <source src="~/Resources/Video/background_VLU.mp4" type="video/mp4">
+    </video>
+    <div class="container text-center" 
+         style="position:absolute;
+                top: 50%;
+               /*  height: 100%; */
+                left: 50%;
+                transform: translate(-50%, -65%);
                 background-color: rgba(0,0,0,0.7);
                 padding: 2rem 2rem 2rem 2rem;
-                max-width:60%;
-                max-height:40%">
-		<h3 style="color:white">WEBSITE QUẢN LÝ CÔNG TÁC CỐ VẤN HỌC TẬP</h3>
-		<h3 style="color:white">-VLU-</h3>
-		<h1 style="color:white">XIN CHÀO</h1>
-		<h2 style="color:white">CHÚC BẠN MỘT NGÀY LÀM VIỆC TỐT LÀNH.</h2>
-		<br>
-		<h4 style="color:white" id="clock"></h4>
-	</div>
+                border-radius:40px;
+                max-width:70%;
+                max-height:45%">
+        <h3 style="color:white">WEBSITE QUẢN LÝ CÔNG TÁC CỐ VẤN HỌC TẬP</h3>
+        <img src="https://insacmau.com/wp-content/uploads/2023/02/logo-van-lang.png" alt="Logo Đại học Văn Lang" style="width:50px; height:50px">
+        <h1 style="color:white">XIN CHÀO</h1>
+        <h2 style="color:white">CHÚC BẠN MỘT NGÀY LÀM VIỆC TỐT LÀNH.</h2>
+        <br>
+        <h4 style="color:white" id="clock"></h4>
+    </div>
 </div>
 <script>
+    function updateClock() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const month = (now.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+        const year = now.getFullYear();
+        const timeString = `${hours}:${minutes}:${seconds}`;
+        const dateString = `HCM, Ngày ${day} Tháng ${month} Năm ${year}`;
+        document.getElementById('clock').innerText = `${timeString} - ${dateString}`;
+    }
 
-	function updateClock() {
-		const now = new Date();
-		const hours = now.getHours().toString().padStart(2, '0');
-		const minutes = now.getMinutes().toString().padStart(2, '0');
-		const seconds = now.getSeconds().toString().padStart(2, '0');
-		const day = now.getDate().toString().padStart(2, '0');
-		const month = (now.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-		const year = now.getFullYear();
-		const timeString = `${hours}:${minutes}:${seconds}`;
-		const dateString = `HCM, Ngày ${day} Tháng ${month} Năm ${year}`;
-		document.getElementById('clock').innerText = `${timeString} - ${dateString}`;
-	}
-
-	setInterval(updateClock, 1000);
-	updateClock(); // Initial call to display clock immediately
-</script>	
+    setInterval(updateClock, 1000);
+    updateClock(); // Initial call to display clock immediately
+</script>

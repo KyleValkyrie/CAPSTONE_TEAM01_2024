@@ -15,6 +15,7 @@ using System.Drawing;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
+using System.Numerics;
 
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
@@ -849,7 +850,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("SchoolYear");
         }
 
-
 //SemesterPlan actions
     //Render View
         public async Task<IActionResult> SemesterPlan(int pageIndex = 1, int pageSize = 20)
@@ -862,13 +862,13 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 .OrderByDescending(sp => sp.CreationTime)
                 .AsQueryable();
 
-            var schoolYears = await _context.AcademicPeriods.Select(sy => new SelectListItem { Value = sy.PeriodName, Text = sy.PeriodName}).ToListAsync();
+            var schoolYears = await _context.AcademicPeriods.Select(sy => new SelectListItem { Value = sy.PeriodId.ToString(), Text = sy.PeriodName}).ToListAsync();
 
             var paginatedSemesterPlans = await PaginatedList<SemesterPlan>.CreateAsync(semesterPlansQuery, pageIndex, pageSize);
 
             var currentUser = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == User.Identity.Name);
 
-            var targetClass = await _context.Classes
+            var targetClasses = await _context.Classes
                 .Where(c => c.AdvisorId == currentUser.Id) // Filter by current user's AdvisorId
                 .Select(c => new SelectListItem
                 {
@@ -877,7 +877,14 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 })
                 .ToListAsync();
 
-            var viewModel = new SemesterPlanViewModel { SemesterPlans = paginatedSemesterPlans, SchoolYears = schoolYears, Class = targetClass};
+            var detail = await _context.PlanDetails.ToListAsync();
+
+            var viewModel = new SemesterPlanViewModel { 
+                SemesterPlans = paginatedSemesterPlans, 
+                SchoolYears = schoolYears, 
+                Class = targetClasses,
+                Details = detail
+            };
 
             ViewBag.Warning = TempData["Warning"];
             ViewBag.Success = TempData["Success"];
@@ -885,13 +892,259 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return View(viewModel);
         }
-        
     //Add Plan
-        
+        [HttpPost]
+        public async Task<IActionResult> AddPlan(SemesterPlan plan, IFormCollection form)
+        {
+            //Setup data for SemesterPlan
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            plan.CreationTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
+            plan.AdvisorName = User.Identity.Name;
+            var period = await _context.AcademicPeriods.FirstOrDefaultAsync(p => p.PeriodId == plan.PeriodId);
+            plan.PeriodName = period.PeriodName;
+            plan.Status = "Nháp";
+
+            //Add new SemesterPlan
+            var exisitingPlan = await _context.SemesterPlans.FirstOrDefaultAsync(pl => pl.AcademicPeriod == plan.AcademicPeriod &&
+                                                                                       pl.ClassId == plan.ClassId &&
+                                                                                       pl.AdvisorName == plan.AdvisorName);
+            if (exisitingPlan == null)
+            {
+                _context.SemesterPlans.Add(plan);
+                await _context.SaveChangesAsync();
+                //Setup data for PlanDetail
+                List<PlanDetail> Details = new List<PlanDetail>();
+                //Detail 1
+                var detail1 = new PlanDetail
+                {
+                    PlanId = plan.PlanId,
+                    CriterionId = 1,
+                    Task = form["Task1_1"],
+                    HowToExecute = form["HowToExecute1_1"],
+                    Quantity = form["Quantity1_1"],
+                    TimeFrame = form["TimeFrame1_1"],
+                    Notes = form["Notes1_1"]
+                };
+                Details.Add(detail1);
+                //Detail 2
+                var detail2 = new PlanDetail
+                {
+                    PlanId = plan.PlanId,
+                    CriterionId = 1,
+                    Task = form["Task1_2"],
+                    HowToExecute = form["HowToExecute1_2"],
+                    Quantity = form["Quantity1_2"],
+                    TimeFrame = form["TimeFrame1_2"],
+                    Notes = form["Notes1_2"]
+                };
+                Details.Add(detail2);
+                //Detail 3
+                var detail3 = new PlanDetail
+                {
+                    PlanId = plan.PlanId,
+                    CriterionId = 1,
+                    Task = form["Task1_3"],
+                    HowToExecute = form["HowToExecute1_3"],
+                    Quantity = form["Quantity1_3"],
+                    TimeFrame = form["TimeFrame1_3"],
+                    Notes = form["Notes1_3"]
+                };
+                Details.Add(detail3);
+                //Detail 4
+                var detail4 = new PlanDetail
+                {
+                    PlanId = plan.PlanId,
+                    CriterionId = 2,
+                    Task = form["Task2_1"],
+                    HowToExecute = form["HowToExecute2_1"],
+                    Quantity = form["Quantity2_1"],
+                    TimeFrame = form["TimeFrame2_1"],
+                    Notes = form["Notes2_1"]
+                };
+                Details.Add(detail4);
+                //Detail 5
+                var detail5 = new PlanDetail
+                {
+                    PlanId = plan.PlanId,
+                    CriterionId = 2,
+                    Task = form["Task2_2"],
+                    HowToExecute = form["HowToExecute2_2"],
+                    Quantity = form["Quantity2_2"],
+                    TimeFrame = form["TimeFrame2_2"],
+                    Notes = form["Notes2_2"]
+                };
+                Details.Add(detail5);
+                //Detail 6
+                var detail6 = new PlanDetail
+                {
+                    PlanId = plan.PlanId,
+                    CriterionId = 3,
+                    Task = form["Task3_1"],
+                    HowToExecute = form["HowToExecute3_1"],
+                    Quantity = form["Quantity3_1"],
+                    TimeFrame = form["TimeFrame3_1"],
+                    Notes = form["Notes3_1"]
+                };
+                Details.Add(detail6);
+                //Detail 7
+                var detail7 = new PlanDetail
+                {
+                    PlanId = plan.PlanId,
+                    CriterionId = 3,
+                    Task = form["Task3_2"],
+                    HowToExecute = form["HowToExecute3_2"],
+                    Quantity = form["Quantity3_2"],
+                    TimeFrame = form["TimeFrame3_2"],
+                    Notes = form["Notes3_1"]
+                };
+                Details.Add(detail7);
+                //Detail 8
+                var detail8 = new PlanDetail
+                {
+                    PlanId = plan.PlanId,
+                    CriterionId = 4,
+                    Task = form["Task4_1"],
+                    HowToExecute = form["HowToExecute4_1"],
+                    Quantity = form["Quantity4_1"],
+                    TimeFrame = form["TimeFrame4_1"],
+                    Notes = form["Notes4_1"]
+                };
+                Details.Add(detail8);
+                //Detail 9
+                var detail9 = new PlanDetail
+                {
+                    PlanId = plan.PlanId,
+                    CriterionId = 4,
+                    Task = form["Task4_2"],
+                    HowToExecute = form["HowToExecute4_2"],
+                    Quantity = form["Quantity4_2"],
+                    TimeFrame = form["TimeFrame4_2"],
+                    Notes = form["Notes4_1"]
+                };
+                Details.Add(detail9);
+                //Detail 9
+                var detail10 = new PlanDetail
+                {
+                    PlanId = plan.PlanId,
+                    CriterionId = 5,
+                    Task = form["Task5_1"],
+                    HowToExecute = form["HowToExecute5_1"],
+                    Quantity = form["Quantity5_1"],
+                    TimeFrame = form["TimeFrame5_1"],
+                    Notes = form["Notes5_1"]
+                };
+                Details.Add(detail10);
+
+                //Add new PlanDetail
+                await _context.PlanDetails.AddRangeAsync(Details);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Thêm kế hoạch thành công! Trạng thái hiện tại là nháp, vui lòng nộp kế hoạch để thay đổi trạng thái!";
+                return RedirectToAction("SemesterPlan");
+            }
+            else
+            {
+                TempData["Warning"] = "Đã tồn tại kế hoạch trong thời gian và lớp tương tự!";
+                return RedirectToAction("SemesterPlan");
+            }
+        }
     //Edit Plan
-           
-//SemesterPlanDetail actions
-    //Render View 
+        [HttpPost]
+        public async Task<IActionResult> EditPlanDetail(IFormCollection form)
+        {
+            // Get the PlanIds value from the form collection
+            var planIdsString = form["PlanIds"].ToString(); 
+            // Split the string into an array of integers
+            var detailIds = planIdsString.Split(',').Select(int.Parse).ToArray();
+
+            List<PlanDetail> plansToEdit = new List<PlanDetail>();
+            //Detail 1
+            var detail1 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[0]);
+            detail1.Task = form["EditTask1_1"];
+            detail1.HowToExecute = form["EditHowToExecute1_1"];
+            detail1.Quantity = form["EditQuantity1_1"];
+            detail1.TimeFrame = form["EditTimeFrame1_1"];
+            detail1.Notes = form["EditNotes1_1"];
+            plansToEdit.Add(detail1);
+            //Detail 2
+            var detail2 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[1]);
+            detail2.Task = form["EditTask1_2"];
+            detail2.HowToExecute = form["EditHowToExecute1_2"];
+            detail2.Quantity = form["EditQuantity1_2"];
+            detail2.TimeFrame = form["EditTimeFrame1_2"];
+            detail2.Notes = form["EditNotes1_2"];
+            plansToEdit.Add(detail2);
+            //Detail 3
+            var detail3 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[2]);
+            detail3.Task = form["EditTask1_3"];
+            detail3.HowToExecute = form["EditHowToExecute1_3"];
+            detail3.Quantity = form["EditQuantity1_3"];
+            detail3.TimeFrame = form["EditTimeFrame1_3"];
+            detail3.Notes = form["EditNotes1_3"];
+            plansToEdit.Add(detail3);
+            //Detail 4
+            var detail4 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[3]);
+            detail4.Task = form["EditTask2_1"];
+            detail4.HowToExecute = form["EditHowToExecute2_1"];
+            detail4.Quantity = form["EditQuantity2_1"];
+            detail4.TimeFrame = form["EditTimeFrame2_1"];
+            detail4.Notes = form["EditNotes2_1"];
+            plansToEdit.Add(detail4);
+            //Detail 5
+            var detail5 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[4]);
+            detail5.Task = form["EditTask2_2"];
+            detail5.HowToExecute = form["EditHowToExecute2_2"];
+            detail5.Quantity = form["EditQuantity2_2"];
+            detail5.TimeFrame = form["EditTimeFrame2_2"];
+            detail5.Notes = form["EditNotes2_2"];
+            plansToEdit.Add(detail5);
+            //Detail 6
+            var detail6 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[5]);
+            detail6.Task = form["EditTask3_1"];
+            detail6.HowToExecute = form["EditHowToExecute3_1"];
+            detail6.Quantity = form["EditQuantity3_1"];
+            detail6.TimeFrame = form["EditTimeFrame3_1"];
+            detail6.Notes = form["EditNotes3_1"];
+            plansToEdit.Add(detail6);
+            //Detail 7
+            var detail7 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[6]);
+            detail7.Task = form["EditTask3_2"];
+            detail7.HowToExecute = form["EditHowToExecute3_2"];
+            detail7.Quantity = form["EditQuantity3_2"];
+            detail7.TimeFrame = form["EditTimeFrame3_2"];
+            detail7.Notes = form["EditNotes3_1"];
+            plansToEdit.Add(detail7);
+            //Detail 8
+            var detail8 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[7]);
+            detail8.Task = form["EditTask4_1"];
+            detail8.HowToExecute = form["EditHowToExecute4_1"];
+            detail8.Quantity = form["EditQuantity4_1"];
+            detail8.TimeFrame = form["EditTimeFrame4_1"];
+            detail8.Notes = form["EditNotes4_1"];
+            plansToEdit.Add(detail8);
+            //Detail 9
+            var detail9 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[8]);
+            detail9.Task = form["EditTask4_2"];
+            detail9.HowToExecute = form["EditHowToExecute4_2"];
+            detail9.Quantity = form["EditQuantity4_2"];
+            detail9.TimeFrame = form["EditTimeFrame4_2"];
+            detail9.Notes = form["EditNotes4_1"];
+            plansToEdit.Add(detail9);
+            //Detail 9
+            var detail10 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[9]);
+            detail10.Task = form["EditTask5_1"];
+            detail10.HowToExecute = form["EditHowToExecute5_1"];
+            detail10.Quantity = form["EditQuantity5_1"];
+            detail10.TimeFrame = form["EditTimeFrame5_1"];
+            detail10.Notes = form["EditNotes5_1"];
+            plansToEdit.Add(detail10);
+
+            _context.PlanDetails.UpdateRange(plansToEdit);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Chi tiết kế hoạch cập nhật thành công";
+            return RedirectToAction("SemesterPlan");
+        }
+    //SemesterPlanDetail actions
+        //Render View 
         public IActionResult SemesterPlanDetail()
         {
             ViewData["page"] = "SemesterPlanDetail";

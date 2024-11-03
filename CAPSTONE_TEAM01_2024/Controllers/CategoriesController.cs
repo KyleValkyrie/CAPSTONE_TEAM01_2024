@@ -760,7 +760,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
 //SchoolYear actions
     //Render SchoolYear view
-    public async Task<IActionResult> SchoolYear(int pageIndex = 1, int pageSize = 20)
+        public async Task<IActionResult> SchoolYear(int pageIndex = 1, int pageSize = 20)
 		{
 			ViewData["page"] = "SchoolYear";
             var periods = _context.AcademicPeriods.AsQueryable();
@@ -1047,16 +1047,16 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("SemesterPlan");
             }
         }
-    //Edit Plan
+    //Edit Plan Detail
         [HttpPost]
         public async Task<IActionResult> EditPlanDetail(IFormCollection form)
         {
             // Get the PlanIds value from the form collection
-            var planIdsString = form["PlanIds"].ToString(); 
+            var planIdsString = form["DetailIds"].ToString(); 
             // Split the string into an array of integers
             var detailIds = planIdsString.Split(',').Select(int.Parse).ToArray();
 
-            List<PlanDetail> plansToEdit = new List<PlanDetail>();
+            List<PlanDetail> detailsToEdit = new List<PlanDetail>();
             //Detail 1
             var detail1 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[0]);
             detail1.Task = form["EditTask1_1"];
@@ -1064,7 +1064,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             detail1.Quantity = form["EditQuantity1_1"];
             detail1.TimeFrame = form["EditTimeFrame1_1"];
             detail1.Notes = form["EditNotes1_1"];
-            plansToEdit.Add(detail1);
+            detailsToEdit.Add(detail1);
             //Detail 2
             var detail2 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[1]);
             detail2.Task = form["EditTask1_2"];
@@ -1072,7 +1072,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             detail2.Quantity = form["EditQuantity1_2"];
             detail2.TimeFrame = form["EditTimeFrame1_2"];
             detail2.Notes = form["EditNotes1_2"];
-            plansToEdit.Add(detail2);
+            detailsToEdit.Add(detail2);
             //Detail 3
             var detail3 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[2]);
             detail3.Task = form["EditTask1_3"];
@@ -1080,7 +1080,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             detail3.Quantity = form["EditQuantity1_3"];
             detail3.TimeFrame = form["EditTimeFrame1_3"];
             detail3.Notes = form["EditNotes1_3"];
-            plansToEdit.Add(detail3);
+            detailsToEdit.Add(detail3);
             //Detail 4
             var detail4 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[3]);
             detail4.Task = form["EditTask2_1"];
@@ -1088,7 +1088,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             detail4.Quantity = form["EditQuantity2_1"];
             detail4.TimeFrame = form["EditTimeFrame2_1"];
             detail4.Notes = form["EditNotes2_1"];
-            plansToEdit.Add(detail4);
+            detailsToEdit.Add(detail4);
             //Detail 5
             var detail5 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[4]);
             detail5.Task = form["EditTask2_2"];
@@ -1096,7 +1096,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             detail5.Quantity = form["EditQuantity2_2"];
             detail5.TimeFrame = form["EditTimeFrame2_2"];
             detail5.Notes = form["EditNotes2_2"];
-            plansToEdit.Add(detail5);
+            detailsToEdit.Add(detail5);
             //Detail 6
             var detail6 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[5]);
             detail6.Task = form["EditTask3_1"];
@@ -1104,7 +1104,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             detail6.Quantity = form["EditQuantity3_1"];
             detail6.TimeFrame = form["EditTimeFrame3_1"];
             detail6.Notes = form["EditNotes3_1"];
-            plansToEdit.Add(detail6);
+            detailsToEdit.Add(detail6);
             //Detail 7
             var detail7 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[6]);
             detail7.Task = form["EditTask3_2"];
@@ -1112,7 +1112,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             detail7.Quantity = form["EditQuantity3_2"];
             detail7.TimeFrame = form["EditTimeFrame3_2"];
             detail7.Notes = form["EditNotes3_1"];
-            plansToEdit.Add(detail7);
+            detailsToEdit.Add(detail7);
             //Detail 8
             var detail8 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[7]);
             detail8.Task = form["EditTask4_1"];
@@ -1120,7 +1120,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             detail8.Quantity = form["EditQuantity4_1"];
             detail8.TimeFrame = form["EditTimeFrame4_1"];
             detail8.Notes = form["EditNotes4_1"];
-            plansToEdit.Add(detail8);
+            detailsToEdit.Add(detail8);
             //Detail 9
             var detail9 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[8]);
             detail9.Task = form["EditTask4_2"];
@@ -1128,7 +1128,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             detail9.Quantity = form["EditQuantity4_2"];
             detail9.TimeFrame = form["EditTimeFrame4_2"];
             detail9.Notes = form["EditNotes4_1"];
-            plansToEdit.Add(detail9);
+            detailsToEdit.Add(detail9);
             //Detail 9
             var detail10 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[9]);
             detail10.Task = form["EditTask5_1"];
@@ -1136,15 +1136,90 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             detail10.Quantity = form["EditQuantity5_1"];
             detail10.TimeFrame = form["EditTimeFrame5_1"];
             detail10.Notes = form["EditNotes5_1"];
-            plansToEdit.Add(detail10);
+            detailsToEdit.Add(detail10);
 
-            _context.PlanDetails.UpdateRange(plansToEdit);
+            var semesterPlan = await _context.SemesterPlans.FirstOrDefaultAsync(spl => spl.PlanId == detail1.PlanId);
+            semesterPlan.Status = "Chưa Nộp";
+
+            _context.SemesterPlans.Update(semesterPlan);
+            _context.PlanDetails.UpdateRange(detailsToEdit);
+            
             await _context.SaveChangesAsync();
             TempData["Success"] = "Chi tiết kế hoạch cập nhật thành công";
             return RedirectToAction("SemesterPlan");
         }
-    //SemesterPlanDetail actions
-        //Render View 
+    //Edit Plan
+        [HttpPost]
+        public async Task<IActionResult> EditPlan(int planId, int periodId, string planType, string classId)
+        {
+            var planToEdit = await _context.SemesterPlans.FirstOrDefaultAsync(pl => pl.PlanId == planId);
+            var period = await _context.AcademicPeriods.FirstOrDefaultAsync(p => p.PeriodId == periodId);
+            //var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            //planToEdit.CreationTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
+            planToEdit.PeriodName = period.PeriodName;
+            planToEdit.PlanType = planType;
+            planToEdit.ClassId = classId;
+
+            _context.SemesterPlans.Update(planToEdit);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Thông tin kế hoạch cập nhật thành công";
+            return RedirectToAction("SemesterPlan");
+        }
+    //Check Plan Validity
+        public async Task<bool> PlanValidation(int planId)
+        {
+            List<PlanDetail> details = await _context.PlanDetails.Where(pd => pd.PlanId == planId).ToListAsync();
+            foreach (var dt in details)
+            {
+                if (string.IsNullOrWhiteSpace(dt.HowToExecute) || string.IsNullOrWhiteSpace(dt.Quantity) || string.IsNullOrWhiteSpace(dt.TimeFrame))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    //Submit Plan
+        [HttpPost]
+        public async Task<IActionResult> SubmitPlan(int planId)
+        {
+            bool validated = await PlanValidation(planId);
+            if (validated == false)
+            {
+                TempData["Error"] = "Kế hoạch chưa đầy đủ thông tin, vui lòng điền đầy đủ thông tin trước khi thử lại!";
+                return RedirectToAction("SemesterPlan");
+            }
+            var planToSubmit = await _context.SemesterPlans.FirstOrDefaultAsync(pl => pl.PlanId == planId);
+            if (planToSubmit.Status == "Đã Nộp")
+            {
+                TempData["Warning"] = "Kế hoạch đã được nộp, vui lòng chỉnh lại chi tiết và tiến hành nộp lại!";
+                return RedirectToAction("SemesterPlan");
+            }
+            planToSubmit.Status = "Đã Nộp";
+            _context.SemesterPlans.Update(planToSubmit);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Nộp kế hoạch thành công";
+            return RedirectToAction("SemesterPlan");            
+        }
+    //Delete Plan
+        [HttpPost]
+        public async Task<IActionResult> DeletePlan(int planId)
+        {
+            var targetPlan = await _context.SemesterPlans.FirstOrDefaultAsync(pl => pl.PlanId == planId);
+            if (targetPlan == null)
+            {
+                TempData["Error"] = "Kế hoạch không tồn tại!";
+                return RedirectToAction("SemesterPlan");
+            }
+
+            _context.SemesterPlans.Remove(targetPlan);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Kế hoạch đã được xóa thành công!";
+            return RedirectToAction("SemesterPlan");
+        }
+
+//SemesterPlanDetail actions
+    //Render View 
         public IActionResult SemesterPlanDetail()
         {
             ViewData["page"] = "SemesterPlanDetail";

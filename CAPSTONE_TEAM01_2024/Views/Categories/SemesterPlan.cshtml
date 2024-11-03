@@ -207,13 +207,13 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
                                         <button class="btn btn-outline-success btn-sm" title="Xem chi tiết" onclick="openEditPlanDetailModal(@plan.PlanId, @plan.PeriodId, '@plan.ClassId', '@plan.Status')">
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        <button class="btn btn-outline-primary btn-sm" title="Cập Nhật">
+                                        <button class="btn btn-outline-primary btn-sm" title="Cập Nhật" onclick="openEditSemesterPlan(@plan.PlanId, @plan.PeriodId, '@plan.PlanType', '@plan.ClassId')">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button class="btn btn-outline-secondary btn-sm" title="Nộp ">
+                                        <button class="btn btn-outline-secondary btn-sm" title="Nộp" onclick="openSubmitSemesterPlan(@plan.PlanId)">
                                             <i class="bi bi-file-earmark-arrow-up"></i>
                                         </button>
-                                        <button class="btn btn-outline-danger btn-sm delete" title="Xóa">
+                                        <button class="btn btn-outline-danger btn-sm delete" title="Xóa" onclick="openDeleteModal(@plan.PlanId)">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -486,7 +486,7 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
             <form id="editSemesterPlanForm" method="post" action="/Categories/EditPlanDetail">
                 <!-- Dropdown Options for Period and Class -->
                 <div class="fields-row" style="display: flex; align-items: center; gap: 10px; width: 100%; font-weight: bold; padding-bottom: 5px;">
-                    <input type="hidden" id="PlanIds" name="PlanIds"/>
+                    <input type = "hidden" id="DetailIds" name="DetailIds"/>
                 </div>
                 <!-- Header Row for Fields -->
                 <div class="fields-row" style="flex: 1; text-align: center; height: 50px; display: flex; align-items: center;">
@@ -625,6 +625,93 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
     </div>
 </div>
 
+<!-- Edit Plan Modal -->
+<div class="modal fade" id="EditSemesterPlanModal" tabindex="-1" aria-labelledby="EditSemesterPlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                <h5 class="modal-title" id="EditSemesterPlanModalLabel">Chỉnh sửa Kế Hoạch Học Kỳ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="EditSemesterPlanForm" method="post" action="/Categories/EditPlan">
+                <div class="modal-body" style="overflow-y: auto; max-height: 80vh;">
+                    <div class="mb-3">
+                        <input type="hidden" id="EditPlanId" name="PlanId" class="form-control" required>
+                        <label for="EditPeriodId" class="form-label">Năm Học</label>
+                        <select class="form-select" id="EditPeriodId" name="PeriodId" class="form-control" required>
+                            @foreach (var item in Model.SchoolYears)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="EditPlanType" class="form-label">Loại Kế Hoạch</label>
+                        <input type="text" id="EditPlanType" name="PlanType" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="EditClassId" class="form-label">Mã Lớp</label>
+                        <select class="form-select" id="EditClassId" name="ClassId" class="form-control" required>
+                            @foreach (var item in Model.Class)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer" style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary save">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Submit Plan Modal -->
+<div class="modal fade" id="SubmitPlanModal" tabindex="-1" aria-labelledby="SubmitSemesterPlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="SubmitPlanModalLabel">Nộp Kế Hoạch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn nộp kế hoạch này không?</p>
+                <form id="submitPlanForm" asp-action="SubmitPlan" method="post">
+                    <input type="hidden" id="SubmitPlanId" name="PlanId" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger">Nộp</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Plan Modal -->
+<div class="modal fade" id="DeletePlanModal" tabindex="-1" aria-labelledby="DeleteSemesterPlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DeletePlanModalLabel">Xóa Kế Hoạch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa kế hoạch này không?</p>
+                <form id="deletePlanForm" asp-action="DeletePlan" method="post">
+                    <input type="hidden" id="SubmitPlanId" name="PlanId" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger">Xóa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 //Add Modal JS
     function openAddPlanModal() { 
@@ -632,7 +719,7 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
         modal.show(); 
     }
 
-//Edit Modal JS
+//Edit Plan Detail Modal JS
     const detailsData = @Html.Raw(Json.Serialize(Model.Details));
     const pattern = [1,2,3,1,2,1,2,1,2,1]; 
     function openEditPlanDetailModal(planId, periodId, classId, status) {
@@ -650,7 +737,7 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
         {
             notesField.value = notes || '';
         }
-        document.getElementById('PlanIds').value += (document.getElementById('PlanIds').value ? ',' : '') + detailId;
+                document.getElementById('DetailIds').value += (document.getElementById('DetailIds').value ? ',' : '') + detailId;
         console.log(detailId);
         cycle++;
     });
@@ -658,5 +745,28 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
     // Show the modal
     var modal = new bootstrap.Modal(document.getElementById('EditPlanDetailModal'));
     modal.show();
+    }
+// Edit Plan Modal JS
+function openEditSemesterPlan(planId, periodId, planType, classId) { 
+    document.getElementById('EditPlanId').value = planId;
+    document.getElementById('EditPeriodId').value = periodId;
+    document.getElementById('EditPlanType').value = planType;
+    document.getElementById('EditClassId').value = classId;
+    // Show the modal
+    var modal = new bootstrap.Modal(document.getElementById('EditSemesterPlanModal'));
+    modal.show();
+    }
+//Submit Plan JS
+        function openSubmitSemesterPlan(planId) {
+            document.getElementById('SubmitPlanId').value = planId;
+        // Show the modal
+            var modal = new bootstrap.Modal(document.getElementById('SubmitPlanModal'));
+        modal.show();
+        }
+// Delete Modal JS
+    function openDeleteModal(planId) {
+        document.getElementById('DeletePlanId').value = planId;
+        var modal = new bootstrap.Modal(document.getElementById('DeletePlanModal')); 
+        modal.show(); 
     }
 </script>

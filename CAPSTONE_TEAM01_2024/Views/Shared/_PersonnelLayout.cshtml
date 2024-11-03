@@ -90,11 +90,67 @@
                             </ul>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" role="button" aria-expanded="false" aria-controls="dropdownMenu4" id="toggleMenu4"
+                               onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
+                               onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
+                                <i class="bi bi-activity"></i> HOẠT ĐỘNG <i class="bi bi-caret-down-fill" style="float:right;"></i>
+                            </a>
+                            <ul class="collapse" id="dropdownMenu4" style="list-style-type: none; padding-left: 35px;">
+                                <li>
+                                    <a class="dropdown-item" href="/Categories/SemesterPlan" id="linkSemesterPlan" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
+                                       onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
+                                       onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
+                                        <i class="bi bi-book"></i> Kế Hoạch
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/Categories/EndSemesterReport" id="linkEndSemesterReport" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
+                                       onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
+                                       onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
+                                        <i class="bi bi-file-earmark-text"></i> Báo Cáo
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                       
+
+
+                        <li class="nav-item">
+                            <a class="nav-link" role="button" aria-expanded="false" aria-controls="dropdownMenu2" id="toggleMenu2"
+                               onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
+                               onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
+                                <i class="bi bi-list"></i> DANH MỤC <i class="bi bi-caret-down-fill" style="float:right;"></i>
+                            </a>
+                            <ul class="collapse" id="dropdownMenu2" style="list-style-type: none; padding-left: 35px;">
+                                <li>
+                                    <a class="dropdown-item" href="/Categories/SchoolYear" id="linkSchoolYear" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
+                                       onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
+                                       onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
+                                        <i class="bi bi-calendar"></i> Năm Học
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/Categories/ClassList" id="linkClassList" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
+                                       onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
+                                       onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
+                                        <i class="bi bi-mortarboard"></i> Lớp Học
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/Categories/StudentList" id="linkStudentList" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
+                                       onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
+                                       onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
+                                        <i class="bi bi-person-lines-fill"></i>  Sinh Viên
+                                    </a>
+                                </li>
+
+                            </ul>
+                        <li class="nav-item">
                             <a class="nav-link" role="button" aria-expanded="false" aria-controls="dropdownMenu3" id="toggleMenu3"
                                data-bs-toggle="collapse" data-bs-target="#dropdownMenu3"
                                onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
                                onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                <i class="bi bi-exclamation-circle"></i> THÔNG BÁO 
+                                <i class="bi bi-exclamation-circle"></i> THÔNG BÁO
                                 <span id="announcementCount" class="badge rounded-pill bg-danger" style="display:none;"></span>
                                 <i class="bi bi-caret-down-fill" style="float:right;"></i>
                             </a>
@@ -122,50 +178,6 @@
                                 <i class="bi bi-graph-up"></i> THỐNG KÊ
                             </a>
                         </li>
-                      
-                        <li class="nav-item">
-                            <a class="nav-link" role="button" aria-expanded="false" aria-controls="dropdownMenu2" id="toggleMenu2"
-                               onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
-                               onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                <i class="bi bi-list"></i> DANH MỤC <i class="bi bi-caret-down-fill" style="float:right;"></i>
-                            </a>
-                            <ul class="collapse" id="dropdownMenu2" style="list-style-type: none; padding-left: 35px;">
-                                <li>
-                                    <a class="dropdown-item" href="/Categories/SchoolYear" id="linkSchoolYear" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
-                                       onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
-                                       onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                        <i class="bi bi-calendar"></i> Năm Học
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="/Categories/ClassList" id="linkClassList" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
-                                       onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
-                                       onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                        <i class="bi bi-mortarboard"></i> Lớp Học
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="/Categories/StudentList" id="linkClassList" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
-                                       onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
-                                       onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                        <i class="bi bi-person-lines-fill"></i>  Sinh Viên
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="/Categories/SemesterPlan" id="linkSemesterPlan" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
-                                       onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
-                                       onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                        <i class="bi bi-book"></i> Kế Hoạch
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="/Categories/EndSemesterReport" id="linkEndSemesterReport" style="text-decoration:none; color: #fff; font-size:1.2rem; font-weight:bold;"
-                                       onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
-                                       onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                        <i class="bi bi-file-earmark-text"></i> Báo Cáo
-                                    </a>
-                                </li>
-                            </ul>
                         </li>
                     </ul>
                 </div>
@@ -212,7 +224,10 @@
                 '/Categories/SchoolYear': 'linkSchoolYear',
                 '/Categories/ClassList': 'linkClassList',
                 '/Categories/SemesterPlan': 'linkSemesterPlan',
-                '/Categories/EndSemesterReport': 'linkEndSemesterReport'
+                '/Categories/EndSemesterReport': 'linkEndSemesterReport',
+                '/Categories/StudentList': 'linkStudentList',
+                '/Announcement/AnnouncementList': 'linkAnnouncement',
+                '/Announcement/MyAnnouncements': 'linkMyAnnouncement',
             };
 
             // Set the selected state
@@ -221,7 +236,7 @@
             }
 
             // Load dropdown state from session storage
-            const dropdownMenus = ['dropdownMenu1', 'dropdownMenu2', 'dropdownMenu3'];
+            const dropdownMenus = ['dropdownMenu1', 'dropdownMenu2', 'dropdownMenu3', 'dropdownMenu4'];
             dropdownMenus.forEach(menuId => {
                 const menuState = sessionStorage.getItem(menuId);
                 const menu = document.getElementById(menuId);

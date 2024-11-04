@@ -1139,7 +1139,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             detailsToEdit.Add(detail10);
 
             var semesterPlan = await _context.SemesterPlans.FirstOrDefaultAsync(spl => spl.PlanId == detail1.PlanId);
-            semesterPlan.Status = "Chưa Nộp";
+            semesterPlan.Status = "Nháp";
 
             _context.SemesterPlans.Update(semesterPlan);
             _context.PlanDetails.UpdateRange(detailsToEdit);
@@ -1225,6 +1225,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             ViewData["page"] = "SemesterPlanDetail";
             return View();
         }
+       
     }
 }
 

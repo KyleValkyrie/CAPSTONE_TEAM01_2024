@@ -4,6 +4,23 @@ ViewData["Title"] = "Semester Plan";
 int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
 }
 <style>
+    /* CSS cụ thể cho các modal nhỏ */
+    #EditSemesterPlanModal .modal-dialog,
+    #SubmitPlanModal .modal-dialog,
+    #DeletePlanModal .modal-dialog {
+        max-width: 600px; /* Điều chỉnh kích thước nhỏ lại */
+    }
+
+    /* Định dạng cho các modal để phân biệt */
+    #EditSemesterPlanModal .modal-header,
+    #SubmitPlanModal .modal-header,
+    #DeletePlanModal .modal-header {
+        background-color: #f8f9fa; /* Màu nền nhạt */
+        border-bottom: 1px solid #ddd;
+    }
+
+     
+    
     .modal-dialog {
         max-width: 90%;
         width: 100%; 
@@ -134,7 +151,6 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
                             <select id="statusFilter" class="form-select custom-select" style="width: 150px;" onchange="filterTable()">
                                 <option value="">Tất cả</option>
                                 <option value="Đã nộp">Đã Nộp</option>
-                                <option value="Chưa nộp">Chưa Nộp</option>
                                 <option value="Nháp">Nháp</option>
                             </select>
                         </div>
@@ -629,7 +645,7 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
 <div class="modal fade" id="EditSemesterPlanModal" tabindex="-1" aria-labelledby="EditSemesterPlanModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header" style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+            <div class="modal-header" >
                 <h5 class="modal-title" id="EditSemesterPlanModalLabel">Chỉnh sửa Kế Hoạch Học Kỳ</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>

@@ -1225,7 +1225,16 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             ViewData["page"] = "SemesterPlanDetail";
             return View();
         }
-       
+       public IActionResult ReceiveEmail()
+       {
+           ViewData["page"] = "ReceiveEmail";
+           return View();
+        }
+       public IActionResult SentEmail()
+       {
+           ViewData["page"] = "SentEmail";
+           return View();
+       }
     }
 }
 

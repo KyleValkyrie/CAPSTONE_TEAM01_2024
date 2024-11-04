@@ -1,0 +1,206 @@
+@{
+ViewData["Title"] = "Sent Email";
+Layout = "_PersonnelLayout";
+}
+<div class="content-wrapper" style="min-height: 912.2px;">
+<header class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h3 class="m-0">Gửi Mail</h3>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <div class="row text-center">
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMailModal">
+                            <i class="bi bi-plus"></i> Thêm Mail
+                        </button>
+                    </div>
+                    <div class="col">
+                        <nav class="navbar navbar-light bg-light">
+                            <form class="d-flex ms-auto">
+                                <input class="form-control me-2" type="search" placeholder="Nhập nội dung tìm kiếm" aria-label="Search">
+                            </form>
+                        </nav>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-4 text-left">
+                        <label for="statusFilter" class="form-label">Trạng Thái</label>
+                        <select id="statusFilter" class="form-select custom-select" style="width: 150px;" onchange="filterTable()">
+                            <option value="">Tất cả</option>
+                            <option value="Đã gửi">Đã Gửi</option>
+                            <option value="Nháp">Nháp</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr class="text-center">
+                        <th>Người Gửi</th>
+                        <th>Người Nhận</th>
+                        <th>Tiêu Đề</th>
+                        <th>Ngày Gửi</th>
+                        <th>Trạng Thái</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                    </thead>
+                    <tbody id="data-table">
+                    <tr>
+                        <td>nguoigui1@example.com</td>
+                        <td>nguoinhan1@example.com</td>
+                        <td>Tiêu Đề 1</td>
+                        <td>2024-10-31</td>
+                        <td>Đã Gửi</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#DetailMailModal">
+                                <i class="fa-solid fa-eye custom-icon"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteMailModal">
+                                <i class="fa-solid fa-trash custom-icon"></i>
+                            </button>
+                           
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>nguoigui2@example.com</td>
+                        <td>nguoinhan2@example.com</td>
+                        <td>Tiêu Đề 2</td>
+                        <td>2024-10-30</td>
+                        <td>Nháp</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#DetailMailModal">
+                                <i class="fa-solid fa-eye custom-icon"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteMailModal">
+                                <i class="fa-solid fa-trash custom-icon"></i>
+                            </button>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>nguoigui3@example.com</td>
+                        <td>nguoinhan3@example.com</td>
+                        <td>Tiêu Đề 3</td>
+                        <td>2024-10-29</td>
+                        <td>Đã Gửi</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#DetailMailModal">
+                                <i class="fa-solid fa-eye custom-icon"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteMailModal">
+                                <i class="fa-solid fa-trash custom-icon"></i>
+                            </button>
+                           
+                        </td>
+                    </tr>
+                    <tr id="noresults" style="display: none;">
+                        <td colspan="5" class="text-center">Không tìm thấy nội dung</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end">
+                        <!-- Pagination items will go here -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</main>
+</div>
+
+<!-- Modal Thêm Mail -->
+<div class="modal fade" id="addMailModal" tabindex="-1" aria-labelledby="addMailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addMailModalLabel">Thêm Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addMailForm">
+                    <div class="mb-3">
+                        <label for="recipientEmail" class="form-label">Người Nhận</label>
+                        <input type="email" class="form-control" id="recipientEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="emailSubject" class="form-label">Tiêu Đề</label>
+                        <input type="text" class="form-control" id="emailSubject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="emailContent" class="form-label">Nội Dung</label>
+                        <textarea class="form-control" id="emailContent" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="emailAttachment" class="form-label">Tệp Đính Kèm</label>
+                        <input type="file" class="form-control" id="emailAttachment">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary">Gửi Mail</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xóa Mail -->
+<div class="modal fade" id="DeleteMailModal" tabindex="-1" aria-labelledby="DeleteMailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DeleteMailModalLabel">Xóa Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa email này không?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem Chi Tiết Email -->
+<div class="modal fade" id="DetailMailModal" tabindex="-1" aria-labelledby="DetailMailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DetailMailModalLabel">Chi Tiết Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="emailDetailContent">
+                <h5>Người Nhận:</h5>
+                <p id="detailRecipient"></p>
+                <h5>Tiêu Đề:</h5>
+                <p id="detailSubject"></p>
+                <h5>Nội Dung:</h5>
+                <p id="detailContent"></p>
+                <h5>Ngày Gửi:</h5>
+                <p id="detailDate"></p>
+                <h5>Tệp Đính Kèm:</h5>
+                <img id="detailAttachment" src="" alt="Hình ảnh đính kèm" class="img-fluid" style="max-width: 100%; height: auto; display: none;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+

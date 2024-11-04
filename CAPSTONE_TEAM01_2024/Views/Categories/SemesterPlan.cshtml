@@ -701,7 +701,7 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
             <div class="modal-body">
                 <p>Bạn có chắc chắn muốn xóa kế hoạch này không?</p>
                 <form id="deletePlanForm" asp-action="DeletePlan" method="post">
-                    <input type="hidden" id="SubmitPlanId" name="PlanId" />
+                    <input type="hidden" id="DeletePlanId" name="PlanId" />
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                         <button type="submit" class="btn btn-danger">Xóa</button>

@@ -25,7 +25,7 @@
     var rolesString = HttpContextAccessor.HttpContext.Session.GetString("Roles");
     var roles = rolesString?.Split(',') ?? new string[0];
 
-    if (roles.Contains("Cố Vấn") || roles.Contains("BCN Khoa"))
+    if (roles.Contains("CVHT") || roles.Contains("BCN Khoa"))
     {
         Layout = "_PersonnelLayout";
     }

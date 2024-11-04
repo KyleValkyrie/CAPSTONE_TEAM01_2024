@@ -1,9 +1,40 @@
-﻿@model CAPSTONE_TEAM01_2024.ViewModels.SemesterPlanViewModel
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@model CAPSTONE_TEAM01_2024.ViewModels.SemesterPlanViewModel
 @{
 ViewData["Title"] = "Semester Plan";
 int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
+var rolesString = HttpContextAccessor.HttpContext.Session.GetString("Roles");
+var roles = rolesString?.Split(',') ?? new string[0];
+bool isNotFaculty = !roles.Contains("BCN Khoa");
 }
 <style>
+
+    .btn .custom-icon {
+        
+        padding: 0; /* Xóa padding */
+        margin: 0; /* Xóa margin */
+        font-size: 14px; /* Đặt kích thước font như mong muốn */
+        line-height: 1; /* Đảm bảo icon không có khoảng cách thừa */
+    }
+
+
+    /* CSS cụ thể cho các modal nhỏ */
+    #EditSemesterPlanModal .modal-dialog,
+    #SubmitPlanModal .modal-dialog,
+    #DeletePlanModal .modal-dialog {
+        max-width: 600px; /* Điều chỉnh kích thước nhỏ lại */
+    }
+
+    /* Định dạng cho các modal để phân biệt */
+    #EditSemesterPlanModal .modal-header,
+    #SubmitPlanModal .modal-header,
+    #DeletePlanModal .modal-header {
+        background-color: #f8f9fa; /* Màu nền nhạt */
+        border-bottom: 1px solid #ddd;
+    }
+
+     
+    
     .modal-dialog {
         max-width: 90%;
         width: 100%; 
@@ -111,15 +142,16 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
             <div class="card">
                 <div class="card-header">
                     <div class="row text-center">
-                        <div class="col-auto">
-                            <button type="button" class="btn btn-success" onclick="openAddPlanModal()">
-                                <i class="bi bi-plus"></i> Thêm Kế Hoạch
-                            </button>
-                            <button type="button" class="btn btn-secondary" onclick="exportPlans()">
-                                <i class="bi bi-download custom-icon"></i> Export
-                            </button>
-                        </div>
-                        <div class="col">
+                       @if (isNotFaculty)
+                       {
+                           <div class="col-auto">
+                               <button type="button" class="btn btn-success" onclick="openAddPlanModal()">
+                                   <i class="bi bi-plus"></i> Thêm Kế Hoạch
+                               </button>
+                               
+                           </div>
+                       }
+                       <div class="col">
                             <nav class="navbar navbar-light bg-light">
                                 <form class="d-flex ms-auto">
                                     <input class="form-control me-2" type="search" placeholder="Nhập nội dung tìm kiếm" aria-label="Search">
@@ -134,7 +166,6 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
                             <select id="statusFilter" class="form-select custom-select" style="width: 150px;" onchange="filterTable()">
                                 <option value="">Tất cả</option>
                                 <option value="Đã nộp">Đã Nộp</option>
-                                <option value="Chưa nộp">Chưa Nộp</option>
                                 <option value="Nháp">Nháp</option>
                             </select>
                         </div>
@@ -204,19 +235,35 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
                                         }
                                     </td>
                                     <td class="text-center">
-                                        <button class="btn btn-outline-success btn-sm" title="Xem chi tiết" onclick="openEditPlanDetailModal(@plan.PlanId, @plan.PeriodId, '@plan.ClassId', '@plan.Status')">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                        <button class="btn btn-outline-primary btn-sm" title="Cập Nhật" onclick="openEditSemesterPlan(@plan.PlanId, @plan.PeriodId, '@plan.PlanType', '@plan.ClassId')">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-outline-secondary btn-sm" title="Nộp" onclick="openSubmitSemesterPlan(@plan.PlanId)">
-                                            <i class="bi bi-file-earmark-arrow-up"></i>
-                                        </button>
-                                        <button class="btn btn-outline-danger btn-sm delete" title="Xóa" onclick="openDeleteModal(@plan.PlanId)">
-                                            <i class="bi bi-trash"></i>
+                                      @if (isNotFaculty)
+                                      {
+                                          <button class="btn btn-outline-success btn-sm"
+                                                  title="Xem chi tiết"
+                                                  onclick="openEditPlanDetailModal(@plan.PlanId, @plan.PeriodId, '@plan.ClassId', '@plan.Status')">
+                                              <i class="fa-solid fa-eye custom-icon"></i>
+                                          </button>
+
+                                          <button class="btn btn-outline-primary btn-sm"
+                                                  title="Cập Nhật"
+                                                  onclick="openEditSemesterPlan(@plan.PlanId, @plan.PeriodId, '@plan.PlanType', '@plan.ClassId')">
+                                              <i class="fa-solid fa-pen-to-square custom-icon"></i>
+                                          </button>
+                                          <button class="btn btn-outline-secondary btn-sm"
+                                                  title="Nộp"
+                                                  onclick="openSubmitSemesterPlan(@plan.PlanId)">
+                                              <i class="fa-solid fa-upload custom-icon"></i>
+                                          </button>
+                                      }
+                                      <button class="btn btn-outline-danger btn-sm delete"
+                                                title="Xóa"
+                                                onclick="openDeleteModal(@plan.PlanId)">
+                                            <i class="fa-solid fa-trash custom-icon"></i>
                                         </button>
                                     </td>
+
+
+
+
                                 </tr>
                             }
                             <tr id="noresults" style="display: none;">
@@ -282,6 +329,7 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
         </div>
     </main>
 </div>
+<!--View Detail BCN Khoa-->
 
 <!--Add Modal--> 
 <div class="modal fade" id="AddSemesterPlanModal" tabindex="-1" aria-labelledby="AddSemesterPlanModalLabel" aria-hidden="true">
@@ -629,7 +677,7 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
 <div class="modal fade" id="EditSemesterPlanModal" tabindex="-1" aria-labelledby="EditSemesterPlanModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header" style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+            <div class="modal-header" >
                 <h5 class="modal-title" id="EditSemesterPlanModalLabel">Chỉnh sửa Kế Hoạch Học Kỳ</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>

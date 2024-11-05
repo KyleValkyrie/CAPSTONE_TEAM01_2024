@@ -236,22 +236,14 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                                         }
                                     </td>
                                     <td class="text-center">
-                                        @if (isNotAdvisor)
-                                        {
-                                            <button class="btn btn-outline-success btn-sm"
-                                                    title="Xem chi tiết"
-                                                    onclick="openEditPlanDetailModal2(@plan.PlanId, @plan.PeriodId, '@plan.ClassId', '@plan.Status')">
-                                                <i class="fa-solid fa-eye custom-icon"></i>
-                                            </button>
-                                        }
-                                        @if (isNotFaculty)
-                                        {
+                                        
                                             <button class="btn btn-outline-success btn-sm"
                                                     title="Xem chi tiết"
                                                     onclick="openEditPlanDetailModal(@plan.PlanId, @plan.PeriodId, '@plan.ClassId', '@plan.Status')">
                                                 <i class="fa-solid fa-eye custom-icon"></i>
                                             </button>
-
+                                        @if (isNotFaculty)
+                                        {
                                             <button class="btn btn-outline-primary btn-sm"
                                                     title="Cập Nhật"
                                                     onclick="openEditSemesterPlan(@plan.PlanId, @plan.PeriodId, '@plan.PlanType', '@plan.ClassId')">
@@ -681,11 +673,14 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                         <textarea name="EditNotes5_1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
                     </div>
                 </div>
-                <!-- Modal Footer -->
-                <div class="modal-footer" style="display: flex; justify-content: flex-end; width: 100%; align-items: center;">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Lưu</button> <!-- Submit button to send the form -->
-                </div>
+                @if (isNotFaculty)
+                {
+                    <!-- Modal Footer -->
+                    <div class="modal-footer" style="display: flex; justify-content: flex-end; width: 100%; align-items: center;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button> <!-- Submit button to send the form -->
+                    </div>
+                }
             </form>
         </div>
     </div>

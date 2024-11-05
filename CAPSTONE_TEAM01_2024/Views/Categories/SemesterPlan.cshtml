@@ -6,6 +6,7 @@ int number = (Model.SemesterPlans.PageIndex - 1) * Model.SemesterPlans.PageSize;
 var rolesString = HttpContextAccessor.HttpContext.Session.GetString("Roles");
 var roles = rolesString?.Split(',') ?? new string[0];
 bool isNotFaculty = !roles.Contains("BCN Khoa");
+bool isNotAdvisor = !roles.Contains("CVHT");
 }
 <style>
 
@@ -235,30 +236,47 @@ bool isNotFaculty = !roles.Contains("BCN Khoa");
                                         }
                                     </td>
                                     <td class="text-center">
-                                      @if (isNotFaculty)
-                                      {
-                                          <button class="btn btn-outline-success btn-sm"
-                                                  title="Xem chi tiết"
-                                                  onclick="openEditPlanDetailModal(@plan.PlanId, @plan.PeriodId, '@plan.ClassId', '@plan.Status')">
-                                              <i class="fa-solid fa-eye custom-icon"></i>
-                                          </button>
+                                        @if (isNotAdvisor)
+                                        {
+                                            <button class="btn btn-outline-success btn-sm"
+                                                    title="Xem chi tiết"
+                                                    onclick="openEditPlanDetailModal2(@plan.PlanId, @plan.PeriodId, '@plan.ClassId', '@plan.Status')">
+                                                <i class="fa-solid fa-eye custom-icon"></i>
+                                            </button>
+                                        }
+                                        @if (isNotFaculty)
+                                        {
+                                            <button class="btn btn-outline-success btn-sm"
+                                                    title="Xem chi tiết"
+                                                    onclick="openEditPlanDetailModal(@plan.PlanId, @plan.PeriodId, '@plan.ClassId', '@plan.Status')">
+                                                <i class="fa-solid fa-eye custom-icon"></i>
+                                            </button>
 
-                                          <button class="btn btn-outline-primary btn-sm"
-                                                  title="Cập Nhật"
-                                                  onclick="openEditSemesterPlan(@plan.PlanId, @plan.PeriodId, '@plan.PlanType', '@plan.ClassId')">
-                                              <i class="fa-solid fa-pen-to-square custom-icon"></i>
-                                          </button>
-                                          <button class="btn btn-outline-secondary btn-sm"
-                                                  title="Nộp"
-                                                  onclick="openSubmitSemesterPlan(@plan.PlanId)">
-                                              <i class="fa-solid fa-upload custom-icon"></i>
-                                          </button>
-                                      }
-                                      <button class="btn btn-outline-danger btn-sm delete"
+                                            <button class="btn btn-outline-primary btn-sm"
+                                                    title="Cập Nhật"
+                                                    onclick="openEditSemesterPlan(@plan.PlanId, @plan.PeriodId, '@plan.PlanType', '@plan.ClassId')">
+                                                <i class="fa-solid fa-pen-to-square custom-icon"></i>
+                                            </button>
+                                        }
+                                        <button class="btn btn-outline-danger btn-sm delete"
                                                 title="Xóa"
                                                 onclick="openDeleteModal(@plan.PlanId)">
                                             <i class="fa-solid fa-trash custom-icon"></i>
                                         </button>
+                                        @if (isNotFaculty)
+                                        {
+                                            <button class="btn btn-outline-secondary btn-sm"
+                                                    title="Nộp"
+                                                    onclick="openSubmitSemesterPlan(@plan.PlanId)">
+                                                <i class="fa-solid fa-upload custom-icon"></i>
+                                            </button>
+                                        }
+                                        <button class="btn btn-outline-info btn-sm"
+                                                title="Xuất"
+                                                onclick="openExportPlan(@plan.PlanId)">
+                                            <i class="fa-solid fa-file-export custom-icon"></i>
+                                        </button>
+
                                     </td>
 
 
@@ -673,6 +691,7 @@ bool isNotFaculty = !roles.Contains("BCN Khoa");
     </div>
 </div>
 
+
 <!-- Edit Plan Modal -->
 <div class="modal fade" id="EditSemesterPlanModal" tabindex="-1" aria-labelledby="EditSemesterPlanModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -789,11 +808,12 @@ bool isNotFaculty = !roles.Contains("BCN Khoa");
         console.log(detailId);
         cycle++;
     });
+        
 
     // Show the modal
     var modal = new bootstrap.Modal(document.getElementById('EditPlanDetailModal'));
     modal.show();
-    }
+}
 // Edit Plan Modal JS
 function openEditSemesterPlan(planId, periodId, planType, classId) { 
     document.getElementById('EditPlanId').value = planId;

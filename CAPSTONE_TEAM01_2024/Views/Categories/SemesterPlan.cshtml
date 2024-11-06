@@ -263,17 +263,13 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                                                 <i class="fa-solid fa-upload custom-icon"></i>
                                             </button>
                                         }
-                                        <button class="btn btn-outline-info btn-sm"
-                                                title="Xuất"
-                                                onclick="openExportPlan(@plan.PlanId)">
-                                            <i class="fa-solid fa-file-export custom-icon"></i>
-                                        </button>
-
+                                        <form action="/Categories/ExportPlan" method="post" style="display: inline;">
+                                            <input type="hidden" name="planId" value="@plan.PlanId" />
+                                            <button type="submit" class="btn btn-outline-info btn-sm" title="Xuất">
+                                                <i class="fa-solid fa-file-export custom-icon"></i>
+                                            </button>
+                                        </form>
                                     </td>
-
-
-
-
                                 </tr>
                             }
                             <tr id="noresults" style="display: none;">

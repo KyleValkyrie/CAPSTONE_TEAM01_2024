@@ -16,6 +16,8 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
 using System.Numerics;
+using Xceed.Words.NET;
+using Xceed.Document.NET;
 
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
@@ -1217,7 +1219,108 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             TempData["Success"] = "Kế hoạch đã được xóa thành công!";
             return RedirectToAction("SemesterPlan");
         }
+    //Export plan
+        [HttpPost]
+        public async Task<IActionResult> ExportPlan(int planId)
+        {
+            var targetPlan = await _context.SemesterPlans.FirstOrDefaultAsync(pl => pl.PlanId == planId);
+            var targetAdvisor = await _context.ApplicationUsers.FirstOrDefaultAsync(t => t.Email == targetPlan.AdvisorName);
+            var details = await _context.PlanDetails.Where(dt => dt.PlanId == planId).ToListAsync();
+            // Create a new document
+            var doc = DocX.Create($"Kế Hoạch năm học {targetPlan.PeriodName}.docx");
+            // Set page orientation to Landscape
+            doc.PageLayout.Orientation = Orientation.Landscape; 
+            // Add content to the document
+            doc.InsertParagraph("TRƯỜNG ĐẠI HỌC VĂN LANG").FontSize(14).Alignment = Alignment.left; 
+            doc.InsertParagraph("KHOA: CÔNG NGHỆ THÔNG TIN").FontSize(14).Bold().Alignment = Alignment.left;
+            doc.InsertParagraph("KẾ HOẠCH HOẠT ĐỘNG CỐ VẤN HỌC TẬP").FontSize(16).Bold().Alignment = Alignment.center;
+            doc.InsertParagraph($"NĂM HỌC: {targetPlan.PeriodName}").FontSize(14).Bold().Color(System.Drawing.Color.Red).Alignment = Alignment.center;
+            var p1 = doc.InsertParagraph(); p1.Append("Mã giảng viên: ").FontSize(14); 
+            p1.Append(targetAdvisor.SchoolId).FontSize(14).Color(System.Drawing.Color.Red); 
+            p1.Alignment = Alignment.left;
+            var p2 = doc.InsertParagraph(); p2.Append("Họ và tên CVHT: ").FontSize(14); 
+            p2.Append(targetAdvisor.FullName).FontSize(14).Color(System.Drawing.Color.Red); 
+            p2.Alignment = Alignment.left;
+            var p3 = doc.InsertParagraph(); p3.Append("Lớp CVHT: ").FontSize(14); 
+            p3.Append(targetPlan.ClassId).FontSize(14).Color(System.Drawing.Color.Red); 
+            p3.Alignment = Alignment.left;
+            // Create a table with 11 rows and 7 columns
+            var table = doc.AddTable(11, 7);
 
+            // Table Headers
+            var headers = new[] { "STT", "TIÊU CHÍ", "MÔ TẢ CÔNG VIỆC", "CÁCH THỰC HIỆN", 
+                                  "ĐỊNH LƯỢNG", "THỜI GIAN", "GHI CHÚ (về chỉ số đạt theo quy định ở từng tiêu chí)" }; 
+            for (int i = 0; i < headers.Length; i++) 
+            { 
+                table.Rows[0].Cells[i].Paragraphs[0].Append(headers[i]).FontSize(12).Bold().Alignment = Alignment.center; 
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Top, new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Bottom, new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Left, new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Right, new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
+            }
+            // Merge cells 
+            //Row 1
+            table.MergeCellsInColumn(0, 1, 3); 
+            table.Rows[1].Cells[0].Paragraphs[0].Append("1").FontSize(12).Bold().Alignment = Alignment.center;
+            table.MergeCellsInColumn(1, 1, 3);
+            table.Rows[1].Cells[1].Paragraphs[0].Append("Một số nội dung cơ bản của nhiệm vụ CVHT").FontSize(12).Bold().Alignment = Alignment.center;
+            //Row 2
+            table.MergeCellsInColumn(0, 4, 5);
+            table.Rows[4].Cells[0].Paragraphs[0].Append("2").FontSize(12).Bold().Alignment = Alignment.center;
+            table.MergeCellsInColumn(1, 4, 5);
+            table.Rows[4].Cells[1].Paragraphs[0].Append("Hướng dẫn sinh viên lập và đăng ký kế hoạch học tập (KHHT), Đăng ký học phần (ĐKHP)").FontSize(12).Bold().Alignment = Alignment.center;
+            //Row 3
+            table.MergeCellsInColumn(0, 6, 7);
+            table.Rows[6].Cells[0].Paragraphs[0].Append("3").FontSize(12).Bold().Alignment = Alignment.center;
+            table.MergeCellsInColumn(1, 6, 7);
+            table.Rows[6].Cells[1].Paragraphs[0].Append("Tư vấn phương pháp học tập, tổ chức cho sinh viên chia sẻ kinh nghiệm học tập").FontSize(12).Bold().Alignment = Alignment.center;
+            table.MergeCellsInColumn(6, 6, 7);
+            //Row 4
+            table.MergeCellsInColumn(0, 8, 9);
+            table.Rows[8].Cells[0].Paragraphs[0].Append("4").FontSize(12).Bold().Alignment = Alignment.center;
+            table.MergeCellsInColumn(1, 8, 9);
+            table.Rows[8].Cells[1].Paragraphs[0].Append("Chăm sóc sinh viên diện đặc biệt").FontSize(12).Bold().Alignment = Alignment.center;
+            table.MergeCellsInColumn(6, 8, 9);
+            //Row 5
+            table.Rows[10].Cells[0].Paragraphs[0].Append("5").FontSize(12).Bold().Alignment = Alignment.center;
+            table.Rows[10].Cells[1].Paragraphs[0].Append("Công tác phối hợp để thực hiện nhiệm vụ CVHT").FontSize(12).Bold().Alignment = Alignment.center;
+
+            // Apply borders and padding to all cells
+            for (int row = 0; row < table.RowCount; row++) 
+            { 
+                for (int col = 0; col < table.ColumnCount; col++) 
+                { 
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Top, new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Bottom, new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Left, new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Right,new  Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
+                    table.Rows[row].Cells[col].MarginLeft = 10f; table.Rows[row].Cells[col].MarginRight = 10f; table.Rows[row].Cells[col].MarginTop = 5f; 
+                    table.Rows[row].Cells[col].MarginBottom = 5f; 
+                } 
+            }
+
+            //Inject Data into table
+            for(int i =0; i<10; i++)
+            {
+                table.Rows[i + 1].Cells[2].Paragraphs[0].Append(details[i].Task);
+                table.Rows[i + 1].Cells[3].Paragraphs[0].Append(details[i].HowToExecute);
+                table.Rows[i + 1].Cells[4].Paragraphs[0].Append(details[i].Quantity);
+                table.Rows[i + 1].Cells[5].Paragraphs[0].Append(details[i].TimeFrame);
+            }
+
+            for(int i=0; i<10; i++)
+            {
+                if (i == 6 || i == 8) { continue; }
+                table.Rows[i + 1].Cells[6].Paragraphs[0].Append(details[i].Notes);
+            }
+            // Insert the table into the document
+            doc.InsertParagraph().InsertTableAfterSelf(table);
+
+            // Save the document to a MemoryStream
+            using (var memoryStream = new MemoryStream()) { doc.SaveAs(memoryStream); memoryStream.Position = 0; 
+                // Return the document as a file download
+            return File(memoryStream.ToArray(), "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"Kế Hoạch năm học {targetPlan.PeriodName}.docx"); }
+        }
 //SemesterPlanDetail actions
     //Render View 
         public IActionResult SemesterPlanDetail()

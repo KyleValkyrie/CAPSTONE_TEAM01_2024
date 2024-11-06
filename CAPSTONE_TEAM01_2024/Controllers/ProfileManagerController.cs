@@ -212,7 +212,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             var existingUser = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Id == UserId);
             if (existingUser != null)
             {
-                existingUser.SchoolId = SchoolId;
+                //existingUser.SchoolId = SchoolId;
 
                 using (var transaction = await _context.Database.BeginTransactionAsync())
                 {

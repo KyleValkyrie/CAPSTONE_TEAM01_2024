@@ -1328,11 +1328,15 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             ViewData["page"] = "SemesterPlanDetail";
             return View();
         }
+        //Receive Mail actions
+        //Render View 
        public IActionResult ReceiveEmail()
        {
            ViewData["page"] = "ReceiveEmail";
            return View();
         }
+       //Sent Mail actions
+       //Render View 
        public IActionResult SentEmail()
        {
            ViewData["page"] = "SentEmail";

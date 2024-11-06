@@ -19,6 +19,10 @@ namespace CAPSTONE_TEAM01_2024
         public DbSet<SemesterPlan> SemesterPlans { get; set; }
         public DbSet<PlanDetail> PlanDetails { get; set; }
         public DbSet<Criterion> Criterions { get; set; }
+        public DbSet<Email> Emails { get; set; }
+        public DbSet<EmailAttachment> EmailAttachments { get; set; }
+        public DbSet<EmailRecipient> EmailRecipients { get; set; }
+        public DbSet<EmailThread> EmailThreads { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
@@ -56,7 +60,41 @@ namespace CAPSTONE_TEAM01_2024
                 .WithOne(pd => pd.SemesterPlan) // Each PlanDetail belongs to one SemesterPlan
                 .HasForeignKey(pd => pd.PlanId) // Foreign key in PlanDetail referencing SemesterPlan
                 .OnDelete(DeleteBehavior.Cascade); // If a SemesterPlan is deleted, delete all related PlanDetails
+            
+            // Configuring One-to-Many Relationship between Email and EmailRecipient
+            modelBuilder.Entity<EmailRecipient>()
+                .HasOne(er => er.Email)
+                .WithMany(e => e.Recipients)
+                .HasForeignKey(er => er.EmailId)
+                .OnDelete(DeleteBehavior.Cascade); // Optional: Cascade delete if an Email is deleted
 
+            // Configuring Many-to-One Relationship between EmailRecipient and ApplicationUser
+            modelBuilder.Entity<EmailRecipient>()
+                .HasOne(er => er.User)
+                .WithMany()
+                .HasForeignKey(er => er.UserId)
+                .OnDelete(DeleteBehavior.Restrict); // Optional: Prevent deleting ApplicationUser if they are in EmailRecipients
+
+            // Configuring One-to-Many Relationship between Email and EmailAttachment
+            modelBuilder.Entity<EmailAttachment>()
+                .HasOne(ea => ea.Email)
+                .WithMany(e => e.Attachments)
+                .HasForeignKey(ea => ea.EmailId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configuring Many-to-One Relationship between Email and EmailThread
+            modelBuilder.Entity<Email>()
+                .HasOne(e => e.Thread)
+                .WithMany(t => t.Emails)
+                .HasForeignKey(e => e.ThreadId)
+                .OnDelete(DeleteBehavior.SetNull); // Optional: Set ThreadId to null if Email is deleted
+
+            // Configuring EmailThread (No foreign keys, just a collection)
+            modelBuilder.Entity<EmailThread>()
+                .HasMany(t => t.Emails)
+                .WithOne(e => e.Thread)
+                .HasForeignKey(e => e.ThreadId)
+                .OnDelete(DeleteBehavior.SetNull); // Optional: Set EmailThread to null if an Email is deleted
         }
     }
 }

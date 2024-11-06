@@ -21,9 +21,9 @@ public class Email
     public string SenderId { get; set; }
     public ApplicationUser Sender { get; set; }
 
-    public List<EmailRecipient> Recipients { get; set; } = new List<EmailRecipient>();
-    public List<EmailAttachment> Attachments { get; set; } = new List<EmailAttachment>();
-
     public int? ThreadId { get; set; }
     public EmailThread Thread { get; set; }
+
+    public List<EmailRecipient> Recipients { get; set; } = new List<EmailRecipient>();
+    public List<EmailAttachment> Attachments { get; set; } = new List<EmailAttachment>();
 }

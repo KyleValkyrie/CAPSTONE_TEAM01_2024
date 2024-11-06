@@ -7,6 +7,7 @@ public class EmailThread
     [Key]
     public int ThreadId { get; set; }
 
+    [Required]
     public string Subject { get; set; }
 
     public List<Email> Emails { get; set; } = new List<Email>();

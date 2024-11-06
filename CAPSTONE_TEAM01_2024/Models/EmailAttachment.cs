@@ -13,6 +13,7 @@ public class EmailAttachment
     [Required]
     public string FilePath { get; set; }
 
+    [Required]
     public int EmailId { get; set; }
     public Email Email { get; set; }
 }

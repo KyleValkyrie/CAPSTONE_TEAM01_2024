@@ -56,24 +56,24 @@ ViewData["Title"] = "Personal Profile";
 
             <div class="mb-3">
                 <label for="fullname" class="form-label">Tên đầy đủ</label>
-                <input type="text" id="fullname" name="FullName" value="@Model.FullName" class="form-control">
+                <input type="text" id="fullname" name="FullName" value="@Model.FullName" class="form-control" required>
             </div>
 
             <div class="mb-3">
                 <label for="schoolId" class="form-label">Mã số</label>
-                <input type="text" id="schoolId" name="SchoolId" value="@Model.SchoolId" class="form-control">
+                <input type="text" id="schoolId" name="SchoolId" value="@Model.SchoolId" class="form-control" required>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Số điện thoại</label>
-                <input type="text" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" class="form-control" >
+                <input type="text" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" class="form-control" required>
             </div>
 
 
             <div class="mb-3">
                 <label for="dateOfBirth" class="form-label">Ngày sinh</label>
                 <input type="date" id="dateOfBirth" name="DateOfBirth" value="@Model.DateOfBirth.ToString("yyyy-MM-dd")"
-                       class="form-control">
+                       class="form-control" required>
             </div>
 
            

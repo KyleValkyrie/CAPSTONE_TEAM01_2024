@@ -20,7 +20,8 @@
             <div class="card">
                 <div class="card-header">
                     <div class="row text-center">
-                        <div class="col-auto">
+                        <div class="col-auto" style="padding: 8px;">
+                            
                             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddStudentModal">
                                 <i class="bi bi-plus custom-icon"></i> Thêm Sinh Viên
                             </button>
@@ -34,7 +35,13 @@
                         <div class="col">
                             <nav class="navbar navbar-light bg-light">
                                 <form class="d-flex ms-auto">
-                                    <input class="form-control me-2" type="search" id="searchInput" placeholder="Nhập nội dung cần tìm" aria-label="Search">
+                                    <select  id="classFilter" class="form-select form-select-lg mx-3 " aria-label=".form-select-lg example" style="font-size: 16px; color: #737b83"onchange="filterTable()">
+                                        <option selected>Lựa chọn Tình Trạng</option>
+                                        
+                                  <option value="71K27CNTT30">71K27CNTT30</option>
+        <option value="71K27CNTT31">71K27CNTT31</option>
+                                    </select>
+                                    <input class="form-control me-2" type="search" id="searchInput" placeholder="Nhập nội dung cần tìm" aria-label="Search" style="width: auto" onchange="filterTable()">
                                 </form>
                             </nav>
                         </div>
@@ -54,7 +61,7 @@
                     {
                         <div class="alert alert-danger">@TempData["Warning"]</div>
                     }
-                    <table class="table table-striped">
+                    <table id="myTable" class="table table-striped">
                         <thead>
                             <tr class="text-center">
                                 <th scope="col">#</th>
@@ -232,7 +239,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="EditSchoolId" class="form-label">Mã Số SV</label>
-                        <input type="text" class="form-control" id="EditSchoolId" name="SchoolId" required>
+                        <input type="text" class="form-control" id="EditSchoolId" name="SchoolId" required readonly>
                     </div>
                     <div class="mb-3">
                         <label for="EditEmail" class="form-label">Email</label>
@@ -342,6 +349,23 @@
 </div>
 
 <script>
+    function filterTable() {
+    var select, filter, table, tr, td, i, txtValue;
+    select = document.getElementById("classFilter");
+    filter = select.value.toUpperCase();
+    table = document.getElementById("myTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 1; i < tr.length; i++) {
+        tr[i].style.display = "none";
+        td = tr[i].getElementsByTagName("td")[5]; // Cột mã lớp. Sửa đổi lại sốcho cột và value trong option để làm  cột trạng thái
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (filter === "" || txtValue.toUpperCase() === filter) {
+                tr[i].style.display = "";
+            }
+        }
+    }
+}
 //Edit Modal JS
     function editStudent(button) {
         var modal = document.getElementById('EditStudentModal');

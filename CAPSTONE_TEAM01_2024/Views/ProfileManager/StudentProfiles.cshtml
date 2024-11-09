@@ -250,7 +250,7 @@
 		var emailPattern = /vanlanguni\.vn$/;
 
         if (!emailPattern.test(emailInput.value)) {
-            emailError.textContent = 'Địa chỉ email không hợp lệ. Vui lòng nhập email có định dạng vanlanguni.vn';
+            emailError.textContent = 'Lưu ý định dạng của email là ' + String.fromCharCode(64) + 'vanlanguni.vn';
             
         } else {
             // End

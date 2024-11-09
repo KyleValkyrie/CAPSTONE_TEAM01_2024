@@ -11,7 +11,7 @@ public class EmailAttachment
     public string FileName { get; set; }
 
     [Required]
-    public string FilePath { get; set; }
+    public byte[] FileData { get; set; }
 
     [Required]
     public int EmailId { get; set; }

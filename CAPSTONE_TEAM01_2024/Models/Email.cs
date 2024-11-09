@@ -14,7 +14,7 @@ public class Email
     [Required]
     public DateTime SentDate { get; set; } = DateTime.Now;
     [Required]
-    public string Status { get; set; } = "Draft"; // Options: Sent, Draft, Read, Unread
+    public string Status { get; set; } = "Đã Gửi"; 
 
     // Use ApplicationUser for sender
     [Required]

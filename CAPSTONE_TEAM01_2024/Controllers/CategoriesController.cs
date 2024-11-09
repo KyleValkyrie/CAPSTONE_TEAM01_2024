@@ -18,6 +18,12 @@ using SixLabors.ImageSharp.Processing;
 using System.Numerics;
 using Xceed.Words.NET;
 using Xceed.Document.NET;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
+using NuGet.Protocol.Plugins;
+using static MimeKit.TextPart;
+
 
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
@@ -25,10 +31,11 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     {
 // Database Context
         private readonly ApplicationDbContext _context;
-		public CategoriesController(ApplicationDbContext context)
+
+        public CategoriesController(ApplicationDbContext context)
         {
             _context = context;
-		}
+        }
 
 
 //EndSemesterReport actions
@@ -37,8 +44,9 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             ViewData["page"] = "EndSemesterReport";
             return View();
         }
+
 //ClassList actions
-    //Render ClassList
+        //Render ClassList
         public async Task<IActionResult> ClassList(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "ClassList";
@@ -68,7 +76,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             ViewBag.Error = TempData["Error"];
             return View(viewModel);
         }
-    // Add Class
+
+        // Add Class
         [HttpPost]
         public async Task<IActionResult> CreateClass(Class model, string AdvisorEmail)
         {
@@ -114,7 +123,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             TempData["Success"] = $"Lớp {model.ClassId} thuộc cố vấn {AdvisorEmail} phụ trách đã được thêm thành công!";
             return RedirectToAction("ClassList");
         }
-    // Edit Class
+
+        // Edit Class
         [HttpPost]
         public async Task<IActionResult> EditClass(Class model, string AdvisorEmail)
         {
@@ -154,6 +164,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     });
                     await _context.SaveChangesAsync();
                 }
+
                 classToUpdate.AdvisorId = advisor.Id;
             }
 
@@ -169,7 +180,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             TempData["Success"] = $"Lớp {model.ClassId} đã được cập nhật thành công!";
             return RedirectToAction("ClassList");
         }
-    //Delete Class
+
+        //Delete Class
         [HttpPost]
         public async Task<IActionResult> DeleteClass(string id)
         {
@@ -184,9 +196,11 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             {
                 TempData["Error"] = "Đã xảy ra lỗi khi xóa lớp.";
             }
+
             return RedirectToAction("ClassList");
         }
-    //Download Excel Template for Class
+
+        //Download Excel Template for Class
         public IActionResult GenerateClassTemplate()
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -224,10 +238,12 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 package.SaveAs(stream);
                 var content = stream.ToArray();
 
-                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Mẫu Excel DS Lớp.xlsx");
+                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "Mẫu Excel DS Lớp.xlsx");
             }
         }
-    //Import Excel Template for Class
+
+        //Import Excel Template for Class
         [HttpPost]
         public async Task<IActionResult> ImportClassExcel(IFormFile ClassExcelFile)
         {
@@ -261,7 +277,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                             try
                             {
                                 // Check if class already exists
-                                var existingClass = await _context.Classes.FirstOrDefaultAsync(c => c.ClassId == classId);
+                                var existingClass =
+                                    await _context.Classes.FirstOrDefaultAsync(c => c.ClassId == classId);
                                 if (existingClass != null)
                                 {
                                     failCount++;
@@ -269,7 +286,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                                 }
 
                                 // Check if advisor exists and create if necessary
-                                var advisorEntity = await _context.Users.FirstOrDefaultAsync(u => u.Email == advisorEmail);
+                                var advisorEntity =
+                                    await _context.Users.FirstOrDefaultAsync(u => u.Email == advisorEmail);
                                 if (advisorEntity == null)
                                 {
                                     advisorEntity = new ApplicationUser
@@ -282,7 +300,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                                     await _context.SaveChangesAsync();
 
                                     // Assign advisor role
-                                    var advisorRole = await _context.Roles.FirstOrDefaultAsync(r => r.NormalizedName == "ADVISOR");
+                                    var advisorRole =
+                                        await _context.Roles.FirstOrDefaultAsync(r => r.NormalizedName == "ADVISOR");
                                     _context.UserRoles.Add(new IdentityUserRole<string>
                                     {
                                         UserId = advisorEntity.Id,
@@ -307,7 +326,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                             catch (Exception ex)
                             {
                                 failCount++;
-                                TempData["Error"] = $"Lỗi tại lớp {classId}: {ex.InnerException?.Message ?? ex.Message}";
+                                TempData["Error"] =
+                                    $"Lỗi tại lớp {classId}: {ex.InnerException?.Message ?? ex.Message}";
                             }
                         }
 
@@ -315,7 +335,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     }
                 }
 
-                TempData["Success"] = $"Nhập file Excel thành công! Số bản ghi thành công: {successCount}, số bản ghi thất bại: {failCount}.";
+                TempData["Success"] =
+                    $"Nhập file Excel thành công! Số bản ghi thành công: {successCount}, số bản ghi thất bại: {failCount}.";
                 return RedirectToAction("ClassList");
             }
             catch (Exception ex)
@@ -324,7 +345,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("ClassList");
             }
         }
-    //Export Excel file for Class
+
+        //Export Excel file for Class
         public async Task<IActionResult> ExportClassToExcel()
         {
             var classes = await _context.Classes.Include(c => c.Advisor).ToListAsync();
@@ -357,7 +379,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     var classItem = classes[i];
 
                     worksheet.Cells[row, 1].Value = classItem.ClassId;
-                    worksheet.Cells[row, 2].Value = classItem.Advisor != null ? classItem.Advisor.Email : "Chưa bổ nhiệm";
+                    worksheet.Cells[row, 2].Value =
+                        classItem.Advisor != null ? classItem.Advisor.Email : "Chưa bổ nhiệm";
                     worksheet.Cells[row, 3].Value = classItem.Term;
                     worksheet.Cells[row, 4].Value = classItem.Department;
                     worksheet.Cells[row, 5].Value = classItem.StudentCount;
@@ -370,42 +393,48 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 package.SaveAs(stream);
                 var content = stream.ToArray();
 
-                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "DS Lớp.xlsx");
+                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "DS Lớp.xlsx");
             }
         }
 
 
 //StudentList actions
-    //Render StudnetLít view
+        //Render StudnetLít view
         public async Task<IActionResult> StudentList(int pageIndex = 1, int pageSize = 30)
         {
             ViewData["page"] = "StudentList";
 
             var studentsQuery = from user in _context.ApplicationUsers
-                                join userRole in _context.UserRoles on user.Id equals userRole.UserId into userRoles
-                                from userRole in userRoles.DefaultIfEmpty()
-                                join role in _context.Roles on userRole.RoleId equals role.Id into roles
-                                from role in roles.DefaultIfEmpty()
-                                where user.Email.EndsWith("@vanlanguni.vn") && (role == null || (role.NormalizedName != "ADVISOR" && role.NormalizedName != "FACULTY"))
-                                select new StudentListViewModel
-                                {
-                                    Id = user.Id,
-                                    Email = user.Email,
-                                    SchoolId = user.SchoolId,
-                                    FullName = user.FullName,
-                                    DateOfBirth = user.DateOfBirth,
-                                    Status = user.Status,
-                                    ClassId = user.ClassId
-                                };
+                join userRole in _context.UserRoles on user.Id equals userRole.UserId into userRoles
+                from userRole in userRoles.DefaultIfEmpty()
+                join role in _context.Roles on userRole.RoleId equals role.Id into roles
+                from role in roles.DefaultIfEmpty()
+                where user.Email.EndsWith("@vanlanguni.vn") && (role == null ||
+                                                                (role.NormalizedName != "ADVISOR" &&
+                                                                 role.NormalizedName != "FACULTY"))
+                select new StudentListViewModel
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    SchoolId = user.SchoolId,
+                    FullName = user.FullName,
+                    DateOfBirth = user.DateOfBirth,
+                    Status = user.Status,
+                    ClassId = user.ClassId
+                };
 
-            var paginatedStudents = await PaginatedList<StudentListViewModel>.CreateAsync(studentsQuery.AsNoTracking(), pageIndex, pageSize);
+            var paginatedStudents =
+                await PaginatedList<StudentListViewModel>.CreateAsync(studentsQuery.AsNoTracking(), pageIndex,
+                    pageSize);
 
             ViewBag.Warning = TempData["Warning"];
             ViewBag.Success = TempData["Success"];
             ViewBag.Error = TempData["Error"];
             return View(paginatedStudents);
         }
-    //Add Student
+
+        //Add Student
         [HttpPost]
         public async Task<IActionResult> AddStudent(StudentListViewModel model)
         {
@@ -468,7 +497,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return RedirectToAction("StudentList");
         }
-    //Edit Student
+
+        //Edit Student
         [HttpPost]
         public async Task<IActionResult> EditStudent(StudentListViewModel model)
         {
@@ -510,7 +540,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return RedirectToAction("StudentList");
         }
-    //Delete Student
+
+        //Delete Student
         [HttpPost]
         public async Task<IActionResult> DeleteStudent(string id)
         {
@@ -537,7 +568,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return RedirectToAction("StudentList");
         }
-    //Download Excel Template for Student
+
+        //Download Excel Template for Student
         public IActionResult GenerateStudentTemplate()
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -577,10 +609,12 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 package.SaveAs(stream);
                 var content = stream.ToArray();
 
-                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Mẫu excel danh sách SV.xlsx");
+                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "Mẫu excel danh sách SV.xlsx");
             }
         }
-    //Import Excel Template for Student
+
+        //Import Excel Template for Student
         [HttpPost]
         public async Task<IActionResult> ImportStudentExcel(IFormFile StudentExcelFile)
         {
@@ -614,7 +648,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                             var status = worksheet.Cells[row, 6].Value?.ToString();
 
                             DateTime dateOfBirth;
-                            if (!DateTime.TryParseExact(dobString, new[] { "dd/MM/yyyy", "M/d/yyyy h:mm:ss tt" }, null, System.Globalization.DateTimeStyles.None, out dateOfBirth))
+                            if (!DateTime.TryParseExact(dobString, new[] { "dd/MM/yyyy", "M/d/yyyy h:mm:ss tt" }, null,
+                                    System.Globalization.DateTimeStyles.None, out dateOfBirth))
                             {
                                 failCount++;
                                 failureDetails.Add($"Dòng {row}: Ngày sinh không hợp lệ '{dobString}'.");
@@ -624,7 +659,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                             try
                             {
                                 // Check if email already exists
-                                var existingUser = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == email);
+                                var existingUser =
+                                    await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == email);
                                 if (existingUser != null)
                                 {
                                     failCount++;
@@ -660,7 +696,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                                 await _context.SaveChangesAsync();
 
                                 // Assign student role
-                                var studentRole = await _context.Roles.FirstOrDefaultAsync(r => r.NormalizedName == "STUDENT");
+                                var studentRole =
+                                    await _context.Roles.FirstOrDefaultAsync(r => r.NormalizedName == "STUDENT");
                                 if (studentRole != null)
                                 {
                                     _context.UserRoles.Add(new IdentityUserRole<string>
@@ -683,11 +720,13 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     }
                 }
 
-                TempData["Success"] = $"Nhập file Excel thành công! Số bản ghi thành công: {successCount}, số bản ghi thất bại: {failCount}.";
+                TempData["Success"] =
+                    $"Nhập file Excel thành công! Số bản ghi thành công: {successCount}, số bản ghi thất bại: {failCount}.";
                 if (failCount > 0)
                 {
                     TempData["Error"] = $"Chi tiết lỗi: {string.Join("; ", failureDetails)}";
                 }
+
                 return RedirectToAction("StudentList");
             }
             catch (Exception ex)
@@ -696,7 +735,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("StudentList");
             }
         }
-    //Export Excel file for Student
+
+        //Export Excel file for Student
         [HttpPost]
         public async Task<IActionResult> ExportStudentsByClass(string ClassId)
         {
@@ -741,7 +781,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     worksheet.Cells[row, 1].Value = student.SchoolId;
                     worksheet.Cells[row, 2].Value = student.Email;
                     worksheet.Cells[row, 3].Value = student.FullName;
-                    worksheet.Cells[row, 4].Value = student.DateOfBirth.ToString("dd/MM/yyyy") ?? "N/A"; 
+                    worksheet.Cells[row, 4].Value = student.DateOfBirth.ToString("dd/MM/yyyy") ?? "N/A";
                     worksheet.Cells[row, 5].Value = student.ClassId;
                     worksheet.Cells[row, 6].Value = student.Status;
                 }
@@ -761,10 +801,10 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
 
 //SchoolYear actions
-    //Render SchoolYear view
+        //Render SchoolYear view
         public async Task<IActionResult> SchoolYear(int pageIndex = 1, int pageSize = 20)
-		{
-			ViewData["page"] = "SchoolYear";
+        {
+            ViewData["page"] = "SchoolYear";
             var periods = _context.AcademicPeriods.AsQueryable();
             var paginatedPeriods = await PaginatedList<AcademicPeriod>.CreateAsync(periods, pageIndex, pageSize);
 
@@ -778,12 +818,14 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             ViewBag.Error = TempData["Error"];
             return View(viewModel);
         }
-    //Add School Year
+
+        //Add School Year
         [HttpPost]
         public async Task<IActionResult> CreatePeriod(AcademicPeriod model)
         {
             // Check if the period name already exists
-            var existingPeriod = await _context.AcademicPeriods.FirstOrDefaultAsync(p => p.PeriodName == model.PeriodName);
+            var existingPeriod =
+                await _context.AcademicPeriods.FirstOrDefaultAsync(p => p.PeriodName == model.PeriodName);
             if (existingPeriod != null)
             {
                 TempData["Error"] = $"Năm học {model.PeriodName} đã tồn tại!";
@@ -796,7 +838,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("SchoolYear");
 
         }
-    //Edit School Year
+
+        //Edit School Year
         [HttpPost]
         public async Task<IActionResult> UpdatePeriod(AcademicPeriod model)
         {
@@ -834,7 +877,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             TempData["Error"] = "Đã xảy ra lỗi khi cập nhật năm học.";
             return RedirectToAction("SchoolYear");
         }
-    //Delete School Year
+
+        //Delete School Year
         [HttpPost]
         public async Task<IActionResult> DeletePeriod(int periodId)
         {
@@ -853,7 +897,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         }
 
 //SemesterPlan actions
-    //Render View
+        //Render View
         public async Task<IActionResult> SemesterPlan(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "SemesterPlan";
@@ -864,9 +908,12 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 .OrderByDescending(sp => sp.CreationTime)
                 .AsQueryable();
 
-            var schoolYears = await _context.AcademicPeriods.Select(sy => new SelectListItem { Value = sy.PeriodId.ToString(), Text = sy.PeriodName}).ToListAsync();
+            var schoolYears = await _context.AcademicPeriods
+                .Select(sy => new SelectListItem { Value = sy.PeriodId.ToString(), Text = sy.PeriodName })
+                .ToListAsync();
 
-            var paginatedSemesterPlans = await PaginatedList<SemesterPlan>.CreateAsync(semesterPlansQuery, pageIndex, pageSize);
+            var paginatedSemesterPlans =
+                await PaginatedList<SemesterPlan>.CreateAsync(semesterPlansQuery, pageIndex, pageSize);
 
             var currentUser = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == User.Identity.Name);
 
@@ -881,9 +928,10 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             var detail = await _context.PlanDetails.ToListAsync();
 
-            var viewModel = new SemesterPlanViewModel { 
-                SemesterPlans = paginatedSemesterPlans, 
-                SchoolYears = schoolYears, 
+            var viewModel = new SemesterPlanViewModel
+            {
+                SemesterPlans = paginatedSemesterPlans,
+                SchoolYears = schoolYears,
                 Class = targetClasses,
                 Details = detail
             };
@@ -894,7 +942,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return View(viewModel);
         }
-    //Add Plan
+
+        //Add Plan
         [HttpPost]
         public async Task<IActionResult> AddPlan(SemesterPlan plan, IFormCollection form)
         {
@@ -907,9 +956,10 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             plan.Status = "Nháp";
 
             //Add new SemesterPlan
-            var exisitingPlan = await _context.SemesterPlans.FirstOrDefaultAsync(pl => pl.AcademicPeriod == plan.AcademicPeriod &&
-                                                                                       pl.ClassId == plan.ClassId &&
-                                                                                       pl.AdvisorName == plan.AdvisorName);
+            var exisitingPlan = await _context.SemesterPlans.FirstOrDefaultAsync(pl =>
+                pl.AcademicPeriod == plan.AcademicPeriod &&
+                pl.ClassId == plan.ClassId &&
+                pl.AdvisorName == plan.AdvisorName);
             if (exisitingPlan == null)
             {
                 _context.SemesterPlans.Add(plan);
@@ -1040,7 +1090,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 //Add new PlanDetail
                 await _context.PlanDetails.AddRangeAsync(Details);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Thêm kế hoạch thành công! Trạng thái hiện tại là nháp, vui lòng nộp kế hoạch để thay đổi trạng thái!";
+                TempData["Success"] =
+                    "Thêm kế hoạch thành công! Trạng thái hiện tại là nháp, vui lòng nộp kế hoạch để thay đổi trạng thái!";
                 return RedirectToAction("SemesterPlan");
             }
             else
@@ -1049,12 +1100,13 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("SemesterPlan");
             }
         }
-    //Edit Plan Detail
+
+        //Edit Plan Detail
         [HttpPost]
         public async Task<IActionResult> EditPlanDetail(IFormCollection form)
         {
             // Get the PlanIds value from the form collection
-            var planIdsString = form["DetailIds"].ToString(); 
+            var planIdsString = form["DetailIds"].ToString();
             // Split the string into an array of integers
             var detailIds = planIdsString.Split(',').Select(int.Parse).ToArray();
 
@@ -1145,12 +1197,13 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             _context.SemesterPlans.Update(semesterPlan);
             _context.PlanDetails.UpdateRange(detailsToEdit);
-            
+
             await _context.SaveChangesAsync();
             TempData["Success"] = "Chi tiết kế hoạch cập nhật thành công";
             return RedirectToAction("SemesterPlan");
         }
-    //Edit Plan
+
+        //Edit Plan
         [HttpPost]
         public async Task<IActionResult> EditPlan(int planId, int periodId, string planType, string classId)
         {
@@ -1167,20 +1220,24 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             TempData["Success"] = "Thông tin kế hoạch cập nhật thành công";
             return RedirectToAction("SemesterPlan");
         }
-    //Check Plan Validity
+
+        //Check Plan Validity
         public async Task<bool> PlanValidation(int planId)
         {
             List<PlanDetail> details = await _context.PlanDetails.Where(pd => pd.PlanId == planId).ToListAsync();
             foreach (var dt in details)
             {
-                if (string.IsNullOrWhiteSpace(dt.HowToExecute) || string.IsNullOrWhiteSpace(dt.Quantity) || string.IsNullOrWhiteSpace(dt.TimeFrame))
+                if (string.IsNullOrWhiteSpace(dt.HowToExecute) || string.IsNullOrWhiteSpace(dt.Quantity) ||
+                    string.IsNullOrWhiteSpace(dt.TimeFrame))
                 {
                     return false;
                 }
             }
+
             return true;
         }
-    //Submit Plan
+
+        //Submit Plan
         [HttpPost]
         public async Task<IActionResult> SubmitPlan(int planId)
         {
@@ -1190,19 +1247,22 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 TempData["Error"] = "Kế hoạch chưa đầy đủ thông tin, vui lòng điền đầy đủ thông tin trước khi thử lại!";
                 return RedirectToAction("SemesterPlan");
             }
+
             var planToSubmit = await _context.SemesterPlans.FirstOrDefaultAsync(pl => pl.PlanId == planId);
             if (planToSubmit.Status == "Đã Nộp")
             {
                 TempData["Warning"] = "Kế hoạch đã được nộp, vui lòng chỉnh lại chi tiết và tiến hành nộp lại!";
                 return RedirectToAction("SemesterPlan");
             }
+
             planToSubmit.Status = "Đã Nộp";
             _context.SemesterPlans.Update(planToSubmit);
             await _context.SaveChangesAsync();
             TempData["Success"] = "Nộp kế hoạch thành công";
-            return RedirectToAction("SemesterPlan");            
+            return RedirectToAction("SemesterPlan");
         }
-    //Delete Plan
+
+        //Delete Plan
         [HttpPost]
         public async Task<IActionResult> DeletePlan(int planId)
         {
@@ -1219,88 +1279,124 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             TempData["Success"] = "Kế hoạch đã được xóa thành công!";
             return RedirectToAction("SemesterPlan");
         }
-    //Export plan
+
+        //Export plan
         [HttpPost]
         public async Task<IActionResult> ExportPlan(int planId)
         {
             var targetPlan = await _context.SemesterPlans.FirstOrDefaultAsync(pl => pl.PlanId == planId);
-            var targetAdvisor = await _context.ApplicationUsers.FirstOrDefaultAsync(t => t.Email == targetPlan.AdvisorName);
+            var targetAdvisor =
+                await _context.ApplicationUsers.FirstOrDefaultAsync(t => t.Email == targetPlan.AdvisorName);
             var details = await _context.PlanDetails.Where(dt => dt.PlanId == planId).ToListAsync();
             // Create a new document
             var doc = DocX.Create($"Kế Hoạch năm học {targetPlan.PeriodName}.docx");
             // Set page orientation to Landscape
-            doc.PageLayout.Orientation = Orientation.Landscape; 
+            doc.PageLayout.Orientation = Orientation.Landscape;
             // Add content to the document
-            doc.InsertParagraph("TRƯỜNG ĐẠI HỌC VĂN LANG").FontSize(14).Alignment = Alignment.left; 
+            doc.InsertParagraph("TRƯỜNG ĐẠI HỌC VĂN LANG").FontSize(14).Alignment = Alignment.left;
             doc.InsertParagraph("KHOA: CÔNG NGHỆ THÔNG TIN").FontSize(14).Bold().Alignment = Alignment.left;
             doc.InsertParagraph("KẾ HOẠCH HOẠT ĐỘNG CỐ VẤN HỌC TẬP").FontSize(16).Bold().Alignment = Alignment.center;
-            doc.InsertParagraph($"NĂM HỌC: {targetPlan.PeriodName}").FontSize(14).Bold().Color(System.Drawing.Color.Red).Alignment = Alignment.center;
-            var p1 = doc.InsertParagraph(); p1.Append("Mã giảng viên: ").FontSize(14); 
-            p1.Append(targetAdvisor.SchoolId).FontSize(14).Color(System.Drawing.Color.Red); 
+            doc.InsertParagraph($"NĂM HỌC: {targetPlan.PeriodName}").FontSize(14).Bold().Color(System.Drawing.Color.Red)
+                .Alignment = Alignment.center;
+            var p1 = doc.InsertParagraph();
+            p1.Append("Mã giảng viên: ").FontSize(14);
+            p1.Append(targetAdvisor.SchoolId).FontSize(14).Color(System.Drawing.Color.Red);
             p1.Alignment = Alignment.left;
-            var p2 = doc.InsertParagraph(); p2.Append("Họ và tên CVHT: ").FontSize(14); 
-            p2.Append(targetAdvisor.FullName).FontSize(14).Color(System.Drawing.Color.Red); 
+            var p2 = doc.InsertParagraph();
+            p2.Append("Họ và tên CVHT: ").FontSize(14);
+            p2.Append(targetAdvisor.FullName).FontSize(14).Color(System.Drawing.Color.Red);
             p2.Alignment = Alignment.left;
-            var p3 = doc.InsertParagraph(); p3.Append("Lớp CVHT: ").FontSize(14); 
-            p3.Append(targetPlan.ClassId).FontSize(14).Color(System.Drawing.Color.Red); 
+            var p3 = doc.InsertParagraph();
+            p3.Append("Lớp CVHT: ").FontSize(14);
+            p3.Append(targetPlan.ClassId).FontSize(14).Color(System.Drawing.Color.Red);
             p3.Alignment = Alignment.left;
             // Create a table with 11 rows and 7 columns
             var table = doc.AddTable(11, 7);
 
             // Table Headers
-            var headers = new[] { "STT", "TIÊU CHÍ", "MÔ TẢ CÔNG VIỆC", "CÁCH THỰC HIỆN", 
-                                  "ĐỊNH LƯỢNG", "THỜI GIAN", "GHI CHÚ (về chỉ số đạt theo quy định ở từng tiêu chí)" }; 
-            for (int i = 0; i < headers.Length; i++) 
-            { 
-                table.Rows[0].Cells[i].Paragraphs[0].Append(headers[i]).FontSize(12).Bold().Alignment = Alignment.center; 
-                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Top, new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
-                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Bottom, new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
-                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Left, new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
-                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Right, new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
+            var headers = new[]
+            {
+                "STT", "TIÊU CHÍ", "MÔ TẢ CÔNG VIỆC", "CÁCH THỰC HIỆN",
+                "ĐỊNH LƯỢNG", "THỜI GIAN", "GHI CHÚ (về chỉ số đạt theo quy định ở từng tiêu chí)"
+            };
+            for (int i = 0; i < headers.Length; i++)
+            {
+                table.Rows[0].Cells[i].Paragraphs[0].Append(headers[i]).FontSize(12).Bold().Alignment =
+                    Alignment.center;
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Top,
+                    new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                        System.Drawing.Color.Black));
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Bottom,
+                    new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                        System.Drawing.Color.Black));
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Left,
+                    new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                        System.Drawing.Color.Black));
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Right,
+                    new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                        System.Drawing.Color.Black));
             }
+
             // Merge cells 
             //Row 1
-            table.MergeCellsInColumn(0, 1, 3); 
+            table.MergeCellsInColumn(0, 1, 3);
             table.Rows[1].Cells[0].Paragraphs[0].Append("1").FontSize(12).Bold().Alignment = Alignment.center;
             table.MergeCellsInColumn(1, 1, 3);
-            table.Rows[1].Cells[1].Paragraphs[0].Append("Một số nội dung cơ bản của nhiệm vụ CVHT").FontSize(12).Bold().Alignment = Alignment.center;
+            table.Rows[1].Cells[1].Paragraphs[0].Append("Một số nội dung cơ bản của nhiệm vụ CVHT").FontSize(12).Bold()
+                .Alignment = Alignment.center;
             //Row 2
             table.MergeCellsInColumn(0, 4, 5);
             table.Rows[4].Cells[0].Paragraphs[0].Append("2").FontSize(12).Bold().Alignment = Alignment.center;
             table.MergeCellsInColumn(1, 4, 5);
-            table.Rows[4].Cells[1].Paragraphs[0].Append("Hướng dẫn sinh viên lập và đăng ký kế hoạch học tập (KHHT), Đăng ký học phần (ĐKHP)").FontSize(12).Bold().Alignment = Alignment.center;
+            table.Rows[4].Cells[1].Paragraphs[0]
+                .Append("Hướng dẫn sinh viên lập và đăng ký kế hoạch học tập (KHHT), Đăng ký học phần (ĐKHP)")
+                .FontSize(12).Bold().Alignment = Alignment.center;
             //Row 3
             table.MergeCellsInColumn(0, 6, 7);
             table.Rows[6].Cells[0].Paragraphs[0].Append("3").FontSize(12).Bold().Alignment = Alignment.center;
             table.MergeCellsInColumn(1, 6, 7);
-            table.Rows[6].Cells[1].Paragraphs[0].Append("Tư vấn phương pháp học tập, tổ chức cho sinh viên chia sẻ kinh nghiệm học tập").FontSize(12).Bold().Alignment = Alignment.center;
+            table.Rows[6].Cells[1].Paragraphs[0]
+                .Append("Tư vấn phương pháp học tập, tổ chức cho sinh viên chia sẻ kinh nghiệm học tập").FontSize(12)
+                .Bold().Alignment = Alignment.center;
             table.MergeCellsInColumn(6, 6, 7);
             //Row 4
             table.MergeCellsInColumn(0, 8, 9);
             table.Rows[8].Cells[0].Paragraphs[0].Append("4").FontSize(12).Bold().Alignment = Alignment.center;
             table.MergeCellsInColumn(1, 8, 9);
-            table.Rows[8].Cells[1].Paragraphs[0].Append("Chăm sóc sinh viên diện đặc biệt").FontSize(12).Bold().Alignment = Alignment.center;
+            table.Rows[8].Cells[1].Paragraphs[0].Append("Chăm sóc sinh viên diện đặc biệt").FontSize(12).Bold()
+                .Alignment = Alignment.center;
             table.MergeCellsInColumn(6, 8, 9);
             //Row 5
             table.Rows[10].Cells[0].Paragraphs[0].Append("5").FontSize(12).Bold().Alignment = Alignment.center;
-            table.Rows[10].Cells[1].Paragraphs[0].Append("Công tác phối hợp để thực hiện nhiệm vụ CVHT").FontSize(12).Bold().Alignment = Alignment.center;
+            table.Rows[10].Cells[1].Paragraphs[0].Append("Công tác phối hợp để thực hiện nhiệm vụ CVHT").FontSize(12)
+                .Bold().Alignment = Alignment.center;
 
             // Apply borders and padding to all cells
-            for (int row = 0; row < table.RowCount; row++) 
-            { 
-                for (int col = 0; col < table.ColumnCount; col++) 
-                { 
-                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Top, new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
-                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Bottom, new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
-                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Left, new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
-                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Right,new  Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0, System.Drawing.Color.Black)); 
-                    table.Rows[row].Cells[col].MarginLeft = 10f; table.Rows[row].Cells[col].MarginRight = 10f; table.Rows[row].Cells[col].MarginTop = 5f; 
-                    table.Rows[row].Cells[col].MarginBottom = 5f; 
-                } 
+            for (int row = 0; row < table.RowCount; row++)
+            {
+                for (int col = 0; col < table.ColumnCount; col++)
+                {
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Top,
+                        new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                            System.Drawing.Color.Black));
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Bottom,
+                        new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                            System.Drawing.Color.Black));
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Left,
+                        new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                            System.Drawing.Color.Black));
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Right,
+                        new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                            System.Drawing.Color.Black));
+                    table.Rows[row].Cells[col].MarginLeft = 10f;
+                    table.Rows[row].Cells[col].MarginRight = 10f;
+                    table.Rows[row].Cells[col].MarginTop = 5f;
+                    table.Rows[row].Cells[col].MarginBottom = 5f;
+                }
             }
 
             //Inject Data into table
-            for(int i =0; i<10; i++)
+            for (int i = 0; i < 10; i++)
             {
                 table.Rows[i + 1].Cells[2].Paragraphs[0].Append(details[i].Task);
                 table.Rows[i + 1].Cells[3].Paragraphs[0].Append(details[i].HowToExecute);
@@ -1308,41 +1404,231 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 table.Rows[i + 1].Cells[5].Paragraphs[0].Append(details[i].TimeFrame);
             }
 
-            for(int i=0; i<10; i++)
+            for (int i = 0; i < 10; i++)
             {
-                if (i == 6 || i == 8) { continue; }
+                if (i == 6 || i == 8)
+                {
+                    continue;
+                }
+
                 table.Rows[i + 1].Cells[6].Paragraphs[0].Append(details[i].Notes);
             }
+
             // Insert the table into the document
             doc.InsertParagraph().InsertTableAfterSelf(table);
 
             // Save the document to a MemoryStream
-            using (var memoryStream = new MemoryStream()) { doc.SaveAs(memoryStream); memoryStream.Position = 0; 
+            using (var memoryStream = new MemoryStream())
+            {
+                doc.SaveAs(memoryStream);
+                memoryStream.Position = 0;
                 // Return the document as a file download
-            return File(memoryStream.ToArray(), "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"Kế Hoạch năm học {targetPlan.PeriodName}.docx"); }
+                return File(memoryStream.ToArray(),
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    $"Kế Hoạch năm học {targetPlan.PeriodName}.docx");
+            }
         }
+
 //SemesterPlanDetail actions
-    //Render View 
+        //Render View 
         public IActionResult SemesterPlanDetail()
         {
             ViewData["page"] = "SemesterPlanDetail";
             return View();
         }
+
         //Receive Mail actions
         //Render View 
-       public IActionResult ReceiveEmail()
-       {
-           ViewData["page"] = "ReceiveEmail";
-           return View();
+        public IActionResult ReceiveEmail()
+        {
+            ViewData["page"] = "ReceiveEmail";
+            return View();
         }
-       //Sent Mail actions
-       //Render View 
-       public IActionResult SentEmail()
-       {
-           ViewData["page"] = "SentEmail";
-           return View();
-       }
+
+        public async Task<IActionResult> SentEmail()
+        {
+            ViewData["page"] = "SentEmail";
+
+            var emails = await _context.Emails
+                    .Include(e => e.Recipients) 
+                    .ThenInclude(r => r.User)
+                    
+
+                .Select(e => new Email
+                {
+                    EmailId = e.EmailId,
+                    Sender = e.Sender,
+                    Recipients = e.Recipients,
+                    Subject = e.Subject,
+                    SentDate = e.SentDate,
+                    Status = e.Status,
+                    SenderId = e.SenderId,
+                    Content = e.Content,
+                    Thread = e.Thread,
+                    ThreadId = e.ThreadId,
+                    Attachments = e.Attachments
+                })
+                .ToListAsync();
+
+            if (emails == null || !emails.Any())
+            {
+                // Nếu emails là null hoặc không có dữ liệu, có thể gán một danh sách trống
+                emails = new List<Email>();
+            }
+
+            ViewBag.Warning = TempData["Warning"];
+            ViewBag.Success = TempData["Success"];
+            ViewBag.Error = TempData["Error"];
+
+            // Truyền emails vào view
+            return View(emails);
+        }
+
+
+        [HttpPost]
+public async Task<IActionResult> SentEmail(string recipientEmail, string emailSubject,
+    string emailContent, List<IFormFile> emailAttachment, int? threadId)
+{
+    var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+    if (vietnamTimeZone == null)
+    {
+        return BadRequest("Vietnam time zone not found");
+    }
+
+    var currentUserId = _context.ApplicationUsers
+        .Where(u => u.Email == User.Identity.Name)
+        .FirstOrDefault()?.Id;
+
+    if (currentUserId == null)
+    {
+        return BadRequest("User not found.");
+    }
+
+    string[] emails = recipientEmail.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+    foreach (string userEmail in emails)
+    {
+        // Email Actions
+        Email thisMail = new Email
+        {
+            SenderId = currentUserId,
+            Subject = emailSubject,
+            Content = emailContent,
+            SentDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone)
+        };
+
+        _context.Emails.Add(thisMail);
+        await _context.SaveChangesAsync(); // Lưu email trước khi tiếp tục
+
+        // Thread Actions
+        if (threadId.HasValue)
+        {
+            // Nếu có threadId (trả lời email), gán threadId vào email này
+            thisMail.ThreadId = threadId.Value;
+        }
+        else
+        {
+            // Nếu không có threadId, tạo một thread mới cho email này
+            EmailThread newThread = new EmailThread
+            {
+                Subject = emailSubject
+            };
+            _context.EmailThreads.Add(newThread); // Thêm thread vào DbContext
+            await _context.SaveChangesAsync(); // Lưu thread vào cơ sở dữ liệu
+            thisMail.ThreadId = newThread.ThreadId; // Gán threadId cho email
+        }
+
+        // Email Attachment Actions
+        foreach (var attachment in emailAttachment)
+        {
+            if (attachment.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    // Copy file content to memory stream
+                    await attachment.CopyToAsync(memoryStream);
+
+                    // Create a new EmailAttachment entry
+                    var theseAttachments = new EmailAttachment
+                    {
+                        FileName = attachment.FileName,
+                        FileData = memoryStream.ToArray(), // Convert stream to byte array
+                        EmailId = thisMail.EmailId
+                    };
+
+                    // Add to the context
+                    _context.EmailAttachments.Add(theseAttachments);
+                }
+            }
+        }
+
+        // Email Recipient actions
+        var recipientUser = _context.ApplicationUsers.FirstOrDefault(u => u.Email == userEmail);
+        if (recipientUser != null)
+        {
+            EmailRecipient thisOne = new EmailRecipient
+            {
+                UserId = recipientUser.Id,
+                EmailId = thisMail.EmailId, // Gán đúng EmailId sau khi lưu email
+                RecipientType = "To" // Hoặc bạn có thể thay "To" bằng "Cc", "Bcc" nếu cần
+            };
+
+            _context.EmailRecipients.Add(thisOne);
+        }
+
+    }
+    
+    await _context.SaveChangesAsync(); // Lưu tất cả thay đổi vào cơ sở dữ liệu một lần
+
+    return RedirectToAction("SentEmail");
+}
+        // Action Delete Email
+       
+        [HttpPost]
+        public async Task<IActionResult> DeleteEmail(int emailId)
+        {
+            var emailToDelete = await _context.Emails.FindAsync(emailId);
+            if (emailToDelete != null)
+            {
+                _context.Emails.Remove(emailToDelete);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = $"Email đã được xóa thành công!";
+            }
+            else
+            {
+                TempData["Error"] = "Không tìm thấy email để xóa.";
+            }
+            return RedirectToAction("SentEmail");
+        }
+        // Action View Detail Email
+        public async Task<IActionResult> GetEmailDetails(int emailId)
+        {
+            var email = await _context.Emails
+                .Include(e => e.Recipients)
+                .ThenInclude(r => r.User)
+                .Include(e => e.Attachments)
+                .FirstOrDefaultAsync(e => e.EmailId == emailId);
+
+            if (email == null)
+            {
+                return NotFound();
+            }
+
+            var emailDetails = new
+            {
+                detailSubject = email.Subject,
+                detailContent = email.Content,
+                detailDate = email.SentDate,
+                Recipients = email.Recipients.Select(r => new { r.User.Email }),
+                detailAttachment = email.Attachments.Select(a => new { a.FileName })
+            };
+
+            return Json(emailDetails);
+        }
+
+        
     }
 }
+   
 
 

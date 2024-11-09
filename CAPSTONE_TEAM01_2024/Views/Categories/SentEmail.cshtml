@@ -1,125 +1,114 @@
+@model IEnumerable<CAPSTONE_TEAM01_2024.Models.Email>
+
 @{
 ViewData["Title"] = "Sent Email";
 Layout = "_PersonnelLayout";
 }
+
 <div class="content-wrapper" style="min-height: 912.2px;">
-<header class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h3 class="m-0">Gửi Mail</h3>
-            </div>
-        </div>
-    </div>
-</header>
-
-<main class="content">
-    <div class="container-fluid">
-        <div class="card">
-            <div class="card-header">
-                <div class="row text-center">
-                    <div class="col-auto">
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMailModal">
-                            <i class="bi bi-plus"></i> Thêm Mail
-                        </button>
-                    </div>
-                    <div class="col">
-                        <nav class="navbar navbar-light bg-light">
-                            <form class="d-flex ms-auto">
-                                <input class="form-control me-2" type="search" placeholder="Nhập nội dung tìm kiếm" aria-label="Search">
-                            </form>
-                        </nav>
-                    </div>
-                </div>
-
-                <div class="row mt-2">
-                    <div class="col-4 text-left">
-                        <label for="statusFilter" class="form-label">Trạng Thái</label>
-                        <select id="statusFilter" class="form-select custom-select" style="width: 150px;" onchange="filterTable()">
-                            <option value="">Tất cả</option>
-                            <option value="Đã gửi">Đã Gửi</option>
-                            <option value="Nháp">Nháp</option>
-                        </select>
-                    </div>
+    <header class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h3 class="m-0">Gửi Mail</h3>
                 </div>
             </div>
+        </div>
+    </header>
 
-            <div class="card-body">
-                <table class="table table-bordered">
-                    <thead>
-                    <tr class="text-center">
-                        <th>Người Gửi</th>
-                        <th>Người Nhận</th>
-                        <th>Tiêu Đề</th>
-                        <th>Ngày Gửi</th>
-                        <th>Trạng Thái</th>
-                        <th>Thao Tác</th>
-                    </tr>
-                    </thead>
-                    <tbody id="data-table">
-                    <tr>
-                        <td>nguoigui1@example.com</td>
-                        <td>nguoinhan1@example.com</td>
-                        <td>Tiêu Đề 1</td>
-                        <td>2024-10-31</td>
-                        <td>Đã Gửi</td>
-                        <td class="text-center">
-                            <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#DetailMailModal">
-                                <i class="fa-solid fa-eye custom-icon"></i>
+    <main class="content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row text-center">
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMailModal">
+                                <i class="bi bi-plus"></i> Thêm Mail
                             </button>
-                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteMailModal">
-                                <i class="fa-solid fa-trash custom-icon"></i>
-                            </button>
-                           
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>nguoigui2@example.com</td>
-                        <td>nguoinhan2@example.com</td>
-                        <td>Tiêu Đề 2</td>
-                        <td>2024-10-30</td>
-                        <td>Nháp</td>
-                        <td class="text-center">
-                            <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#DetailMailModal">
-                                <i class="fa-solid fa-eye custom-icon"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteMailModal">
-                                <i class="fa-solid fa-trash custom-icon"></i>
-                            </button>
-                            
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>nguoigui3@example.com</td>
-                        <td>nguoinhan3@example.com</td>
-                        <td>Tiêu Đề 3</td>
-                        <td>2024-10-29</td>
-                        <td>Đã Gửi</td>
-                        <td class="text-center">
-                            <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#DetailMailModal">
-                                <i class="fa-solid fa-eye custom-icon"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteMailModal">
-                                <i class="fa-solid fa-trash custom-icon"></i>
-                            </button>
-                           
-                        </td>
-                    </tr>
-                    <tr id="noresults" style="display: none;">
-                        <td colspan="5" class="text-center">Không tìm thấy nội dung</td>
-                    </tr>
-                    </tbody>
-                </table>
+                        </div>
+                        <div class="col">
+                            <nav class="navbar navbar-light bg-light">
+                                <form class="d-flex ms-auto" method="get" action="@Url.Action("SentEmail", "Email")">
+                                    <input class="form-control me-2" type="search" name="search" placeholder="Nhập nội dung tìm kiếm" aria-label="Search">
+                                </form>
+                            </nav>
+                        </div>
+                    </div>
 
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-end">
-                        <!-- Pagination items will go here -->
-                    </ul>
-                </nav>
+                   
+                </div>
+
+                <div class="card-body">
+                    @if (TempData["Success"] != null)
+                    {
+                    <div class="alert alert-success">@TempData["Success"]</div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                    <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+                    @if (TempData["Warning"] != null)
+                    {
+                    <div class="alert alert-danger">@TempData["Warning"]</div>
+                    }
+                    <table class="table table-bordered" id="data-table">
+                        <thead>
+                        <tr class="text-center">
+                            <th>Người Gửi</th>
+                            <th>Người Nhận</th>
+                            <th>Tiêu Đề</th>
+                            <th>Ngày Gửi</th>
+                            <th>Trạng Thái</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                        </thead>        
+                        <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                        <table class="table">
+                            <tbody>
+                            @foreach (var emailItem in Model)
+                            {
+                            <tr>
+                                <td>@emailItem.Sender</td>
+                                <td>@emailItem.Recipients.FirstOrDefault()?.User.Email</td>
+                                <td>@emailItem.Subject</td>
+                                    <td>@emailItem.SentDate.ToString("yyyy-MM-dd")</td>
+                                <td>@emailItem.Status</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#DetailMailModal" data-email-id="@emailItem.EmailId">
+                                        <i class="fa-solid fa-eye custom-icon"></i>
+                                    </button>
+
+                                    @foreach (var emails in Model)
+                                    {
+                                    <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteMailModal"
+                                            data-email-id="@emails.EmailId" onclick="openDeleteModal(this)">
+                                        <i class="fa-solid fa-trash custom-icon"></i> 
+                                    </button>
+                                    }
+                                    
+
+                                </td>
+                            </tr>
+                            }
+                            </tbody>
+                        </table>
+                        }
+                        
+                        
+                        </tbody>
+                    </table>
+
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-end">
+                            <!-- Pagination items will go here -->
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 </div>
 
 <!-- Modal Thêm Mail -->
@@ -131,29 +120,39 @@ Layout = "_PersonnelLayout";
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="addMailForm">
+                <form id="addMailForm" method="post" action="@Url.Action("SentEmail", "Categories")" enctype="multipart/form-data">
+                    @foreach (var emails in Model)
+                    {
+                    <input type="hidden" id="threadId" name="threadId" value="@emails.ThreadId" />
+                    }
+
+                <input type="hidden" id="threadId" name="threadId"  />
+
                     <div class="mb-3">
                         <label for="recipientEmail" class="form-label">Người Nhận</label>
-                        <input type="email" class="form-control" id="recipientEmail" required>
+                        <input type="email" class="form-control" id="recipientEmail" name="recipientEmail" required>
                     </div>
                     <div class="mb-3">
                         <label for="emailSubject" class="form-label">Tiêu Đề</label>
-                        <input type="text" class="form-control" id="emailSubject" required>
+                        <input type="text" class="form-control" id="emailSubject" name="emailSubject" required>
                     </div>
                     <div class="mb-3">
                         <label for="emailContent" class="form-label">Nội Dung</label>
-                        <textarea class="form-control" id="emailContent" rows="3" required></textarea>
+                        <textarea class="form-control" id="emailContent" name="emailContent" rows="3" required></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="emailAttachment" class="form-label">Tệp Đính Kèm</label>
-                        <input type="file" class="form-control" id="emailAttachment">
+                        <input type="file" class="form-control" id="emailAttachment" name="emailAttachment" multiple>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary" id="sendEmailButton">Gửi Mail</button>
                     </div>
                 </form>
+
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-primary">Gửi Mail</button>
-            </div>
+            
         </div>
     </div>
 </div>
@@ -171,11 +170,16 @@ Layout = "_PersonnelLayout";
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-danger">Xóa</button>
+                <form id="deleteEmailForm" asp-action="DeleteEmail" method="post">
+                    <!-- Lấy emailId từ button vào đây -->
+                    <input type="hidden" id="emailId" name="emailId" />
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Modal Xem Chi Tiết Email -->
 <div class="modal fade" id="DetailMailModal" tabindex="-1" aria-labelledby="DetailMailModalLabel" aria-hidden="true">
@@ -205,3 +209,63 @@ Layout = "_PersonnelLayout";
     </div>
 </div>
 
+<script>
+    // Hàm mở modal Xóa và gán emailId vào form
+    function openDeleteModal(button) {
+        // Lấy emailId từ button
+        var emailId = button.getAttribute('data-email-id');
+
+        // Điền emailId vào form
+        document.getElementById('emailId').value = emailId;
+
+        // Mở modal
+        $('#DeleteMailModal').modal('show');
+
+    }
+
+
+    // Hàm mở modal khi nhấn vào nút "Xem Chi Tiết"
+    function openDetailModal(button) {
+        var emailId = button.getAttribute('data-email-id'); // Lấy emailId từ nút bấm
+        // Gửi yêu cầu AJAX để lấy chi tiết email
+        $.ajax({
+            url: '@Url.Action("GetEmailDetails", "Categories")', // Đảm bảo đường dẫn chính xác
+            data: { emailId: emailId },
+            type: 'GET',
+            success: function (response) {
+                if (response) {
+                    // Cập nhật thông tin trong modal
+                    $('#detailRecipient').html(''); // Làm trống danh sách người nhận trước
+                    response.recipients.forEach(function (recipient) {
+                        $('#detailRecipient').append('<p>' + recipient.email + '</p>');
+                    });
+
+                    $('#detailSubject').text(response.subject);
+                    $('#detailContent').text(response.content);
+                    $('#detailDate').text(new Date(response.sentDate).toLocaleString());
+
+                    // Xử lý tệp đính kèm
+                    if (response.attachments.length > 0) {
+                        $('#detailAttachment').show().attr('src', '/path/to/attachments/' + response.attachments[0].fileName);
+                    } else {
+                        $('#detailAttachment').hide(); // Ẩn nếu không có đính kèm
+                    }
+
+                    // Mở modal sau khi đã tải xong dữ liệu
+                    $('#DetailMailModal').modal('show');
+                }
+            },
+            error: function () {
+                alert("Có lỗi xảy ra khi tải chi tiết email.");
+            }
+        });
+    }
+
+    // Đảm bảo sự kiện click được thiết lập chính xác trên nút "Xem Chi Tiết"
+    $(document).on('click', '.viewDetailButton', function () {
+        openDetailModal(this);
+    });
+
+
+
+</script>

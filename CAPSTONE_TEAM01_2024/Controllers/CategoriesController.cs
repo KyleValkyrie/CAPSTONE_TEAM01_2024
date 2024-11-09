@@ -317,7 +317,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Đã xảy ra lỗi khi nhập file Excel: {ex.InnerException?.Message ?? ex.Message}";
+                /*  TempData["Error"] = $"Đã xảy ra lỗi khi nhập file Excel. Đảm bảo các cột trong file excel được điền đầy đủ: {ex.InnerException?.Message ?? ex.Message}";*/
+                TempData["Error"] = $"Đã xảy ra lỗi khi nhập file Excel. Đảm bảo các cột trong file excel được điền đầy đủ";
                 return RedirectToAction("ClassList");
             }
         }

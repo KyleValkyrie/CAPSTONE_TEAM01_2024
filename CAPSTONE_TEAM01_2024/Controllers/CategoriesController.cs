@@ -401,7 +401,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
 
 //StudentList actions
-        //Render StudnetLít view
+    //Render StudnetLít view
         public async Task<IActionResult> StudentList(int pageIndex = 1, int pageSize = 30)
         {
             ViewData["page"] = "StudentList";
@@ -435,7 +435,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return View(paginatedStudents);
         }
 
-        //Add Student
+    //Add Student
         [HttpPost]
         public async Task<IActionResult> AddStudent(StudentListViewModel model)
         {
@@ -499,7 +499,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("StudentList");
         }
 
-        //Edit Student
+    //Edit Student
         [HttpPost]
         public async Task<IActionResult> EditStudent(StudentListViewModel model)
         {
@@ -542,7 +542,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("StudentList");
         }
 
-        //Delete Student
+    //Delete Student
         [HttpPost]
         public async Task<IActionResult> DeleteStudent(string id)
         {
@@ -570,7 +570,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("StudentList");
         }
 
-        //Download Excel Template for Student
+    //Download Excel Template for Student
         public IActionResult GenerateStudentTemplate()
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -615,7 +615,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             }
         }
 
-        //Import Excel Template for Student
+    //Import Excel Template for Student
         [HttpPost]
         public async Task<IActionResult> ImportStudentExcel(IFormFile StudentExcelFile)
         {
@@ -737,7 +737,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             }
         }
 
-        //Export Excel file for Student
+    //Export Excel file for Student
         [HttpPost]
         public async Task<IActionResult> ExportStudentsByClass(string ClassId)
         {
@@ -802,7 +802,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
 
 //SchoolYear actions
-        //Render SchoolYear view
+    //Render SchoolYear view
         public async Task<IActionResult> SchoolYear(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "SchoolYear";
@@ -820,7 +820,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return View(viewModel);
         }
 
-        //Add School Year
+    //Add School Year
         [HttpPost]
         public async Task<IActionResult> CreatePeriod(AcademicPeriod model)
         {
@@ -840,7 +840,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
         }
 
-        //Edit School Year
+    //Edit School Year
         [HttpPost]
         public async Task<IActionResult> UpdatePeriod(AcademicPeriod model)
         {
@@ -879,7 +879,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("SchoolYear");
         }
 
-        //Delete School Year
+    //Delete School Year
         [HttpPost]
         public async Task<IActionResult> DeletePeriod(int periodId)
         {
@@ -898,7 +898,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         }
 
 //SemesterPlan actions
-        //Render View
+    //Render View
         public async Task<IActionResult> SemesterPlan(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "SemesterPlan";
@@ -944,7 +944,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return View(viewModel);
         }
 
-        //Add Plan
+    //Add Plan
         [HttpPost]
         public async Task<IActionResult> AddPlan(SemesterPlan plan, IFormCollection form)
         {
@@ -1102,7 +1102,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             }
         }
 
-        //Edit Plan Detail
+    //Edit Plan Detail
         [HttpPost]
         public async Task<IActionResult> EditPlanDetail(IFormCollection form)
         {
@@ -1204,7 +1204,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("SemesterPlan");
         }
 
-        //Edit Plan
+    //Edit Plan
         [HttpPost]
         public async Task<IActionResult> EditPlan(int planId, int periodId, string planType, string classId)
         {
@@ -1222,7 +1222,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("SemesterPlan");
         }
 
-        //Check Plan Validity
+    //Check Plan Validity
         public async Task<bool> PlanValidation(int planId)
         {
             List<PlanDetail> details = await _context.PlanDetails.Where(pd => pd.PlanId == planId).ToListAsync();
@@ -1238,7 +1238,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return true;
         }
 
-        //Submit Plan
+    //Submit Plan
         [HttpPost]
         public async Task<IActionResult> SubmitPlan(int planId)
         {
@@ -1263,7 +1263,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("SemesterPlan");
         }
 
-        //Delete Plan
+    //Delete Plan
         [HttpPost]
         public async Task<IActionResult> DeletePlan(int planId)
         {
@@ -1281,7 +1281,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("SemesterPlan");
         }
 
-        //Export plan
+    //Export plan
         [HttpPost]
         public async Task<IActionResult> ExportPlan(int planId)
         {
@@ -1430,16 +1430,61 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             }
         }
 
+    //Duplicate Plan
+        [HttpPost]
+        public async Task<IActionResult> DuplicatePlan(int planId)
+        {
+            //Fetch the original SemesterPlan
+            var originalPlan = _context.SemesterPlans
+            .Include(sp => sp.PlanDetails) // Load associated PlanDetails
+            .FirstOrDefault(sp => sp.PlanId == planId);
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            //Duplicated Plan data
+            var dupPlan = new SemesterPlan{ 
+                ClassId = originalPlan.ClassId,
+                PlanType = originalPlan.PlanType,
+                PeriodId = originalPlan.PeriodId,
+                CreationTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone),
+                AdvisorName = User.Identity.Name,
+                PeriodName = originalPlan.PeriodName,
+                Status = "Nháp"
+            };
+            _context.SemesterPlans.Add(dupPlan);
+            await _context.SaveChangesAsync();
+
+            //Duplicate Plan details
+            foreach (var detail in originalPlan.PlanDetails)
+            {
+                var duplicatedDetail = new PlanDetail
+                {
+                    PlanId = dupPlan.PlanId, // Associate with the new SemesterPlan
+                    Task = detail.Task,
+                    CriterionId = detail.CriterionId,
+                    HowToExecute = detail.HowToExecute,
+                    Quantity = detail.Quantity,
+                    TimeFrame = detail.TimeFrame,
+                    Notes = detail.Notes
+                    // Copy other fields as necessary
+                };
+
+                _context.PlanDetails.Add(duplicatedDetail);
+            }
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Nhân bản kế hoạch thành công!";
+            return RedirectToAction("SemesterPlan");
+        }
+
 //SemesterPlanDetail actions
-        //Render View 
+//Render View 
         public IActionResult SemesterPlanDetail()
         {
             ViewData["page"] = "SemesterPlanDetail";
             return View();
         }
 
-        //Receive Mail actions
-        //Render View 
+//Receive Mail actions
+    //Render View 
         public IActionResult ReceiveEmail()
         {
             ViewData["page"] = "ReceiveEmail";

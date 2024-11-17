@@ -60,19 +60,31 @@ bool isNotAdvisor = !roles.Contains("CVHT");
         border-top: 1px solid #ddd;
     }
 
-   
-    .fields-row {
+
+    .fields-row .header-cell {
+        height: 50px; /* Đặt chiều cao cho các ô tiêu đề */
         display: flex;
-        width: 100%;
-        border-bottom: 2px solid #ccc;
-        padding-bottom: 5px;
-        gap: 10px;
-        font-weight: bold;
+        justify-content: center;
         align-items: center;
+        font-weight: bold;
+        text-align: center;
+        border: 1px solid #ddd; /* Thêm viền nếu cần kiểm tra */
     }
 
+    .fields-row + div {
+        display: flex;
+        width: 100%;
+        border: 1px solid #ddd; /* Kiểm tra độ khớp với các ô bên dưới */
+    }
+
+    textarea {
+        border: 1px solid #ddd; /* Thêm viền để kiểm tra kích thước */
+        box-sizing: border-box; /* Đảm bảo padding không làm thay đổi kích thước */
+    }
        .header-cell {
         flex: 1;
+           
+           margin-right: 0; /* Xóa lệch phải (nếu có) */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -379,9 +391,9 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                         </div>
                     </div>
                     <!-- Header Row for Fields -->
-                    <div class="fields-row" style="flex: 1; text-align: center; height: 50px; display: flex; align-items: center;">
-                            <div class="header-cell" style="flex: 1; text-align: center;">Tiêu Chí</div>
-                            <div class="header-cell" style="flex: 1; text-align: center;">Mô Tả Công Việc</div>
+                    <div class="fields-row" style="display: flex; align-items: center; height: 50px;">
+                            <div class="header-cell" style="flex: 1.1; text-align: center;">Tiêu Chí</div>
+                            <div class="header-cell" style="flex: 2.21; text-align: center;">Mô Tả Công Việc</div>
                             <div class="header-cell" style="flex: 1; text-align: center;">Cách Thực Hiện</div>
                             <div class="header-cell" style="flex: 1; text-align: center;">Định Lượng</div>
                             <div class="header-cell" style="flex: 1; text-align: center;">Thời Gian</div>
@@ -551,14 +563,14 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                     <input type = "hidden" id="DetailIds" name="DetailIds"/>
                 </div>
                 <!-- Header Row for Fields -->
-                <div class="fields-row" style="flex: 1; text-align: center; height: 50px; display: flex; align-items: center;">
-                    <div class="header-cell" style="flex: 1; text-align: center;">Tiêu Chí</div>
-                    <div class="header-cell" style="flex: 1; text-align: center;">Mô Tả Công Việc</div>
+                <div class="fields-row" style="display: flex; align-items: center; height: 50px;">
+                    <div class="header-cell" style="flex: 1.1; text-align: center;">Tiêu Chí</div>
+                    <div class="header-cell" style="flex: 2.21; text-align: center;">Mô Tả Công Việc</div>
                     <div class="header-cell" style="flex: 1; text-align: center;">Cách Thực Hiện</div>
                     <div class="header-cell" style="flex: 1; text-align: center;">Định Lượng</div>
                     <div class="header-cell" style="flex: 1; text-align: center;">Thời Gian</div>
                     <div class="header-cell" style="flex: 1; text-align: center;">Ghi Chú</div>
-                </div>                
+                </div>         
                 <!-- Rows for Tiêu Chí 1 in Edit Modal -->
                 <div style="display: flex; width: 100%;">
                     <textarea name="EditCriteria1" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>1.Một số nội dung cơ bản của nhiệm vụ CVHT</textarea>

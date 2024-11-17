@@ -1647,32 +1647,49 @@ public async Task<IActionResult> SentEmail(string recipientEmail, string emailSu
             return RedirectToAction("SentEmail");
         }
         // Action View Detail Email
+        [HttpGet]
         public async Task<IActionResult> GetEmailDetails(int emailId)
         {
+            ViewData["page"] = "SentEmail";
+            // Kiểm tra giá trị emailId truyền vào
+            Console.WriteLine($"EmailId được truyền: {emailId}");
+
             var email = await _context.Emails
+                .Include(e => e.Sender) 
                 .Include(e => e.Recipients)
-                .ThenInclude(r => r.User)
+                .ThenInclude(r => r.User) 
                 .Include(e => e.Attachments)
                 .FirstOrDefaultAsync(e => e.EmailId == emailId);
 
+            // Kiểm tra nếu email là null
             if (email == null)
             {
+                Console.WriteLine("Email không tìm thấy trong cơ sở dữ liệu.");
                 return NotFound();
             }
 
-            var emailDetails = new
-            {
-                detailSubject = email.Subject,
-                detailContent = email.Content,
-                detailDate = email.SentDate,
-                Recipients = email.Recipients.Select(r => new { r.User.Email }),
-                detailAttachment = email.Attachments.Select(a => new { a.FileName })
-            };
+            // Debug thông tin email
+            Console.WriteLine($"Email tìm thấy: {email.Subject}, Người gửi: {email.Sender?.FullName ?? "Không có thông tin người gửi"}");
 
-            return Json(emailDetails);
+            // Kiểm tra các Recipients và Attachments
+            Console.WriteLine($"Số lượng người nhận: {email.Recipients.Count}");
+            Console.WriteLine($"Số lượng tệp đính kèm: {email.Attachments.Count}");
+
+            // Trả về thông tin chi tiết của email dưới dạng JSON
+            return Json(new
+            {
+                Recipients = email.Recipients.Select(r => new { r.User.Email }).ToList(),
+                Subject = email.Subject,
+                Content = email.Content,
+                SentDate = email.SentDate,
+                Attachments = email.Attachments.Select(a => new { a.FileName }).ToList(),
+                Sender = email.Sender?.FullName ?? "Không có thông tin người gửi"
+            });
         }
 
-        
+
+
+
     }
 }
    

@@ -177,7 +177,6 @@ Layout = "_PersonnelLayout";
     </div>
 </div>
 
-
 <!-- Modal Xem Chi Tiết Email -->
 <div class="modal fade" id="viewEmailModal" tabindex="-1" aria-labelledby="viewEmailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -187,14 +186,14 @@ Layout = "_PersonnelLayout";
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p><strong>Người gửi:</strong> <span id="emailSender"></span></p>
-                <p><strong>Người nhận:</strong> <span id="emailRecipients"></span></p>
-                <p><strong>Tiêu đề:</strong> <span id="emailSubject"></span></p>
+                <p><strong>Người gửi:</strong> <span id="viewEmailSender"></span></p>
+                <p><strong>Người nhận:</strong> <span id="viewEmailRecipients"></span></p>
+                <p><strong>Tiêu đề:</strong> <span id="viewEmailSubject"></span></p>
                 <p><strong>Nội dung:</strong></p>
-                <div id="emailContent" style="border: 1px solid #ddd; padding: 10px;"></div>
-                <p><strong>Ngày gửi:</strong> <span id="emailSentDate"></span></p>
+                <div id="viewEmailContent" style="border: 1px solid #ddd; padding: 10px;"></div>
+                <p><strong>Ngày gửi:</strong> <span id="viewEmailSentDate"></span></p>
                 <p><strong>File đính kèm:</strong></p>
-                <ul id="emailAttachments"></ul>
+                <ul id="viewEmailAttachments"></ul>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -203,9 +202,8 @@ Layout = "_PersonnelLayout";
     </div>
 </div>
 
-
 <script>
-    // Hàm mở modal Xóa và gán emailId vào form
+// Hàm mở modal Xóa và gán emailId vào form
     function openDeleteModal(button) {
         // Lấy emailId từ button
         var emailId = button.getAttribute('data-email-id');
@@ -219,43 +217,52 @@ Layout = "_PersonnelLayout";
     }
 
 
-   
-        $(document).on('click', '.btn-view-email', function () {
-        var emailId = $(this).data('email-id'); // Lấy emailId từ button
+// Edit Modal JS
+    $(document).on('click', '.btn-view-email', function () {
+        var emailId = $(this).data('email-id'); // Get the emailId from the button's data attribute
 
-        // Gửi request AJAX để lấy chi tiết email
+        // Send an AJAX request to fetch the email details
         $.ajax({
-        url: '/Categories/GetEmailDetails', 
-        type: 'GET',
-        data: { emailId: emailId },
-        success: function (data) {
-        if (data) {
-        // Gắn dữ liệu vào modal
-        $('#emailSender').text(data.Sender);
-        $('#emailRecipients').text(data.Recipients.join(', '));
-        $('#emailSubject').text(data.Subject);
-        $('#emailContent').html(data.Content.replace(/\n/g, '<br>')); // Đổi xuống dòng thành <br>
-        $('#emailSentDate').text(data.SentDate);
+            url: '/Categories/GetEmailDetails',
+            type: 'GET',
+            data: { emailId: emailId },
+            success: function (data) {
+                if (data) {
+                    console.log(data.subject); // Check the subject
+                    console.log(data.content); // Check the content
+                    // Populate the modal fields with data
+                    $('#viewEmailSender').text(data.sender || 'Không xác định');
+                    $('#viewEmailRecipients').text(
+                        data.recipients && data.recipients.length > 0
+                            ? data.recipients.map(r => r.email).join(', ')
+                            : 'Không có người nhận'
+                    );
+                    $('#viewEmailSubject').text(data.subject || 'Không có tiêu đề');
+                    $('#viewEmailContent').html(data.content ? data.content.replace(/\n/g, '<br>') : 'Không có nội dung');
+                    $('#viewEmailSentDate').text(data.sentDate || 'Không xác định');
 
-        // Xử lý file đính kèm
-        var attachmentList = '';
-        data.Attachments.forEach(function (attachment) {
-        attachmentList += '<li>' + attachment.FileName + '</li>';
+                    // Handle attachments
+                    var attachmentList = '';
+                    if (data.attachments && data.attachments.length > 0) {
+                        data.attachments.forEach(function (attachment) {
+                            attachmentList += `<li>${attachment.fileName}</li>`;
+                        });
+                    } else {
+                        attachmentList = '<li>Không có file đính kèm</li>';
+                    }
+                    $('#viewEmailAttachments').html(attachmentList);
+
+                    // Show the modal
+                    $('#viewEmailModal').modal('show');
+                } else {
+                    alert('Dữ liệu không khả dụng.');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching email details:', xhr.responseText);
+                alert('Không thể tải chi tiết email.');
+            }
+        });
     });
-        $('#emailAttachments').html(attachmentList);
-
-        // Hiển thị modal
-        $('#viewEmailModal').modal('show');
-    }
-    },
-        error: function () {
-        alert('Không thể tải chi tiết email.');
-    }
-    });
-    });
-
-
-
-
 
 </script>

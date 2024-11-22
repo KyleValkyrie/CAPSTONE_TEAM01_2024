@@ -1,4 +1,124 @@
-﻿<div class="content-wrapper" style="min-height: 912.2px;">
+﻿<style>
+    /* Ensure modal dialog is centered with appropriate width */
+    .modal-dialog {
+        max-width: 90%;
+        width: 100%;
+    }
+
+    /* Header section of the modal */
+    .modal-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #ddd;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Title styling */
+    .modal-title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    
+
+    /* Fields section within the modal */
+    .fields-row {
+        display: flex;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    /* Styling for header cells in the fields row */
+    .header-cell {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 50px;
+        font-weight: bold;
+        text-align: center;
+        border: 1px solid #ddd;
+        padding: 0 15px;
+        flex-grow: 1;
+    }
+
+    /* Styling for text areas */
+    textarea {
+        resize: none;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 100%;
+    }
+
+    /* Make sure file input fields are styled and inline with text areas */
+    input[type="file"] {
+        padding: 5px;
+        margin-top: 5px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    /* Flex layout for the rows with task descriptions and file inputs */
+    .row-container {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    /* Ensuring each column is aligned and the textarea has a consistent size */
+    .row-container > div {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex-basis: 100%;
+    }
+
+    textarea[readonly] {
+        font-weight: bold;
+        background-color: #f8f9fa;
+    }
+
+    /* Ensuring button layout */
+    .btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+    }
+
+    /* Hover effect for buttons */
+    .btn:hover {
+        opacity: 0.9;
+    }
+
+    /* Footer section of the modal */
+    .modal-footer {
+        justify-content: flex-end;
+        display: flex;
+        width: 100%;
+        align-items: center;
+        padding-top: 10px;
+        border-top: 1px solid #ddd;
+    }
+
+</style>
+<div class="content-wrapper" style="min-height: 912.2px;">
     <!-- Content Header (Page header) -->
     <header class="content-header">
         <div class="container-fluid">
@@ -93,8 +213,8 @@
                     
                     <!-- Header Row for Fields -->
                     <div class="fields-row" style="display: flex; align-items: center; height: 50px;">
-                            <div class="header-cell" style="flex: 1.1; text-align: center;">Tiêu Chí Đánh Giá</div>
-                            <div class="header-cell" style="flex: 1.5; text-align: center;">Mô Tả Công Việc Cụ Thể</div>
+                            <div class="header-cell" style="flex: 1.05; text-align: center;">Tiêu Chí Đánh Giá</div>
+                            <div class="header-cell" style="flex: 1; text-align: center;">Mô Tả Công Việc Cụ Thể</div>
                             <div class="header-cell" style="flex: 1; text-align: center;">Hồ Sơ, Minh Chứng</div>
                         </div>
                     <!-- Rows for Tiêu Chí 1 -->
@@ -122,7 +242,7 @@
                             </div>
                     <!-- Rows for Tiêu Chí 3 -->
                     <div style="display: flex; width: 100%;">
-                            <textarea name="Criteria3" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>3.Tổ chức các cuộc họp lớp, tư vấn cho sinh viên các nội dung học tập như: quy chế, quy định về tổ chức hoạt động đào tạo theo học chế tín chỉ; cấu trúc, lưu đồ của CTĐT, mục tiêu đào tạo, chuẩn đầu ra của ngành/chuyên ngành… </textarea>
+                            <textarea name="Criteria3" style="flex: 1; min-width: 100px; height: 250px; font-weight: bold;" readonly>3.Tổ chức các cuộc họp lớp, tư vấn cho sinh viên các nội dung học tập như: quy chế, quy định về tổ chức hoạt động đào tạo theo học chế tín chỉ; cấu trúc, lưu đồ của CTĐT, mục tiêu đào tạo, chuẩn đầu ra của ngành/chuyên ngành… </textarea>
                                 <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                                 <textarea name="Task3_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>3.1.CVHT thu thập và hiểu các văn bản liên quan quy định, quy chế đào tạo, chuẩn đầu ra, cấu trúc, lưu đồ CTĐT…phổ biến nội dung trong các buổi sinh hoạt lớp và tư vấn trực tiếp cho SV khi cần. Tổ chức sinh hoạt lớp SV bằng hình thức trực tiếp hoặc trực tuyến (online) ít nhất 2 lần/học kỳ; có biên bản các cuộc họp đầy đủ, đáp ứng yêu cầu về nội dung họp. </textarea>
                                 <textarea name="Task3_2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>3.2.Tiếp SV trực tiếp theo lịch trực tại văn phòng khoa hoặc thông qua các phương tiện khác. </textarea>
@@ -138,7 +258,7 @@
                             </div>
                     <!-- Rows for Tiêu Chí 4 -->
                     <div style="display: flex; width: 100%;">
-                        <textarea name="Criteria4" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>4.Tổ chức các cuộc họp lớp, tư vấn cho sinh viên các nội dung học tập như: quy chế, quy định về tổ chức hoạt động đào tạo theo học chế tín chỉ; cấu trúc, lưu đồ của CTĐT, mục tiêu đào tạo, chuẩn đầu ra của ngành/chuyên ngành… </textarea>
+                        <textarea name="Criteria4" style="flex: 1; min-width: 100px; height: 250px; font-weight: bold;" readonly>4.Tổ chức các cuộc họp lớp, tư vấn cho sinh viên các nội dung học tập như: quy chế, quy định về tổ chức hoạt động đào tạo theo học chế tín chỉ; cấu trúc, lưu đồ của CTĐT, mục tiêu đào tạo, chuẩn đầu ra của ngành/chuyên ngành… </textarea>
                         <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                             <textarea name="Task4_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>4.1.Hướng dẫn sinh viên cách xây dựng kế hoạch học tập cho khóa học hoặc năm học, tư vấn cho sinh viên lập kế hoạch học tập của năm học hoặc khóa học, xem xét và phê duyệt kế hoạch học tập của sinh viên đối với những trường hợp có yêu cầu từ Phòng Đào tạo.  </textarea>
                             <textarea name="Task4_2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>4.2.Hướng dẫn sinh viên điều chỉnh kế hoạch học tập và đăng ký môn học phù hợp với năng lực và hoàn cảnh của từng sinh viên.  </textarea>
@@ -154,7 +274,7 @@
                     </div>
                     <!-- Rows for Tiêu Chí 5 -->
                     <div style="display: flex; width: 100%;">
-                        <textarea name="Criteria5" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>5.Trao đổi kinh nghiệm cá nhân trong học tập và nghề nghiệp, định hướng nghề nghiệp cho SV có nhu cầu. Tư vấn cho SV lựa chọn chuyên ngành (nếu có).</textarea>
+                        <textarea name="Criteria5" style="flex: 1; min-width: 100px; height: 370px; font-weight: bold;" readonly>5.Trao đổi kinh nghiệm cá nhân trong học tập và nghề nghiệp, định hướng nghề nghiệp cho SV có nhu cầu. Tư vấn cho SV lựa chọn chuyên ngành (nếu có).</textarea>
                         <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                             <textarea name="Task5_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>5.1.Tư vấn sinh viên lựa chọn chuyên ngành  
 
@@ -198,7 +318,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     </div>
                     <!-- Rows for Tiêu Chí 8 -->
                     <div style="display: flex; width: 100%;">
-                        <textarea name="Criteria8" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>8.Tham gia đầy đủ các buổi tập huấn/hội nghị/cuộc họp liên quan đến công tác CVHT do Khoa, Trường tổ chức (nếu có).</textarea>
+                        <textarea name="Criteria8" style="flex: 1; min-width: 100px; height: 250px; font-weight: bold;" readonly>8.Tham gia đầy đủ các buổi tập huấn/hội nghị/cuộc họp liên quan đến công tác CVHT do Khoa, Trường tổ chức (nếu có).</textarea>
                         <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                             <textarea name="Task8_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>8.1.Tham dự họp, hội nghị theo triệu tập của của các cấp: Khoa - Phòng chức năng - Trường.</textarea>
                             <textarea name="Task8_2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>8.2.Tham gia họp tổng kết, đánh giá công tác CVHT do Hội đồng Khoa triệu tập. </textarea>

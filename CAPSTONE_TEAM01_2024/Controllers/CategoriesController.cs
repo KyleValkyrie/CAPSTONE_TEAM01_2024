@@ -1498,23 +1498,20 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             var emails = await _context.Emails
                     .Include(e => e.Recipients) 
                     .ThenInclude(r => r.User)
-                    
-
-                .Select(e => new Email
-                {
-                    EmailId = e.EmailId,
-                    Sender = e.Sender,
-                    Recipients = e.Recipients,
-                    Subject = e.Subject,
-                    SentDate = e.SentDate,
-                    Status = e.Status,
-                    SenderId = e.SenderId,
-                    Content = e.Content,
-                    Thread = e.Thread,
-                    ThreadId = e.ThreadId,
-                    Attachments = e.Attachments
-                })
-                .ToListAsync();
+                    .Select(e => new Email
+                    {
+                        EmailId = e.EmailId,
+                        Sender = e.Sender,
+                        Recipients = e.Recipients,
+                        Subject = e.Subject,
+                        SentDate = e.SentDate,
+                        Status = e.Status,
+                        SenderId = e.SenderId,
+                        Content = e.Content,
+                        Thread = e.Thread,
+                        ThreadId = e.ThreadId,
+                        Attachments = e.Attachments
+                    }).ToListAsync();
 
             if (emails == null || !emails.Any())
             {
@@ -1532,104 +1529,102 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
 
         [HttpPost]
-public async Task<IActionResult> SentEmail(string recipientEmail, string emailSubject,
-    string emailContent, List<IFormFile> emailAttachment, int? threadId)
-{
-    var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
-    if (vietnamTimeZone == null)
-    {
-        return BadRequest("Vietnam time zone not found");
-    }
-
-    var currentUserId = _context.ApplicationUsers
-        .Where(u => u.Email == User.Identity.Name)
-        .FirstOrDefault()?.Id;
-
-    if (currentUserId == null)
-    {
-        return BadRequest("User not found.");
-    }
-
-    string[] emails = recipientEmail.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-    foreach (string userEmail in emails)
-    {
-        // Email Actions
-        Email thisMail = new Email
+        public async Task<IActionResult> SentEmail(string recipientEmail, string emailSubject, string emailContent, List<IFormFile> emailAttachment, int? threadId)
         {
-            SenderId = currentUserId,
-            Subject = emailSubject,
-            Content = emailContent,
-            SentDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone)
-        };
-
-        _context.Emails.Add(thisMail);
-        await _context.SaveChangesAsync(); // Lưu email trước khi tiếp tục
-
-        // Thread Actions
-        if (threadId.HasValue)
-        {
-            // Nếu có threadId (trả lời email), gán threadId vào email này
-            thisMail.ThreadId = threadId.Value;
-        }
-        else
-        {
-            // Nếu không có threadId, tạo một thread mới cho email này
-            EmailThread newThread = new EmailThread
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            if (vietnamTimeZone == null)
             {
-                Subject = emailSubject
-            };
-            _context.EmailThreads.Add(newThread); // Thêm thread vào DbContext
-            await _context.SaveChangesAsync(); // Lưu thread vào cơ sở dữ liệu
-            thisMail.ThreadId = newThread.ThreadId; // Gán threadId cho email
-        }
+                return BadRequest("Vietnam time zone not found");
+            }
 
-        // Email Attachment Actions
-        foreach (var attachment in emailAttachment)
-        {
-            if (attachment.Length > 0)
+            var currentUserId = _context.ApplicationUsers
+                .Where(u => u.Email == User.Identity.Name)
+                .FirstOrDefault()?.Id;
+
+            if (currentUserId == null)
             {
-                using (var memoryStream = new MemoryStream())
+                return BadRequest("User not found.");
+            }
+
+            string[] emails = recipientEmail.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string userEmail in emails)
+            {
+                // Email Actions
+                Email thisMail = new Email
                 {
-                    // Copy file content to memory stream
-                    await attachment.CopyToAsync(memoryStream);
+                    SenderId = currentUserId,
+                    Subject = emailSubject,
+                    Content = emailContent,
+                    SentDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone)
+                };
 
-                    // Create a new EmailAttachment entry
-                    var theseAttachments = new EmailAttachment
+                _context.Emails.Add(thisMail);
+                await _context.SaveChangesAsync(); // Lưu email trước khi tiếp tục
+
+                // Thread Actions
+                if (threadId.HasValue)
+                {
+                    // Nếu có threadId (trả lời email), gán threadId vào email này
+                    thisMail.ThreadId = threadId.Value;
+                }
+                else
+                {
+                    // Nếu không có threadId, tạo một thread mới cho email này
+                    EmailThread newThread = new EmailThread
                     {
-                        FileName = attachment.FileName,
-                        FileData = memoryStream.ToArray(), // Convert stream to byte array
-                        EmailId = thisMail.EmailId
+                        Subject = emailSubject
+                    };
+                    _context.EmailThreads.Add(newThread); // Thêm thread vào DbContext
+                    await _context.SaveChangesAsync(); // Lưu thread vào cơ sở dữ liệu
+                    thisMail.ThreadId = newThread.ThreadId; // Gán threadId cho email
+                }
+
+                // Email Attachment Actions
+                foreach (var attachment in emailAttachment)
+                {
+                    if (attachment.Length > 0)
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            // Copy file content to memory stream
+                            await attachment.CopyToAsync(memoryStream);
+
+                            // Create a new EmailAttachment entry
+                            var theseAttachments = new EmailAttachment
+                            {
+                                FileName = attachment.FileName,
+                                FileData = memoryStream.ToArray(), // Convert stream to byte array
+                                EmailId = thisMail.EmailId
+                            };
+
+                            // Add to the context
+                            _context.EmailAttachments.Add(theseAttachments);
+                        }
+                    }
+                }
+
+                // Email Recipient actions
+                var recipientUser = _context.ApplicationUsers.FirstOrDefault(u => u.Email == userEmail);
+                if (recipientUser != null)
+                {
+                    EmailRecipient thisOne = new EmailRecipient
+                    {
+                        UserId = recipientUser.Id,
+                        EmailId = thisMail.EmailId, // Gán đúng EmailId sau khi lưu email
+                        RecipientType = "To" // Hoặc bạn có thể thay "To" bằng "Cc", "Bcc" nếu cần
                     };
 
-                    // Add to the context
-                    _context.EmailAttachments.Add(theseAttachments);
+                    _context.EmailRecipients.Add(thisOne);
                 }
+
             }
-        }
-
-        // Email Recipient actions
-        var recipientUser = _context.ApplicationUsers.FirstOrDefault(u => u.Email == userEmail);
-        if (recipientUser != null)
-        {
-            EmailRecipient thisOne = new EmailRecipient
-            {
-                UserId = recipientUser.Id,
-                EmailId = thisMail.EmailId, // Gán đúng EmailId sau khi lưu email
-                RecipientType = "To" // Hoặc bạn có thể thay "To" bằng "Cc", "Bcc" nếu cần
-            };
-
-            _context.EmailRecipients.Add(thisOne);
-        }
-
-    }
     
-    await _context.SaveChangesAsync(); // Lưu tất cả thay đổi vào cơ sở dữ liệu một lần
+            await _context.SaveChangesAsync(); // Lưu tất cả thay đổi vào cơ sở dữ liệu một lần
 
-    return RedirectToAction("SentEmail");
-}
-        // Action Delete Email
-       
+            return RedirectToAction("SentEmail");
+        }
+    // Action Delete Email
         [HttpPost]
         public async Task<IActionResult> DeleteEmail(int emailId)
         {
@@ -1646,7 +1641,7 @@ public async Task<IActionResult> SentEmail(string recipientEmail, string emailSu
             }
             return RedirectToAction("SentEmail");
         }
-        // Action View Detail Email
+    // Action View Detail Email
         [HttpGet]
         public async Task<IActionResult> GetEmailDetails(int emailId)
         {
@@ -1661,20 +1656,6 @@ public async Task<IActionResult> SentEmail(string recipientEmail, string emailSu
                 .Include(e => e.Attachments)
                 .FirstOrDefaultAsync(e => e.EmailId == emailId);
 
-            // Kiểm tra nếu email là null
-            if (email == null)
-            {
-                Console.WriteLine("Email không tìm thấy trong cơ sở dữ liệu.");
-                return NotFound();
-            }
-
-            // Debug thông tin email
-            Console.WriteLine($"Email tìm thấy: {email.Subject}, Người gửi: {email.Sender?.FullName ?? "Không có thông tin người gửi"}");
-
-            // Kiểm tra các Recipients và Attachments
-            Console.WriteLine($"Số lượng người nhận: {email.Recipients.Count}");
-            Console.WriteLine($"Số lượng tệp đính kèm: {email.Attachments.Count}");
-
             // Trả về thông tin chi tiết của email dưới dạng JSON
             return Json(new
             {
@@ -1683,13 +1664,9 @@ public async Task<IActionResult> SentEmail(string recipientEmail, string emailSu
                 Content = email.Content,
                 SentDate = email.SentDate,
                 Attachments = email.Attachments.Select(a => new { a.FileName }).ToList(),
-                Sender = email.Sender?.FullName ?? "Không có thông tin người gửi"
+                Sender = email.Sender.UserName
             });
         }
-
-
-
-
     }
 }
    

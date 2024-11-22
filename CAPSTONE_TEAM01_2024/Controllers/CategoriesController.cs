@@ -1490,14 +1490,16 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             ViewData["page"] = "ReceiveEmail";
             return View();
         }
-
-        public async Task<IActionResult> SentEmail()
+//Send Mail actions
+    //Render View
+        public async Task<IActionResult> SentEmail(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "SentEmail";
-
-            var emails = await _context.Emails
-                    .Include(e => e.Recipients) 
+            var currentUser = await _context.ApplicationUsers.FirstOrDefaultAsync(us => us.UserName == User.Identity.Name);
+            var emails = _context.Emails
+                    .Include(e => e.Recipients)
                     .ThenInclude(r => r.User)
+                    .Where(e => e.SenderId == currentUser.Id)
                     .Select(e => new Email
                     {
                         EmailId = e.EmailId,
@@ -1511,23 +1513,23 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                         Thread = e.Thread,
                         ThreadId = e.ThreadId,
                         Attachments = e.Attachments
-                    }).ToListAsync();
+                    }).AsQueryable();
 
-            if (emails == null || !emails.Any())
+            var paginatedEmails =
+                await PaginatedList<Email>.CreateAsync(emails, pageIndex, pageSize);
+
+            var viewmodel = new SentEmailViewModel
             {
-                // Nếu emails là null hoặc không có dữ liệu, có thể gán một danh sách trống
-                emails = new List<Email>();
-            }
-
+                SentEmail = paginatedEmails
+            };
             ViewBag.Warning = TempData["Warning"];
             ViewBag.Success = TempData["Success"];
             ViewBag.Error = TempData["Error"];
 
             // Truyền emails vào view
-            return View(emails);
+            return View(viewmodel);
         }
-
-
+    //Send Mail
         [HttpPost]
         public async Task<IActionResult> SentEmail(string recipientEmail, string emailSubject, string emailContent, List<IFormFile> emailAttachment, int? threadId)
         {
@@ -1621,10 +1623,11 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             }
     
             await _context.SaveChangesAsync(); // Lưu tất cả thay đổi vào cơ sở dữ liệu một lần
-
+            TempData["Success"] =
+                    "Gửi Mail thành công!";
             return RedirectToAction("SentEmail");
         }
-    // Action Delete Email
+    //Delete Email
         [HttpPost]
         public async Task<IActionResult> DeleteEmail(int emailId)
         {
@@ -1641,7 +1644,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             }
             return RedirectToAction("SentEmail");
         }
-    // Action View Detail Email
+    //View Detail 
         [HttpGet]
         public async Task<IActionResult> GetEmailDetails(int emailId)
         {

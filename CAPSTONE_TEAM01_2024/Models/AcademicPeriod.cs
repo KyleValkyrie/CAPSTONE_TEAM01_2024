@@ -15,5 +15,6 @@ namespace CAPSTONE_TEAM01_2024.Models
 		public DateTime PeriodEnd { get; set; }
         [JsonIgnore]
         public ICollection<SemesterPlan> SemesterPlans { get; set; }
+        public ICollection<SemesterReport> SemesterReports { get; set; }
     }
 }

@@ -19,6 +19,7 @@ namespace CAPSTONE_TEAM01_2024.Models
         public ICollection<ApplicationUser> Students { get; set; } = new List<ApplicationUser>(); // Collection of students in the class
         [JsonIgnore]
         public ICollection<SemesterPlan> SemesterPlans { get; set; }
+        public ICollection<SemesterReport> SemesterReports { get; set; }
     }
 
 }

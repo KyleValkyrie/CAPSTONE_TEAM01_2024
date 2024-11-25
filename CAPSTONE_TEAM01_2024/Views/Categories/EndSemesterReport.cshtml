@@ -1,4 +1,43 @@
 ﻿<style>
+    /* Phần tử hiển thị thông tin upload */
+    .file-info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        padding: 10px;
+        cursor: pointer;
+        height: 50px;
+    }
+
+    /* Danh sách file */
+    .file-list {
+        list-style-type: none;
+        padding: 0;
+        margin-top: 10px;
+        display: none; /* Ẩn danh sách ban đầu */
+    }
+
+    .file-list li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        padding: 10px;
+        margin-bottom: 5px;
+    }
+
+    /* Icon xóa */
+    .delete-icon {
+        cursor: pointer;
+        color: red;
+        font-size: 16px;
+    }
+
     /* Ensure modal dialog is centered with appropriate width */
     .modal-dialog {
         max-width: 90%;
@@ -208,189 +247,423 @@
                 <h5 class="modal-title" id="AddSemesterPlanModalLabel">Thêm Báo Cáo Cuối Kỳ</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-                <form id="addReportForm" method="post" action=""> 
-                    <!-- Dropdown Options -->
+            <form id="addReportForm" method="post" action=""> 
+                <!-- Dropdown Options -->
                     
-                    <!-- Header Row for Fields -->
-                    <div class="fields-row" style="display: flex; align-items: center; height: 50px;">
-                            <div class="header-cell" style="flex: 1.05; text-align: center;">Tiêu Chí Đánh Giá</div>
-                            <div class="header-cell" style="flex: 1; text-align: center;">Mô Tả Công Việc Cụ Thể</div>
-                            <div class="header-cell" style="flex: 1; text-align: center;">Hồ Sơ, Minh Chứng</div>
-                        </div>
-                    <!-- Rows for Tiêu Chí 1 -->
-                    <div style="display: flex; width: 100%;">
-                            <textarea name="Criteria1" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>1.Có kế hoạch hoạt động về công tác CVHT của năm học.,</textarea>
-                                <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                                    <textarea name="Task1_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>Kế hoạch cụ thể, rõ ràng, nộp đúng hạn. Hoạt động diễn ra trong học kỳ, năm học đáp ứng bao nhiêu % kế hoạch thiết kế.</textarea>
-                                </div>
-                                <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                                    <textarea name="HowToExecute1_1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
-                                    <input type="file" id="upload1_1" name="files8_2[]" multiple>
-                                </div>
-                            </div>
-                    <!-- Rows for Tiêu Chí 2 -->
-                    <div style="display: flex; width: 100%;">
-                            <textarea name="Criteria2" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>2.CVHT khai thác hệ thống quản lý học tập của SV để nắm rõ tình trạng học tập của SV </textarea>
-                                <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                                <textarea name="Task2_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>CVHT sử dụng thành thạo tài khoản online đã được phân quyền để khai thác hiệu quả và đánh giá được kết quả học tập của SV đối với lớp do mình làm cố vấn. </textarea>
-                                </div>
-                                <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                                    <textarea name="HowToExecute2_1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
-                                    <input type="file" id="upload2_1" name="files8_2[]" multiple>
-                                    
-                                </div>
-                            </div>
-                    <!-- Rows for Tiêu Chí 3 -->
-                    <div style="display: flex; width: 100%;">
-                            <textarea name="Criteria3" style="flex: 1; min-width: 100px; height: 250px; font-weight: bold;" readonly>3.Tổ chức các cuộc họp lớp, tư vấn cho sinh viên các nội dung học tập như: quy chế, quy định về tổ chức hoạt động đào tạo theo học chế tín chỉ; cấu trúc, lưu đồ của CTĐT, mục tiêu đào tạo, chuẩn đầu ra của ngành/chuyên ngành… </textarea>
-                                <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                                <textarea name="Task3_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>3.1.CVHT thu thập và hiểu các văn bản liên quan quy định, quy chế đào tạo, chuẩn đầu ra, cấu trúc, lưu đồ CTĐT…phổ biến nội dung trong các buổi sinh hoạt lớp và tư vấn trực tiếp cho SV khi cần. Tổ chức sinh hoạt lớp SV bằng hình thức trực tiếp hoặc trực tuyến (online) ít nhất 2 lần/học kỳ; có biên bản các cuộc họp đầy đủ, đáp ứng yêu cầu về nội dung họp. </textarea>
-                                <textarea name="Task3_2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>3.2.Tiếp SV trực tiếp theo lịch trực tại văn phòng khoa hoặc thông qua các phương tiện khác. </textarea>
-
-                                </div>
-                                <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                                    <textarea name="HowToExecute3_1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
-                                    <input type="file" id="upload3_1" name="files8_2[]" multiple>
-                                    <textarea name="HowToExecute3_2" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
-                                    <input type="file" id="upload3_2" name="files8_2[]" multiple>
-
-                                </div>
-                            </div>
-                    <!-- Rows for Tiêu Chí 4 -->
-                    <div style="display: flex; width: 100%;">
-                        <textarea name="Criteria4" style="flex: 1; min-width: 100px; height: 250px; font-weight: bold;" readonly>4.Tổ chức các cuộc họp lớp, tư vấn cho sinh viên các nội dung học tập như: quy chế, quy định về tổ chức hoạt động đào tạo theo học chế tín chỉ; cấu trúc, lưu đồ của CTĐT, mục tiêu đào tạo, chuẩn đầu ra của ngành/chuyên ngành… </textarea>
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                            <textarea name="Task4_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>4.1.Hướng dẫn sinh viên cách xây dựng kế hoạch học tập cho khóa học hoặc năm học, tư vấn cho sinh viên lập kế hoạch học tập của năm học hoặc khóa học, xem xét và phê duyệt kế hoạch học tập của sinh viên đối với những trường hợp có yêu cầu từ Phòng Đào tạo.  </textarea>
-                            <textarea name="Task4_2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>4.2.Hướng dẫn sinh viên điều chỉnh kế hoạch học tập và đăng ký môn học phù hợp với năng lực và hoàn cảnh của từng sinh viên.  </textarea>
-
-                        </div>
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                            <textarea name="HowToExecute4_1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
-                            <input type="file" id="upload4_1" name="files8_2[]" multiple>
-                            <textarea name="HowToExecute4_2" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
-                            <input type="file" id="upload4_2" name="files8_2[]" multiple>
-
-                        </div>
+                <!-- Header Row for Fields -->
+                <div class="fields-row" style="display: flex; align-items: center; height: 50px;">
+                    <div class="header-cell" style="flex: 1.05; text-align: center;">Tiêu Chí Đánh Giá</div>
+                    <div class="header-cell" style="flex: 1; text-align: center;">Mô Tả Công Việc Cụ Thể</div>
+                    <div class="header-cell" style="flex: 1; text-align: center;">Hồ Sơ, Minh Chứng</div>
+                </div>
+                <!-- Rows for Tiêu Chí 1 -->
+                <div style="display: flex; width: 100%;">
+                    <textarea name="Criteria1" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>1.Có kế hoạch hoạt động về công tác CVHT của năm học.,</textarea>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="Task1_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>Kế hoạch cụ thể, rõ ràng, nộp đúng hạn. Hoạt động diễn ra trong học kỳ, năm học đáp ứng bao nhiêu % kế hoạch thiết kế.</textarea>
                     </div>
-                    <!-- Rows for Tiêu Chí 5 -->
-                    <div style="display: flex; width: 100%;">
-                        <textarea name="Criteria5" style="flex: 1; min-width: 100px; height: 370px; font-weight: bold;" readonly>5.Trao đổi kinh nghiệm cá nhân trong học tập và nghề nghiệp, định hướng nghề nghiệp cho SV có nhu cầu. Tư vấn cho SV lựa chọn chuyên ngành (nếu có).</textarea>
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                            <textarea name="Task5_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>5.1.Tư vấn sinh viên lựa chọn chuyên ngành  
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="HowToExecute1_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
+                        
+                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
+                        <div id="uploadedFilesInfo1_1" class="file-info" style="cursor: pointer;">
+                            0 files uploaded
+                        </div>
+
+                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
+                        <ul id="fileList1_1" class="file-list" style="display: none;">
+                            <!-- Các file sẽ được thêm vào đây -->
+                        </ul>
+
+                        <input type="file" id="upload1_1" name="files1_1[]" multiple>
+                    </div>
+                </div>
+                <!-- Rows for Tiêu Chí 2 -->
+                <div style="display: flex; width: 100%;">
+                    <textarea name="Criteria2" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>2.CVHT khai thác hệ thống quản lý học tập của SV để nắm rõ tình trạng học tập của SV </textarea>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="Task2_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>CVHT sử dụng thành thạo tài khoản online đã được phân quyền để khai thác hiệu quả và đánh giá được kết quả học tập của SV đối với lớp do mình làm cố vấn. </textarea>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="HowToExecute2_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
+                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
+                        <div id="uploadedFilesInfo2_1" class="file-info" style="cursor: pointer;">
+                            0 files uploaded
+                        </div>
+
+                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
+                        <ul id="fileList2_1" class="file-list" style="display: none;">
+                            <!-- Các file sẽ được thêm vào đây -->
+                        </ul>
+
+                        <input type="file" id="upload2_1" name="files2_1[]" multiple>
+                                    
+                    </div>
+                </div>
+                <!-- Rows for Tiêu Chí 3 -->
+                <div style="display: flex; width: 100%;">
+                    <textarea name="Criteria3" style="flex: 1; min-width: 100px; height: 360px; font-weight: bold;" readonly>3.Tổ chức các cuộc họp lớp, tư vấn cho sinh viên các nội dung học tập như: quy chế, quy định về tổ chức hoạt động đào tạo theo học chế tín chỉ; cấu trúc, lưu đồ của CTĐT, mục tiêu đào tạo, chuẩn đầu ra của ngành/chuyên ngành… </textarea>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="Task3_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>3.1.CVHT thu thập và hiểu các văn bản liên quan quy định, quy chế đào tạo, chuẩn đầu ra, cấu trúc, lưu đồ CTĐT…phổ biến nội dung trong các buổi sinh hoạt lớp và tư vấn trực tiếp cho SV khi cần. Tổ chức sinh hoạt lớp SV bằng hình thức trực tiếp hoặc trực tuyến (online) ít nhất 2 lần/học kỳ; có biên bản các cuộc họp đầy đủ, đáp ứng yêu cầu về nội dung họp. </textarea>
+                        <textarea name="Task3_2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>3.2.Tiếp SV trực tiếp theo lịch trực tại văn phòng khoa hoặc thông qua các phương tiện khác. </textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="HowToExecute3_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
+                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
+                        <div id="uploadedFilesInfo3_1" class="file-info" style="cursor: pointer;">
+                            0 files uploaded
+                        </div>
+
+                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
+                        <ul id="fileList3_1" class="file-list" style="display: none;">
+                            <!-- Các file sẽ được thêm vào đây -->
+                        </ul>
+
+                        <input type="file" id="upload3_1" name="files3_1[]" multiple>
+                        <textarea name="HowToExecute3_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
+                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
+                        <div id="uploadedFilesInfo3_2" class="file-info" style="cursor: pointer;">
+                            0 files uploaded
+                        </div>
+
+                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
+                        <ul id="fileList3_2" class="file-list" style="display: none;">
+                            <!-- Các file sẽ được thêm vào đây -->
+                        </ul>
+
+                        <input type="file" id="upload3_2" name="files3_2[]" multiple>
+
+                    </div>
+                </div>
+                <!-- Rows for Tiêu Chí 4 -->
+                <div style="display: flex; width: 100%;">
+                    <textarea name="Criteria4" style="flex: 1; min-width: 100px; height: 360px; font-weight: bold;" readonly>4.Tổ chức các cuộc họp lớp, tư vấn cho sinh viên các nội dung học tập như: quy chế, quy định về tổ chức hoạt động đào tạo theo học chế tín chỉ; cấu trúc, lưu đồ của CTĐT, mục tiêu đào tạo, chuẩn đầu ra của ngành/chuyên ngành… </textarea>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="Task4_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>4.1.Hướng dẫn sinh viên cách xây dựng kế hoạch học tập cho khóa học hoặc năm học, tư vấn cho sinh viên lập kế hoạch học tập của năm học hoặc khóa học, xem xét và phê duyệt kế hoạch học tập của sinh viên đối với những trường hợp có yêu cầu từ Phòng Đào tạo.  </textarea>
+                        <textarea name="Task4_2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>4.2.Hướng dẫn sinh viên điều chỉnh kế hoạch học tập và đăng ký môn học phù hợp với năng lực và hoàn cảnh của từng sinh viên.  </textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="HowToExecute4_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
+                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
+                        <div id="uploadedFilesInfo4_1" class="file-info" style="cursor: pointer;">
+                            0 files uploaded
+                        </div>
+
+                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
+                        <ul id="fileList4_1" class="file-list" style="display: none;">
+                            <!-- Các file sẽ được thêm vào đây -->
+                        </ul>
+
+                        <input type="file" id="upload4_1" name="files4_1[]" multiple>
+                        <textarea name="HowToExecute4_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
+                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
+                        <div id="uploadedFilesInfo4_2" class="file-info" style="cursor: pointer;">
+                            0 files uploaded
+                        </div>
+
+                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
+                        <ul id="fileList4_2" class="file-list" style="display: none;">
+                            <!-- Các file sẽ được thêm vào đây -->
+                        </ul>
+
+                        <input type="file" id="upload4_2" name="files4_2[]" multiple>
+
+                    </div>
+                </div>
+                <!-- Rows for Tiêu Chí 5 -->
+                <div style="display: flex; width: 100%;">
+                    <textarea name="Criteria5" style="flex: 1; min-width: 100px; height: 550px; font-weight: bold;" readonly>5.Trao đổi kinh nghiệm cá nhân trong học tập và nghề nghiệp, định hướng nghề nghiệp cho SV có nhu cầu. Tư vấn cho SV lựa chọn chuyên ngành (nếu có).</textarea>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="Task5_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>5.1.Tư vấn sinh viên lựa chọn chuyên ngành  
 
 Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp với sở thích, năng lực của SV, dựa trên cơ sở cung cấp đầy đủ thông tin đào tạo của chuyên ngành. </textarea>
-                            <textarea name="Task5_2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>5.2.Trao đổi kinh nghiệm cá nhân trong học tập và nghề nghiệp, định hướng nghề nghiệp cho sinh viên có nhu cầu.</textarea>
-                            <textarea name="Task5_3" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>5.3.Giới thiệu nơi thực tập và việc làm cho SV (nếu có).</textarea>
-                        </div>
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                            <textarea name="HowToExecute5_1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
-                            <input type="file" id="upload5_1" name="files8_2[]" multiple>
-                            <textarea name="HowToExecute5_2" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
-                            <input type="file" id="upload5_2" name="files8_2[]" multiple>
-                            <textarea name="HowToExecute5_3" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
-                            <input type="file" id="upload5_3" name="files8_2[]" multiple>
-
-                        </div>
+                        <textarea name="Task5_2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>5.2.Trao đổi kinh nghiệm cá nhân trong học tập và nghề nghiệp, định hướng nghề nghiệp cho sinh viên có nhu cầu.</textarea>
+                        <textarea name="Task5_3" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>5.3.Giới thiệu nơi thực tập và việc làm cho SV (nếu có).</textarea>
                     </div>
-                    <!-- Rows for Tiêu Chí 6 -->
-                    <div style="display: flex; width: 100%;">
-                        <textarea name="Criteria6" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>6.Tư vấn SV thuộc diện cảnh báo học vụ (Quy trình cảnh báo sớm). </textarea>
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                            <textarea name="Task6_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>Tư vấn sinh viên thuộc diện cảnh báo học vụ hoặc có nguy cơ bị cảnh báo học vụ ở từng học kỳ có phương án học tập tiếp theo. </textarea>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="HowToExecute5_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
+                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
+                        <div id="uploadedFilesInfo5_1" class="file-info" style="cursor: pointer;">
+                            0 files uploaded
                         </div>
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                            <textarea name="HowToExecute6_1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
-                            <input type="file" id="upload6_1" name="files8_2[]" multiple>
 
+                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
+                        <ul id="fileList5_1" class="file-list" style="display: none;">
+                            <!-- Các file sẽ được thêm vào đây -->
+                        </ul>
+
+                        <input type="file" id="upload5_1" name="files5_1[]" multiple>
+                        <textarea name="HowToExecute5_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
+                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
+                        <div id="uploadedFilesInfo5_2" class="file-info" style="cursor: pointer;">
+                            0 files uploaded
                         </div>
+
+                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
+                        <ul id="fileList5_2" class="file-list" style="display: none;">
+                            <!-- Các file sẽ được thêm vào đây -->
+                        </ul>
+
+                        <input type="file" id="upload5_2" name="files5_2[]" multiple>
+                        <textarea name="HowToExecute5_3" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
+                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
+                        <div id="uploadedFilesInfo5_3" class="file-info" style="cursor: pointer;">
+                            0 files uploaded
+                        </div>
+
+                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
+                        <ul id="fileList5_3" class="file-list" style="display: none;">
+                            <!-- Các file sẽ được thêm vào đây -->
+                        </ul>
+
+                        <input type="file" id="upload5_3" name="files5_3[]" multiple>
+
                     </div>
-                    <!-- Rows for Tiêu Chí 7 -->
-                    <div style="display: flex; width: 100%;">
-                        <textarea name="Criteria7" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>7.Các ý kiến, đề xuất, khiếu nại của SV được phản ánh kịp thời đến các cấp có thẩm quyền.  </textarea>
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                            <textarea name="Task7_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>CVHT làm cầu nối giữa SV và Khoa, Trường trong đề đạt nguyện vọng, ý kiến, phản ánh nhằm xây dựng môi trường học tập lành mạnh. Không có trường hợp SV gửi đơn thư khiếu nại vượt cấp. </textarea>
-                        </div>
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                            <textarea name="HowToExecute7_1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
-                            <input type="file" id="upload7_1" name="files8_2[]" multiple>
-
-                        </div>
+                </div>
+                <!-- Rows for Tiêu Chí 6 -->
+                <div style="display: flex; width: 100%;">
+                    <textarea name="Criteria6" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>6.Tư vấn SV thuộc diện cảnh báo học vụ (Quy trình cảnh báo sớm). </textarea>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="Task6_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>Tư vấn sinh viên thuộc diện cảnh báo học vụ hoặc có nguy cơ bị cảnh báo học vụ ở từng học kỳ có phương án học tập tiếp theo. </textarea>
                     </div>
-                    <!-- Rows for Tiêu Chí 8 -->
-                    <div style="display: flex; width: 100%;">
-                        <textarea name="Criteria8" style="flex: 1; min-width: 100px; height: 250px; font-weight: bold;" readonly>8.Tham gia đầy đủ các buổi tập huấn/hội nghị/cuộc họp liên quan đến công tác CVHT do Khoa, Trường tổ chức (nếu có).</textarea>
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                            <textarea name="Task8_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>8.1.Tham dự họp, hội nghị theo triệu tập của của các cấp: Khoa - Phòng chức năng - Trường.</textarea>
-                            <textarea name="Task8_2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>8.2.Tham gia họp tổng kết, đánh giá công tác CVHT do Hội đồng Khoa triệu tập. </textarea>
-
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="HowToExecute6_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
+                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
+                        <div id="uploadedFilesInfo6_1" class="file-info" style="cursor: pointer;">
+                            0 files uploaded
                         </div>
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                            <textarea name="HowToExecute8_1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
-                            <input type="file" id="upload8_1" name="files8_2[]" multiple>
-                            <textarea name="HowToExecute8_2" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
-                            <input type="file" id="upload8_2" name="files8_1[]" multiple>   
 
+                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
+                        <ul id="fileList6_1" class="file-list" style="display: none;">
+                            <!-- Các file sẽ được thêm vào đây -->
+                        </ul>
+
+                        <input type="file" id="upload6_1" name="files6_1[]" multiple>
+
+                    </div>
+                </div>
+                <!-- Rows for Tiêu Chí 7 -->
+                <div style="display: flex; width: 100%;">
+                    <textarea name="Criteria7" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>7.Các ý kiến, đề xuất, khiếu nại của SV được phản ánh kịp thời đến các cấp có thẩm quyền.  </textarea>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="Task7_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>CVHT làm cầu nối giữa SV và Khoa, Trường trong đề đạt nguyện vọng, ý kiến, phản ánh nhằm xây dựng môi trường học tập lành mạnh. Không có trường hợp SV gửi đơn thư khiếu nại vượt cấp. </textarea>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="HowToExecute7_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
+                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
+                        <div id="uploadedFilesInfo7_1" class="file-info" style="cursor: pointer;">
+                            0 files uploaded
                         </div>
+
+                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
+                        <ul id="fileList7_1" class="file-list" style="display: none;">
+                            <!-- Các file sẽ được thêm vào đây -->
+                        </ul>
+
+                        <input type="file" id="upload7_1" name="files7_1[]" multiple>
+
+                    </div>
+                </div>
+                <!-- Rows for Tiêu Chí 8 -->
+                <div style="display: flex; width: 100%;">
+                    <textarea name="Criteria8" style="flex: 1; min-width: 100px; height: 360px; font-weight: bold;" readonly>8.Tham gia đầy đủ các buổi tập huấn/hội nghị/cuộc họp liên quan đến công tác CVHT do Khoa, Trường tổ chức (nếu có).</textarea>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="Task8_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>8.1.Tham dự họp, hội nghị theo triệu tập của của các cấp: Khoa - Phòng chức năng - Trường.</textarea>
+                        <textarea name="Task8_2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>8.2.Tham gia họp tổng kết, đánh giá công tác CVHT do Hội đồng Khoa triệu tập. </textarea>
+
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <textarea name="HowToExecute8_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
+                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
+                        <div id="uploadedFilesInfo8_1" class="file-info" style="cursor: pointer;">
+                            0 files uploaded
+                        </div>
+
+                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
+                        <ul id="fileList8_1" class="file-list" style="display: none;">
+                            <!-- Các file sẽ được thêm vào đây -->
+                        </ul>
+
+                        <input type="file" id="upload8_1" name="files8_2[]" multiple>
+                        <textarea name="HowToExecute8_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
+                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
+                        <div id="uploadedFilesInfo8_2" class="file-info" style="cursor: pointer;">
+                            0 files uploaded
+                        </div>
+
+                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
+                        <ul id="fileList8_2" class="file-list" style="display: none;">
+                            <!-- Các file sẽ được thêm vào đây -->
+                        </ul>
+
+                        <input type="file" id="upload8_2" name="files8_2[]" multiple>   
+
+                    </div>
                         
-                    </div>
-                    <!--CVHT Danh Gia-->
-                    <div style="display: flex; flex-direction: row; gap: 10px; margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <label for="selfAssessment" style="white-space: nowrap;">Cá Nhân Tự Đánh Giá:</label>
-                            <textarea id="selfAssessment" name="selfAssessment"
+                </div>
+                <!--CVHT Danh Gia-->
+                <div style="display: flex; flex-direction: row; gap: 10px; margin-bottom: 20px;margin-top: 20px;margin-left: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label for="selfAssessment" style="white-space: nowrap; font-weight: bold;">Cá Nhân Tự Đánh Giá:</label>
+                        <textarea id="selfAssessment" name="selfAssessment"
                                       placeholder="Nhập đánh giá"
-                                      style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; margin-left: 20px; resize: vertical; min-height: 50px;"></textarea>
-
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <label for="ranking" style="white-space: nowrap;">Cá Nhân Tự Xếp Loại:</label>
-                            <select id="ranking" name="ranking"
-                                    style="width: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; margin-left: 20px;">
-                                <option value="A">A</option>
-                                <option value="B">B</option>
-                                <option value="C">C</option>
-                                <option value="D">D</option>
-                                <option value="E">E</option>
-                            </select>
-                        </div>
+                                      style="flex: 1; width: 850px; height: 50px;overflow-y: auto; "></textarea>
                     </div>
-                    <!--BCN Khoa Danh Gia-->
-                    <div style="display: flex; flex-direction: row; gap: 10px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label for="ranking" style="white-space: nowrap; font-weight: bold;">Cá Nhân Tự Xếp Loại:</label>
+                        <select id="ranking" name="ranking"
+                                style="width: 120px; padding: 8px; border: 1px solid #ccc; border-radius: 8px; margin-left: 20px;">
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="E">E</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!--BCN Khoa Danh Gia-->
+                <div style="display: flex; flex-direction: row; gap: 10px; margin-bottom: 20px;  margin-left: 10px;">
                        
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <label for="FaculityAssessment" style="white-space: nowrap;">BCN Khoa Đánh Giá:</label>
-                            <textarea id="FaculityAssessment" name="FaculityAssessment"
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label for="FaculityAssessment" style="white-space: nowrap; font-weight: bold;">BCN Khoa Đánh Giá:</label>
+                        <textarea id="FaculityAssessment" name="FaculityAssessment"
                                       placeholder="Nhập đánh giá"
-                                      style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; margin-left: 20px; resize: vertical; min-height: 50px;"></textarea>
+                                      style="flex: 1; width: 850px; height: 50px;overflow-y: auto;margin-left: 13px; "></textarea>
 
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <label for="ranking" style="white-space: nowrap;">BCN Khoa Xếp Loại:</label>
-                            <!-- Combo box -->
-                            <select id="Faculityranking" name="Faculityranking"
-                                    style="width: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; margin-left: 20px;">
-                                <option value="A">A</option>
-                                <option value="B">B</option>
-                                <option value="C">C</option>
-                                <option value="D">D</option>
-                                <option value="E">E</option>
-                            </select>
-                        </div>
                     </div>
+                    <div style="display: flex; align-items: center; gap: 10px;margin-left: 10px;">
+                        <label for="ranking" style="white-space: nowrap; font-weight: bold;">BCN Khoa Xếp Loại:</label>
+                        <!-- Combo box -->
+                        <select id="Faculityranking" name="Faculityranking"
+                                style="width: 120px; padding: 8px; border: 1px solid #ccc; border-radius: 8px; margin-left: 20px;">
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="E">E</option>
+                        </select>
+                    </div>
+                </div>
 
-                    <!-- Modal Footer -->
-                    <div class="modal-footer" style="display: flex; justify-content: flex-end; width: 100%; align-items: center;">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                <button type="submit" class="btn btn-primary">Lưu</button> <!-- Submit button to send the form -->
-                        </div>
-                </form>
-            </div>
+                <!-- Modal Footer -->
+                <div class="modal-footer" style="display: flex; justify-content: flex-end; width: 100%; align-items: center;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button> <!-- Submit button to send the form -->
+                </div>
+            </form>
         </div>
     </div>
+</div>
+
+<!-- Modal hiển thị các file đã upload -->
+<div id="filesModal" style="display: none; position: fixed; top: 50%; left: 50%;
+                            transform: translate(-50%, -50%); background: #fff;
+                            border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                            padding: 20px; width: 400px;">
+    <h3>Uploaded Files</h3>
+    <ul id="fileList" style="list-style: none; padding: 0; font-size: 14px;">
+        <!-- Các file sẽ được thêm vào đây -->
+    </ul>
+    <button onclick="closeFilesModal()" style="padding: 8px 16px; background-color: #007bff;
+                                               color: white; border: none; border-radius: 4px;
+                                               cursor: pointer;">
+        Close
+    </button>
+</div>
+
 <script>
     //Add Modal JS
     function openAddReportModal() {
         var modal = new bootstrap.Modal(document.getElementById('AddReportModal'));
         modal.show();
     }
+
+    // Giả sử bạn có một API endpoint như sau:
+    // - `/api/files/{id}`: Lấy danh sách các file của phần tử có id là `{id}`
+    // - `/api/files/delete/{fileId}`: Xóa một file với fileId
+
+    // Giả lập ID của phần tử
+    const elementIds = ["1_1", "2_1" ,"3_1", "3_2", "4_1", "4_2", "5_1", "5_2", "5_3", "6_1", "7_1", "8_1","8_2"]; // Thêm các id khác nếu cần
+
+    // Lấy dữ liệu từ server (API endpoint giả sử)
+    function fetchFiles(id) {
+        // Thay URL này bằng endpoint thật của bạn
+        return fetch(`/api/files/${id}`)
+            .then(response => response.json())
+            .then(data => data.files || [])
+            .catch(error => {
+                console.error("Error fetching files:", error);
+                return [];
+            });
+    }
+
+    // Cập nhật số lượng file cho phần tử
+    function updateUploadedFilesInfo(id) {
+        const filesInfoElement = document.getElementById("uploadedFilesInfo" + id);
+
+        // Lấy danh sách file từ server
+        fetchFiles(id).then(files => {
+            filesInfoElement.textContent = `${files.length} files uploaded`;
+
+            // Cập nhật lại danh sách file khi có sự thay đổi
+            const fileList = document.getElementById("fileList" + id);
+            fileList.innerHTML = ''; // Xóa các mục cũ
+            files.forEach((file, index) => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                <span>${file.name}</span>
+                <span class="delete-icon" onclick="deleteFile(${id}, ${file.id})">X</span>
+            `;
+                fileList.appendChild(li);
+            });
+        });
+    }
+
+    // Hiển thị hoặc ẩn danh sách file khi click vào phần tử
+    function toggleFileList(id) {
+        const fileList = document.getElementById("fileList" + id);
+        // Nếu danh sách đang ẩn, hiển thị nó
+        if (fileList.style.display === "none") {
+            fileList.style.display = "block";
+            updateUploadedFilesInfo(id); // Cập nhật danh sách file khi xổ xuống
+        } else {
+            // Nếu danh sách đang hiển thị, ẩn nó
+            fileList.style.display = "none";
+        }
+    }
+
+    // Xóa file khỏi server
+    function deleteFile(id, fileId) {
+        // Gửi yêu cầu xóa file tới server
+        fetch(`/api/files/delete/${fileId}`, {
+            method: "DELETE"
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Nếu xóa thành công, cập nhật lại số lượng file
+                    updateUploadedFilesInfo(id);
+                    alert("File deleted successfully!");
+                } else {
+                    alert("Error deleting file");
+                }
+            })
+            .catch(error => {
+                console.error("Error deleting file:", error);
+                alert("Error deleting file");
+            });
+    }
+
+    // Cập nhật số lượng file ngay khi tải trang
+    window.onload = function () {
+        elementIds.forEach(id => {
+            updateUploadedFilesInfo(id); // Cập nhật số lượng file
+            document.getElementById("uploadedFilesInfo" + id).onclick = function () {
+                toggleFileList(id); // Hiển thị hoặc ẩn danh sách khi click
+            };
+        });
+    };
+
 </script>

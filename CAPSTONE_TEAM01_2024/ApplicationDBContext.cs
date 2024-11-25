@@ -23,6 +23,15 @@ namespace CAPSTONE_TEAM01_2024
         public DbSet<EmailAttachment> EmailAttachments { get; set; }
         public DbSet<EmailRecipient> EmailRecipients { get; set; }
         public DbSet<EmailThread> EmailThreads { get; set; }
+        
+        public DbSet<SemesterReport> SemesterReports { get; set; }
+        
+        public DbSet<CriterionReport> CriterionReports { get; set; }
+        
+        public DbSet<ReportDetail> ReportDetails { get; set; }
+        
+        public DbSet<AttachmentReport> AttachmentReports { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
@@ -95,6 +104,37 @@ namespace CAPSTONE_TEAM01_2024
                 .WithOne(e => e.Thread)
                 .HasForeignKey(e => e.ThreadId)
                 .OnDelete(DeleteBehavior.SetNull); // Optional: Set EmailThread to null if an Email is deleted
+            //
+            modelBuilder.Entity<SemesterReport>()
+                .HasOne(sr => sr.AcademicPeriod)
+                .WithMany(ap => ap.SemesterReports)
+                .HasForeignKey(sr => sr.PeriodId);
+            
+            modelBuilder.Entity<SemesterReport>()
+                .HasOne(sr => sr.Class)
+                .WithMany(c => c.SemesterReports)
+                .HasForeignKey(sr => sr.ClassId);
+            
+            modelBuilder.Entity<SemesterReport>()
+                .HasMany(sp=>sp.ReportDetails)
+                .WithOne(r => r.SemesterReport)
+                .HasForeignKey(r=>r.ReportId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<ReportDetail>()
+                .HasOne(rd => rd.CriterionReport)
+                .WithMany()
+                .HasForeignKey(rd => rd.CriterionId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            modelBuilder.Entity<AttachmentReport>()
+                .HasOne(ar => ar.DetailReport) 
+                .WithMany(rd => rd.AttachmentReport) 
+                .HasForeignKey(ar => ar.DetailReportlId)
+                .OnDelete(DeleteBehavior.Cascade); 
+            
+           
+
         }
     }
 }

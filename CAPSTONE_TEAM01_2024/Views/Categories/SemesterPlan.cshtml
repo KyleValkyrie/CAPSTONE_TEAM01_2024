@@ -274,15 +274,16 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                                                     onclick="openSubmitSemesterPlan(@plan.PlanId)">
                                                 <i class="fa-solid fa-upload custom-icon"></i>
                                             </button>
-                                        }   
-                                        <form method="post" action="/Categories/DuplicatePlan" style="display:inline;">
-                                            <input type="hidden" name="planId" value="@plan.PlanId" />
-                                            <button class="btn btn-outline-warning btn-sm duplicate-btn"
-                                                    type="submit"
-                                                    title="Nhân Bản">
-                                                <i class="bi bi-files"></i>
-                                            </button>
-                                        </form>
+
+                                            <form method="post" action="/Categories/DuplicatePlan" style="display:inline;">
+                                                <input type="hidden" name="planId" value="@plan.PlanId"/>
+                                                <button class="btn btn-outline-warning btn-sm duplicate-btn"
+                                                        type="submit"
+                                                        title="Nhân Bản">
+                                                    <i class="bi bi-files"></i>
+                                                </button>
+                                            </form>
+                                        }
                                         <form action="/Categories/ExportPlan" method="post" style="display: inline;">
                                             <input type="hidden" name="planId" value="@plan.PlanId" />
                                             <button type="submit" class="btn btn-outline-info btn-sm" title="Xuất">

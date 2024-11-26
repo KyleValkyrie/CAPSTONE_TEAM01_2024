@@ -1,4 +1,15 @@
-﻿<style>
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@model CAPSTONE_TEAM01_2024.ViewModels.SemesterReportViewModel
+@{
+    ViewData["Title"] = " End Semester Report";
+    int number = (Model.SemesterReports.PageIndex - 1) * Model.SemesterReports.PageSize;
+    var rolesString = HttpContextAccessor.HttpContext.Session.GetString("Roles");
+    var roles = rolesString?.Split(',') ?? new string[0];
+    bool isNotFaculty = !roles.Contains("BCN Khoa");
+    bool isNotAdvisor = !roles.Contains("CVHT");
+}
+
+<style>
     /* Phần tử hiển thị thông tin upload */
     .file-info {
         display: flex;
@@ -194,42 +205,168 @@
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["Success"]</div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+                    @if (TempData["Warning"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Warning"]</div>
+                    }
                     <table class="table table-striped">
                         <thead>
-                            <tr class="text-center">
-                                <th>#</th>
-                                <th>Năm Học</th>
-                                <th>Loại Báo Cáo</th>
-                                <th>Mã Lớp</th>
-                                <th>Tên Cố Vấn</th>
-                                <th>Ngày Tạo</th>
-                                <th>Trạng Thái</th>
-                                <th>Thao Tác</th>
-                            </tr>
+                        <tr class="text-center">
+                            <th>#</th>
+                            <th>Năm Học</th>
+                            <th>Loại Báo Cáo</th>
+                            <th>Mã Lớp</th>
+                            <th>Tên Cố Vấn</th>
+                            <th>Ngày Tạo</th>
+                            <th>Trạng Thái</th>
+                            <th>Thao Tác</th>
+                        </tr>
                         </thead>
-                        <tbody>
-                            <!-- Dữ liệu sẽ được render tại đây -->
+                        <tbody id="data-table">
+                        @foreach (var report in Model.SemesterReports)
+                        {
+                            number++;
                             <tr>
-                                <td colspan="9" class="text-center">Không có dữ liệu</td>
+                                <td class="text-center">@number</td>
+                                <td class="text-center">@report.PeriodName</td>
+                                <td class="text-center">@report.ReportType</td>
+                                <td class="text-center">@report.ClassId</td>
+                                <td class="text-center">
+                                    @if (report.Class.Advisor != null)
+                                    {
+                                        @if (string.IsNullOrEmpty(report.Class.Advisor.FullName))
+                                        {
+                                            @report.Class.Advisor.Email
+                                        }
+                                        else
+                                        { @report.Class.Advisor.FullName
+                                        }
+                                    }
+                                </td>
+                                <td class="text-center">@report.CreationTimeReport</td>
+                                <td class="text-center">
+                                    @if (report.StatusReport == "Nháp")
+                                    {
+                                        <span class="badge bg-secondary text-white">@report.StatusReport</span>
+                                    }
+                                    else if(report.StatusReport == "Đã Nộp")
+                                    {
+                                        <span class="badge bg-success">@report.StatusReport</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-primary">@report.StatusReport</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+
+                                    <button class="btn btn-outline-success btn-sm"
+                                            title="Xem chi tiết"
+                                            onclick="openEditReportDetailModal(@report.ReportId, @report.PeriodId, '@report.ClassId', '@report.StatusReport')">
+                                        <i class="fa-solid fa-eye custom-icon"></i>
+                                    </button>
+                                    @if (isNotFaculty)
+                                    {
+                                        <button class="btn btn-outline-primary btn-sm"
+                                                title="Cập Nhật"
+                                                onclick="openEditSemesterReport(@report.ReportId, @report.PeriodId, '@report.ReportType', '@report.ClassId')">
+                                            <i class="fa-solid fa-pen-to-square custom-icon"></i>
+                                        </button>
+                                    }
+                                    <button class="btn btn-outline-danger btn-sm delete"
+                                            title="Xóa"
+                                            onclick="openDeleteModal(@report.ReportId)">
+                                        <i class="fa-solid fa-trash custom-icon"></i>
+                                    </button>
+                                    @if (isNotFaculty)
+                                    {
+                                        <button class="btn btn-outline-secondary btn-sm"
+                                                title="Nộp"
+                                                onclick="openSubmitSemesterReport(@report.ReportId)">
+                                            <i class="fa-solid fa-upload custom-icon"></i>
+                                        </button>
+
+                                        <form method="post" action="/Categories/DuplicateReport" style="display:inline;">
+                                            <input type="hidden" name="reportId" value="@report.ReportId"/>
+                                            <button class="btn btn-outline-warning btn-sm duplicate-btn"
+                                                    type="submit"
+                                                    title="Nhân Bản">
+                                                <i class="bi bi-files"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    <form action="/Categories/ExportReport" method="post" style="display: inline;">
+                                        <input type="hidden" name="reportId" value="@report.ReportId" />
+                                        <button type="submit" class="btn btn-outline-info btn-sm" title="Xuất">
+                                            <i class="fa-solid fa-file-export custom-icon"></i>
+                                        </button>
+                                    </form>
+                                </td>
                             </tr>
+                        }
+                        <tr>
+                            <td colspan="9" class="text-center">Không tìm thấy nội dung</td>
+                        </tr>
                         </tbody>
                     </table>
                     <!-- Pagination Controls -->
                     <nav aria-label="Page navigation">
                         <ul class="pagination justify-content-end">
-                            <li class="page-item disabled">
-                                <a class="page-link" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item active">
-                                <a class="page-link">1</a>
-                            </li>
-                            <li class="page-item disabled">
-                                <a class="page-link" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
+                            @if (Model.SemesterReports.HasPreviousPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="SchoolYear" asp-route-pageIndex="@(Model.SemesterReports.PageIndex - 1)" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <a class="page-link" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            @for (var i = 1; i <= Model.SemesterReports.TotalPages; i++)
+                            {
+                                if (i == Model.SemesterReports.PageIndex)
+                                {
+                                    <li class="page-item active">
+                                        <a class="page-link">@i</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="SemesterReport" asp-route-pageIndex="@i">@i</a>
+                                    </li>
+                                }
+                            }
+                            @if (Model.SemesterReports.HasNextPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="SemesterReport" asp-route-pageIndex="@(Model.SemesterReports.PageIndex + 1)" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <a class="page-link" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
                         </ul>
                     </nav>
                 </div>
@@ -244,12 +381,34 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header" style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                <h5 class="modal-title" id="AddSemesterPlanModalLabel">Thêm Báo Cáo Cuối Kỳ</h5>
+                <h5 class="modal-title" id="AddSemesterReportModalLabel">Thêm Báo Cáo Cuối Kỳ</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="addReportForm" method="post" action=""> 
+            <form id="addReportForm" method="post" action="/Categories/AddReport"> 
                 <!-- Dropdown Options -->
-                    
+                <div class="fields-row" style="display: flex; align-items: center; gap: 10px; width: 100%; font-weight: bold; padding-bottom: 5px;">
+                    <div style="flex: 1; text-align: center;">Báo Cáo CVHT </div>
+                    <input type="hidden" id="ReportType" name="ReportType" value="Báo Cáo CVHT" />
+                    <div style="flex: 1; text-align: center;">
+                        <select id="PeriodId" name="PeriodId" style="width: 100%;" required>
+                            <option value="" disabled selected>Vui lòng chọn năm học</option>
+                            @foreach (var item in Model.SchoolYears)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div style="flex: 1; text-align: center;">Lớp: </div>
+                    <div style="flex: 1; text-align: center;">
+                        <select id="ClassId" name="ClassId" style="width: 100%;" required>
+                            <option value="" disabled selected>Vui lòng chọn lớp</option>
+                            @foreach (var item in Model.Class)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
                 <!-- Header Row for Fields -->
                 <div class="fields-row" style="display: flex; align-items: center; height: 50px;">
                     <div class="header-cell" style="flex: 1.05; text-align: center;">Tiêu Chí Đánh Giá</div>
@@ -258,7 +417,7 @@
                 </div>
                 <!-- Rows for Tiêu Chí 1 -->
                 <div style="display: flex; width: 100%;">
-                    <textarea name="Criteria1" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>1.Có kế hoạch hoạt động về công tác CVHT của năm học.,</textarea>
+                    <textarea name="Criteria1" style="flex: 1; min-width: 100px; height: 200px; font-weight: bold;" readonly>1.Có kế hoạch hoạt động về công tác CVHT của năm học.</textarea>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea name="Task1_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>Kế hoạch cụ thể, rõ ràng, nộp đúng hạn. Hoạt động diễn ra trong học kỳ, năm học đáp ứng bao nhiêu % kế hoạch thiết kế.</textarea>
                     </div>
@@ -271,7 +430,7 @@
                         </div>
 
                         <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList1_1" class="file-list" style="display: none;">
+                        <ul id="fileList1_1" class="file-list"  style="  display: none;">
                             <!-- Các file sẽ được thêm vào đây -->
                         </ul>
 

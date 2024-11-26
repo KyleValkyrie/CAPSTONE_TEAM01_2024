@@ -37,13 +37,114 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             _context = context;
         }
 
-
-//EndSemesterReport actions
-        public IActionResult EndSemesterReport()
+//SemesterReport actions
+        //Render SemesterReport
+        public async Task<IActionResult> EndSemesterReport(int pageIndex = 1, int pageSize = 20)
         {
-            ViewData["page"] = "EndSemesterReport";
-            return View();
-        }
+            ViewData["Page"] =" EndSemesterReport";
+            var semesterReportsQuery = _context.SemesterReports
+                .Include(sp => sp.Class)
+                .ThenInclude(c => c.Advisor)
+                .OrderByDescending(sp => sp.CreationTimeReport)
+                .AsQueryable();
+
+            var schoolYears = await _context.AcademicPeriods
+                .Select(sy => new SelectListItem { Value = sy.PeriodId.ToString(), Text = sy.PeriodName })
+                .ToListAsync();
+
+            var paginatedSemesterReports =
+                await PaginatedList<SemesterReport>.CreateAsync(semesterReportsQuery, pageIndex, pageSize);
+
+            var currentUser = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == User.Identity.Name);
+
+            var targetClasses = await _context.Classes
+                .Where(c => c.AdvisorId == currentUser.Id) // Filter by current user's AdvisorId
+                .Select(c => new SelectListItem
+                {
+                    Value = c.ClassId,
+                    Text = c.ClassId
+                })
+                .ToListAsync();
+
+            var detailReport = await _context.ReportDetails.ToListAsync();
+            var viewModel = new SemesterReportViewModel
+            {
+                SemesterReports = paginatedSemesterReports,
+                SchoolYears = schoolYears,
+                Class = targetClasses,
+                ReportDetails = detailReport
+            };
+            ViewBag.Warning = TempData["Warning"];
+            ViewBag.Success = TempData["Success"];
+            ViewBag.Error = TempData["Error"]; return View(viewModel);
+        }   
+        // Add SemesterReport
+        [HttpPost] 
+        public async Task<IActionResult> AddReport(SemesterReport report, IFormCollection form) 
+        {
+    // Setup data for SemesterReport
+    var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+    report.CreationTimeReport = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
+    report.AdvisorName = User.Identity.Name;
+    var period = await _context.AcademicPeriods.FirstOrDefaultAsync(p => p.PeriodId == report.PeriodId);
+    report.PeriodName = period.PeriodName;
+    report.StatusReport = "Nháp";
+
+    // Add new SemesterReport
+    var existingReport = await _context.SemesterReports.FirstOrDefaultAsync(rp =>
+        rp.AcademicPeriod == report.AcademicPeriod &&
+        rp.ClassId == report.ClassId &&
+        rp.AdvisorName == report.AdvisorName);
+    
+    if (existingReport == null)
+    {
+        _context.SemesterReports.Add(report);
+        await _context.SaveChangesAsync();
+
+        // Setup data for ReportDetails
+        var detailIds = new List<string>
+        {
+            "1_1", "2_1", "3_1", "3_2", "4_1", "4_2", 
+            "5_1", "5_2", "5_3", "6_1", "7_1", "8_1", "8_2"
+        };
+
+        var details = detailIds.Select(id => new ReportDetail
+        {
+            ReportId = report.ReportId,
+            CriterionId = int.Parse(id.Split('_')[0]),
+            TaskReport = form[$"Task{id}"],
+            HowToExecuteReport = form[$"HowToExecute{id}"],
+            AttachmentReport = form[$"files{id}[]"]
+                .Select(fileName => new AttachmentReport
+                {
+                    FileNames = fileName,
+                    FilePath = Path.Combine("Uploads", fileName), // Điều chỉnh đường dẫn thực tế
+                    FileDatas = Array.Empty<byte>(), // Nếu cần lưu dữ liệu thực của tệp
+                    DetailReportlId = report.ReportId
+                }).ToList(),
+            // Add SelfAssessment and SelfRanking
+            SelfAssessment = form["selfAssessment"], // Get personal assessment from form
+            SelfRanking = Enum.TryParse<ReportDetail.Ranking>(form["ranking"], out var selfRank) ? selfRank : ReportDetail.Ranking.E, // Default to "E" if invalid
+            // Add FacultyAssessment and FacultyRanking
+            FacultyAssessment = form["FaculityAssessment"], // Get faculty assessment from form
+            FacultyRanking = Enum.TryParse<ReportDetail.Ranking>(form["Faculityranking"], out var facultyRank) ? facultyRank : ReportDetail.Ranking.E // Default to "E" if invalid
+        }).ToList();
+
+
+        // Add new ReportDetails
+        await _context.ReportDetails.AddRangeAsync(details);
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = "Thêm Báo Cáo thành công! Trạng thái hiện tại là nháp, vui lòng nộp Báo Cáo để thay đổi trạng thái!";
+        return RedirectToAction("EndSemesterReport");
+    }
+    else
+    {
+        TempData["Warning"] = "Đã tồn tại Báo Cáo trong thời gian và lớp tương tự!";
+        return RedirectToAction("EndSemesterReport");
+    }
+}
+
 
 //ClassList actions
         //Render ClassList
@@ -1184,7 +1285,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             detail9.TimeFrame = form["EditTimeFrame4_2"];
             detail9.Notes = form["EditNotes4_1"];
             detailsToEdit.Add(detail9);
-            //Detail 9
+            //Detail 10
             var detail10 = await _context.PlanDetails.FirstOrDefaultAsync(pl => pl.DetailId == detailIds[9]);
             detail10.Task = form["EditTask5_1"];
             detail10.HowToExecute = form["EditHowToExecute5_1"];

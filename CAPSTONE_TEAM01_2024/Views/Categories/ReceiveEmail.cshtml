@@ -1,6 +1,9 @@
+@model CAPSTONE_TEAM01_2024.ViewModels.EmailViewModel
+
 @{
     ViewData["Title"] = "Receive Email";
-    Layout = "_PersonnelLayout";
+//Layout = "_PersonnelLayout";
+    int number = (Model.Emails.PageIndex - 1) * Model.Emails.PageSize;
 }
 <div class="content-wrapper" style="min-height: 912.2px;">
         <header class="content-header">
@@ -32,73 +35,47 @@
                     </div>
 
                     <div class="card-body">
+                        @if (TempData["Success"] != null)
+                        {
+                            <div class="alert alert-success">@TempData["Success"]</div>
+                        }
+                        @if (TempData["Error"] != null)
+                        {
+                            <div class="alert alert-danger">@TempData["Error"]</div>
+                        }
+                        @if (TempData["Warning"] != null)
+                        {
+                            <div class="alert alert-danger">@TempData["Warning"]</div>
+                        }
                         <table class="table table-bordered">
                             <thead>
                                 <tr class="text-center">
                                     <th>Người Gửi</th>
                                     <th>Người Nhận</th>
                                     <th>Tiêu Đề</th>
-                                    <th>Ngày Nhận</th>
-                                   
+                                    <th>Ngày Nhận</th>                        
                                     <th>Thao Tác</th>
                                 </tr>
-                            </thead>
+                            </thead>    
                             <tbody id="data-table">
-                                <tr>
-                                    <td>nguoigui1@example.com</td>
-                                    <td>nguoinhan1@example.com</td>
-                                    <td>Tiêu Đề 1</td>
-                                    <td>2024-10-31</td>
-                                   
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#DetailMailModal">
-                                            <i class="fa-solid fa-eye custom-icon"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteMailModal">
-                                            <i class="fa-solid fa-trash custom-icon"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ReplyMailModal">
-                                            <i class="fa-solid fa-reply custom-icon"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>nguoigui2@example.com</td>
-                                    <td>nguoinhan2@example.com</td>
-                                    <td>Tiêu Đề 2</td>
-                                    <td>2024-10-30</td>
-                                   
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#DetailMailModal">
-                                            <i class="fa-solid fa-eye custom-icon"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteMailModal">
-                                            <i class="fa-solid fa-trash custom-icon"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ReplyMailModal">
-                                            <i class="fa-solid fa-reply custom-icon"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>nguoigui3@example.com</td>
-                                    <td>nguoinhan3@example.com</td>
-                                    <td>Tiêu Đề 3</td>
-                                    <td>2024-10-29</td>
-                                   
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#DetailMailModal">
-                                            <i class="fa-solid fa-eye custom-icon"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteMailModal">
-                                            <i class="fa-solid fa-trash custom-icon"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ReplyMailModal">
-                                            <i class="fa-solid fa-reply custom-icon"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr id="noresults" style="display: none;">
+                                 @foreach (var email in Model.Emails)
+                                {
+                                    <tr class="text-center">
+                                        <td>@email.Sender</td>
+                                        <td> @string.Join(", ", email.Recipients.Select(r => r.User.Email))</td>
+                                        <td>@email.Subject</td>
+                                        <td>@email.SentDate</td>                              
+                                        <td class="text-center">
+                                        <button type="button" class="btn btn-outline-info btn-sm btn-view-email" data-bs-toggle="modal" data-bs-target="#DetailMailModal" data-email-id="@email.EmailId">
+                                                <i class="fa-solid fa-eye custom-icon"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ReplyMailModal" data-sender-email="@email.Sender" data-thread-id="@email.ThreadId">
+                                                <i class="fa-solid fa-reply custom-icon"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            <tr id="noresults" style="display: none;">
                                     <td colspan="5" class="text-center">Không tìm thấy nội dung</td>
                                 </tr>
                             </tbody>
@@ -106,7 +83,53 @@
 
                         <nav aria-label="Page navigation">
                             <ul class="pagination justify-content-end">
-                                <!-- Pagination items will go here -->
+                                @if (Model.Emails.HasPreviousPage)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="ReceiveEmail" asp-route-pageIndex="@(Model.Emails.PageIndex - 1)" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item disabled">
+                                        <a class="page-link" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                }
+                                @for (var i = 1; i <= Model.Emails.TotalPages; i++)
+                                {
+                                    if (i == Model.Emails.PageIndex)
+                                    {
+                                        <li class="page-item active">
+                                            <a class="page-link">@i</a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="page-item">
+                                        <a class="page-link" asp-action="ReceiveEmail" asp-route-pageIndex="@i">@i</a>
+                                        </li>
+                                    }
+                                }
+                                @if (Model.Emails.HasNextPage)
+                                {
+                                    <li class="page-item">
+                                    <a class="page-link" asp-action="ReceiveEmail" asp-route-pageIndex="@(Model.Emails.PageIndex + 1)" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item disabled">
+                                        <a class="page-link" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                }
                             </ul>
                         </nav>
                     </div>
@@ -115,8 +138,8 @@
         </main>
     </div>
 
-    <!-- Modal Thêm Mail -->
-    <div class="modal fade" id="addMailModal" tabindex="-1" aria-labelledby="addMailModalLabel" aria-hidden="true">
+<!-- Modal Thêm Mail -->
+<div class="modal fade" id="addMailModal" tabindex="-1" aria-labelledby="addMailModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -151,84 +174,138 @@
         </div>
     </div>
 
-    <!-- Modal Xóa Mail -->
-    <div class="modal fade" id="DeleteMailModal" tabindex="-1" aria-labelledby="DeleteMailModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="DeleteMailModalLabel">Xóa Email</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Bạn có chắc chắn muốn xóa email này không?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-danger">Xóa</button>
-                </div>
+<!-- Modal Xem Chi Tiết Email -->
+<div class="modal fade" id="DetailMailModal" tabindex="-1" aria-labelledby="DetailMailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DetailMailModalLabel">Chi Tiết Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="emailDetailContent">
+                <h5>Người Nhận:</h5>
+                <p id="detailRecipient"></p>
+                <h5>Tiêu Đề:</h5>
+                <p id="detailSubject"></p>
+                <h5>Nội Dung:</h5>
+                <p id="detailContent"></p>
+                <h5>Ngày Gửi:</h5>
+                <p id="detailDate"></p>
+                <h5>Tệp Đính Kèm:</h5>
+                <ul id="detailAttachment"></ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal Xem Chi Tiết Email -->
-    <div class="modal fade" id="DetailMailModal" tabindex="-1" aria-labelledby="DetailMailModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="DetailMailModalLabel">Chi Tiết Email</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="emailDetailContent">
-                    <h5>Người Nhận:</h5>
-                    <p id="detailRecipient"></p>
-                    <h5>Tiêu Đề:</h5>
-                    <p id="detailSubject"></p>
-                    <h5>Nội Dung:</h5>
-                    <p id="detailContent"></p>
-                    <h5>Ngày Gửi:</h5>
-                    <p id="detailDate"></p>
-                    <h5>Tệp Đính Kèm:</h5>
-                    <img id="detailAttachment" src="" alt="Hình ảnh đính kèm" class="img-fluid" style="max-width: 100%; height: auto; display: none;">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                </div>
+<!-- Modal Trả Lời Email -->
+<div class="modal fade" id="ReplyMailModal" tabindex="-1" aria-labelledby="ReplyMailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ReplyMailModalLabel">Trả Lời Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div class="modal-body">
+                <form id="replyMailForm" method="post" action="@Url.Action("SentEmail", "Categories")" enctype="multipart/form-data">
+                <input type="hidden" class="form-control" id="threadId" name="threadId">
+                    <div class="mb-3">
+                        <label for="replyRecipient" class="form-label">Người Nhận</label>
+                    <input type="email" class="form-control" id="replyRecipient" name="recipientEmail" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="replySubject" class="form-label">Tiêu Đề</label>
+                    <input type="text" class="form-control" id="replySubject" name="emailSubject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="replyContent" class="form-label">Nội Dung</label>
+                        <textarea class="form-control" id="replyContent" rows="3" name="emailContent" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="replyAttachment" class="form-label">Tệp Đính Kèm</label>
+                        <input type="file" class="form-control" id="replyAttachment" name="emailAttachment">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Gửi Trả Lời</button>
+                    </div>
+                </form>
+            </div>             
         </div>
     </div>
+</div>
 
-    <!-- Modal Trả Lời Email -->
-    <div class="modal fade" id="ReplyMailModal" tabindex="-1" aria-labelledby="ReplyMailModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="ReplyMailModalLabel">Trả Lời Email</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="replyMailForm">
-                        <div class="mb-3">
-                            <label for="replyRecipient" class="form-label">Người Nhận</label>
-                            <input type="email" class="form-control" id="replyRecipient" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="replySubject" class="form-label">Tiêu Đề</label>
-                            <input type="text" class="form-control" id="replySubject" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="replyContent" class="form-label">Nội Dung</label>
-                            <textarea class="form-control" id="replyContent" rows="3" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="replyAttachment" class="form-label">Tệp Đính Kèm</label>
-                            <input type="file" class="form-control" id="replyAttachment">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-primary">Gửi Trả Lời</button>
-                </div>
-            </div>
-        </div>
-    </div>
+<script>
+//Reply JS
+    // When the modal is about to be shown
+    document.getElementById('ReplyMailModal').addEventListener('show.bs.modal', function (event) {
+        // Get the button that triggered the modal
+        var button = event.relatedTarget;
+
+        // Extract datas from the data attribute
+        var senderEmail = button.getAttribute('data-sender-email');
+        var thread = button.getAttribute('data-thread-id');
+
+        // Find the recipient input field and set its value
+        var recipientInput = document.getElementById('replyRecipient');
+        recipientInput.value = senderEmail;
+
+        //Find the hidden id field and set its value
+        var threadId = document.getElementById('threadId');
+        threadId.value = thread;
+    });
+
+// Edit Modal JS
+    $(document).on('click', '.btn-view-email', function () {
+        var emailId = $(this).data('email-id'); // Get the emailId from the button's data attribute
+
+        // Send an AJAX request to fetch the email details
+        $.ajax({
+            url: '/Categories/GetEmailDetails',  // Ensure this URL is correct for fetching email details
+            type: 'GET',
+            data: { emailId: emailId },
+            success: function (data) {
+                if (data) 
+                {
+                    console.log(data.subject); // Check the subject
+                    console.log(data.content); // Check the content
+                    console.log(data.attachments);// Check the attachtments
+                    // Populate the modal fields with data
+                    $('#detailRecipient').text(data.recipients && data.recipients.length > 0
+                        ? data.recipients.map(r => r.email).join(', ')
+                        : 'Không có người nhận');
+                    $('#detailSubject').text(data.subject || 'Không có tiêu đề');
+                    $('#detailContent').html(data.content ? data.content.replace(/\n/g, '<br>') : 'Không có nội dung');
+                    $('#detailDate').text(data.sentDate || 'Không xác định');
+
+                    // Handle attachments
+                    var attachmentList = '';
+                    if (data.attachments && data.attachments.length > 0) {
+                        data.attachments.forEach(function (attachment) {
+                            // Add each attachment to the list as an item
+                            attachmentList += `<li>${attachment.fileName}</li>`;
+                        });
+                    } else {
+                        attachmentList = '<li>Không có file đính kèm</li>'; // Handle case with no attachments
+                    }
+                    $('#detailAttachment').html(attachmentList); // Set the attachment list in the modal
+
+                    // Show the modal
+                    $('#DetailMailModal').modal('show');
+                } 
+                else 
+                {
+                    alert('Dữ liệu không khả dụng.');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching email details:', xhr.responseText);
+                alert('Không thể tải chi tiết email.');
+            }
+        });
+    });
+
+</script>

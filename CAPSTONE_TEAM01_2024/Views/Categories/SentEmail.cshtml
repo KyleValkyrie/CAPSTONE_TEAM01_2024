@@ -1,9 +1,9 @@
-@model CAPSTONE_TEAM01_2024.ViewModels.SentEmailViewModel
+@model CAPSTONE_TEAM01_2024.ViewModels.EmailViewModel
 
 @{
 ViewData["Title"] = "Sent Email";
-Layout = "_PersonnelLayout";
-    int number = (Model.SentEmail.PageIndex - 1) * Model.SentEmail.PageSize;
+//Layout = "_PersonnelLayout";
+    int number = (Model.Emails.PageIndex - 1) * Model.Emails.PageSize;
 }
 
 <div class="content-wrapper" style="min-height: 912.2px;">
@@ -64,11 +64,11 @@ Layout = "_PersonnelLayout";
                         </tr>
                         </thead>        
                         <tbody id="data-table">
-                            @foreach (var email in Model.SentEmail)
+                            @foreach (var email in Model.Emails)
                             {
                                 <tr class="text-center">
                                     <td>@email.Sender</td>
-                                    <td>@email.Recipients.FirstOrDefault()?.User.Email</td>
+                                    <td> @string.Join(", ", email.Recipients.Select(r => r.User.Email))</td>
                                     <td>@email.Subject</td>
                                     <td>@email.SentDate.ToString("yyyy-MM-dd")</td>
                                     <td>@email.Status</td>
@@ -95,10 +95,10 @@ Layout = "_PersonnelLayout";
 
                     <nav aria-label="Page navigation">
                         <ul class="pagination justify-content-end">
-                            @if (Model.SentEmail.HasPreviousPage)
+                            @if (Model.Emails.HasPreviousPage)
                             {
                                 <li class="page-item">
-                                    <a class="page-link" asp-action="SentEmail" asp-route-pageIndex="@(Model.SentEmail.PageIndex - 1)" aria-label="Previous">
+                                    <a class="page-link" asp-action="SentEmail" asp-route-pageIndex="@(Model.Emails.PageIndex - 1)" aria-label="Previous">
                                         <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
@@ -111,9 +111,9 @@ Layout = "_PersonnelLayout";
                                     </a>
                                 </li>
                             }
-                            @for (var i = 1; i <= Model.SentEmail.TotalPages; i++)
+                            @for (var i = 1; i <= Model.Emails.TotalPages; i++)
                             {
-                                if (i == Model.SentEmail.PageIndex)
+                                if (i == Model.Emails.PageIndex)
                                 {
                                     <li class="page-item active">
                                         <a class="page-link">@i</a>
@@ -126,10 +126,10 @@ Layout = "_PersonnelLayout";
                                     </li>
                                 }
                             }
-                            @if (Model.SentEmail.HasNextPage)
+                            @if (Model.Emails.HasNextPage)
                             {
                                 <li class="page-item">
-                                    <a class="page-link" asp-action="SentEmail" asp-route-pageIndex="@(Model.SentEmail.PageIndex + 1)" aria-label="Next">
+                                    <a class="page-link" asp-action="SentEmail" asp-route-pageIndex="@(Model.Emails.PageIndex + 1)" aria-label="Next">
                                         <span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>
@@ -160,12 +160,12 @@ Layout = "_PersonnelLayout";
             </div>
             <div class="modal-body">
                 <form id="addMailForm" method="post" action="@Url.Action("SentEmail", "Categories")" enctype="multipart/form-data">
-                    @foreach (var emails in Model.SentEmail)
+                    @foreach (var emails in Model.Emails)
                     {
                     <input type="hidden" id="threadId" name="threadId" value="@emails.ThreadId" />
                     }
 
-                <input type="hidden" id="threadId" name="threadId"  />
+                    <input type="hidden" id="threadId" name="threadId"  />
 
                     <div class="mb-3">
                         <label for="recipientEmail" class="form-label">Người Nhận</label>

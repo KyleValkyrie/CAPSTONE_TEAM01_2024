@@ -23,6 +23,7 @@ using MailKit.Security;
 using MimeKit;
 using NuGet.Protocol.Plugins;
 using static MimeKit.TextPart;
+using System.Linq;
 
 
 namespace CAPSTONE_TEAM01_2024.Controllers
@@ -1577,7 +1578,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         }
 
 //SemesterPlanDetail actions
-//Render View 
+    //Render View 
         public IActionResult SemesterPlanDetail()
         {
             ViewData["page"] = "SemesterPlanDetail";
@@ -1586,10 +1587,41 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
 //Receive Mail actions
     //Render View 
-        public IActionResult ReceiveEmail()
+        public async Task<IActionResult> ReceiveEmail(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "ReceiveEmail";
-            return View();
+            var currentUser = await _context.ApplicationUsers.FirstOrDefaultAsync(us => us.UserName == User.Identity.Name);
+            var emails = _context.Emails
+                    .Include(e => e.Recipients)
+                    .ThenInclude(r => r.User)
+                    .Where(e => e.Recipients.Any(r => r.User.UserName == User.Identity.Name))
+                    .Select(e => new Email
+                    {
+                        EmailId = e.EmailId,
+                        Sender = e.Sender,
+                        Recipients = e.Recipients,
+                        Subject = e.Subject,
+                        SentDate = e.SentDate,
+                        Status = e.Status,
+                        SenderId = e.SenderId,
+                        Content = e.Content,
+                        Thread = e.Thread,
+                        ThreadId = e.ThreadId,
+                        Attachments = e.Attachments
+                    }).AsQueryable();
+
+            var paginatedEmails =
+                await PaginatedList<Email>.CreateAsync(emails, pageIndex, pageSize);
+
+            var viewmodel = new EmailViewModel
+            {
+                Emails = paginatedEmails
+            };
+            ViewBag.Warning = TempData["Warning"];
+            ViewBag.Success = TempData["Success"];
+            ViewBag.Error = TempData["Error"];
+
+            return View(viewmodel);
         }
 //Send Mail actions
     //Render View
@@ -1619,9 +1651,9 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             var paginatedEmails =
                 await PaginatedList<Email>.CreateAsync(emails, pageIndex, pageSize);
 
-            var viewmodel = new SentEmailViewModel
+            var viewmodel = new EmailViewModel
             {
-                SentEmail = paginatedEmails
+                Emails = paginatedEmails
             };
             ViewBag.Warning = TempData["Warning"];
             ViewBag.Success = TempData["Success"];

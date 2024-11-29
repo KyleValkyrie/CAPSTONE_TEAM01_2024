@@ -124,6 +124,15 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
             return RedirectToAction("Index", "Users");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> FindUser(string query)
+        {
+            var validUsers = await _context.ApplicationUsers.Where(u=> u.Email.Contains(query) || u.FullName.Contains(query))
+                            .Select(u => new { u.FullName, u.Email, u.SchoolId})    
+                            .ToListAsync();
+            return Json(validUsers);
+        }
     }
 
 }

@@ -128,10 +128,28 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         [HttpGet]
         public async Task<IActionResult> FindUser(string query)
         {
-            var validUsers = await _context.ApplicationUsers.Where(u=> u.Email.Contains(query) || u.FullName.Contains(query))
-                            .Select(u => new { u.FullName, u.Email, u.SchoolId})    
-                            .ToListAsync();
-            return Json(validUsers);
+            // Query the Users table and join the Roles table via AspNetUserRoles
+            var users = _context.ApplicationUsers
+                                .Where(u => u.Email.Contains(query) || u.FullName.Contains(query))
+                                .Join(_context.UserRoles,
+                                      user => user.Id,
+                                      userRole => userRole.UserId,
+                                      (user, userRole) => new { user, userRole })
+                                .Join(_context.Roles,
+                                      userRole => userRole.userRole.RoleId,
+                                      role => role.Id,
+                                      (userRole, role) => new { userRole.user, role })
+                                .ToList();
+
+            // Map users to a view model or anonymous object with role information
+            var result = users.Select(user => new
+            {
+                user.user.Email,
+                user.user.FullName,
+                RoleName = user.role.Name,  // Access role name
+            }).ToList();
+
+            return Json(result);
         }
     }
 

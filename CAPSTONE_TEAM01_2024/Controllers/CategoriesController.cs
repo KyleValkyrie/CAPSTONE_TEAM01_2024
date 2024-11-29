@@ -1868,6 +1868,10 @@ public async Task<IActionResult> EditReportDetail(IFormCollection form)
                     "Gửi Mail thành công!";
             return RedirectToAction("SentEmail");
         }
+        public async Task<IActionResult> SendEmail (IFormCollection form)
+        {
+            return RedirectToAction("SentEmail");
+        }
     //Delete Email
         [HttpPost]
         public async Task<IActionResult> DeleteEmail(int emailId)

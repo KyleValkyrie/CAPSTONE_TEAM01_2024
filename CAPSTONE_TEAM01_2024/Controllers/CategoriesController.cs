@@ -1896,20 +1896,36 @@ public async Task<IActionResult> EditReportDetail(IFormCollection form)
         public async Task<IActionResult> GetEmailDetails(int emailId)
         {
             ViewData["page"] = "SentEmail";
-            // Kiểm tra giá trị emailId truyền vào
             Console.WriteLine($"EmailId được truyền: {emailId}");
 
             var email = await _context.Emails
-                .Include(e => e.Sender) 
+                .Include(e => e.Sender)
                 .Include(e => e.Recipients)
-                .ThenInclude(r => r.User) 
+                    .ThenInclude(r => r.User)
                 .Include(e => e.Attachments)
                 .FirstOrDefaultAsync(e => e.EmailId == emailId);
 
-            // Trả về thông tin chi tiết của email dưới dạng JSON
+            if (email == null)
+            {
+                return NotFound("Email not found");
+            }
+
+            // Group recipients by type (To, Cc, Bcc)
+            var recipientsByType = email.Recipients
+                .GroupBy(r => r.RecipientType) // Assuming `r.Type` is the recipient type (To, Cc, Bcc)
+                .ToDictionary(
+                    group => group.Key, // Group key is the type (To, Cc, Bcc)
+                    group => group.Select(r => r.User.Email).ToList() // List of emails per group
+                );
+
             return Json(new
             {
-                Recipients = email.Recipients.Select(r => new { r.User.Email }).ToList(),
+                Recipients = new
+                {
+                    To = recipientsByType.ContainsKey("To") ? recipientsByType["To"] : new List<string>(),
+                    Cc = recipientsByType.ContainsKey("Cc") ? recipientsByType["Cc"] : new List<string>(),
+                    Bcc = recipientsByType.ContainsKey("Bcc") ? recipientsByType["Bcc"] : new List<string>()
+                },
                 Subject = email.Subject,
                 Content = email.Content,
                 SentDate = email.SentDate,
@@ -1917,6 +1933,7 @@ public async Task<IActionResult> EditReportDetail(IFormCollection form)
                 Sender = email.Sender.UserName
             });
         }
+
     }
 }
    

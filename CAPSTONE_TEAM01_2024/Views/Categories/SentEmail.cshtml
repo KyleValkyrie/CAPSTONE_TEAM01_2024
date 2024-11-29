@@ -69,16 +69,10 @@ ViewData["Title"] = "Sent Email";
                                 <tr class="text-center">
                                     <td>@email.Sender</td>
                                     <td> @{
-                                        var currentUserEmail = User.Identity.Name;
                                         var toRecipients = email.Recipients.Where(r => r.RecipientType == "To").Select(r => r.User.Email).ToList();
                                         var ccRecipients = email.Recipients.Where(r => r.RecipientType == "Cc").Select(r => r.User.Email).ToList();
                                         var bccRecipients = email.Recipients.Where(r => r.RecipientType == "Bcc").Select(r => r.User.Email).ToList();
 
-                                        // If the current user is sending, show Bcc recipients
-                                        if (User.Identity.Name != null)
-                                        {
-                                            bccRecipients = bccRecipients.Where(email => email == currentUserEmail).ToList();
-                                        }
                                     }
                                         @if (toRecipients.Any())
                                         {
@@ -88,6 +82,7 @@ ViewData["Title"] = "Sent Email";
                                         {
                                             <strong>Cc:</strong> @string.Join(", ", ccRecipients)<br>
                                         }
+                                        
                                         @if (bccRecipients.Any())
                                         {
                                             <strong>Bcc:</strong> @string.Join(", ", bccRecipients)
@@ -295,11 +290,24 @@ ViewData["Title"] = "Sent Email";
             </div>
             <div class="modal-body">
                 <p><strong>Người gửi:</strong> <span id="viewEmailSender"></span></p>
-                <p><strong>Người nhận:</strong> <span id="viewEmailRecipients"></span></p>
+
+                <!-- Recipients section -->
+                <p><strong>Người nhận:</strong></p>
+                <div id="viewEmailRecipients">
+                    <p><strong>To:</strong> <span id="viewEmailTo"></span></p>
+                    <p><strong>Cc:</strong> <span id="viewEmailCc"></span></p>
+                    <p><strong>Bcc:</strong> <span id="viewEmailBcc"></span></p>
+                </div>
+
+                <!-- Email subject and content -->
                 <p><strong>Tiêu đề:</strong> <span id="viewEmailSubject"></span></p>
                 <p><strong>Nội dung:</strong></p>
                 <div id="viewEmailContent" style="border: 1px solid #ddd; padding: 10px;"></div>
+
+                <!-- Sent date -->
                 <p><strong>Ngày gửi:</strong> <span id="viewEmailSentDate"></span></p>
+
+                <!-- Attachments section -->
                 <p><strong>File đính kèm:</strong></p>
                 <ul id="viewEmailAttachments"></ul>
             </div>
@@ -325,52 +333,65 @@ ViewData["Title"] = "Sent Email";
     }
 
 // Edit Modal JS
-    $(document).on('click', '.btn-view-email', function () {
-        var emailId = $(this).data('email-id'); // Get the emailId from the button's data attribute
+$(document).on('click', '.btn-view-email', function () {
+    var emailId = $(this).data('email-id'); // Get the emailId from the button's data attribute
 
-        // Send an AJAX request to fetch the email details
-        $.ajax({
-            url: '/Categories/GetEmailDetails',
-            type: 'GET',
-            data: { emailId: emailId },
-            success: function (data) {
-                if (data) {
-                    console.log(data.subject); // Check the subject
-                    console.log(data.content); // Check the content
-                    // Populate the modal fields with data
-                    $('#viewEmailSender').text(data.sender || 'Không xác định');
-                    $('#viewEmailRecipients').text(
-                        data.recipients && data.recipients.length > 0
-                            ? data.recipients.map(r => r.email).join(', ')
-                            : 'Không có người nhận'
-                    );
-                    $('#viewEmailSubject').text(data.subject || 'Không có tiêu đề');
-                    $('#viewEmailContent').html(data.content ? data.content.replace(/\n/g, '<br>') : 'Không có nội dung');
-                    $('#viewEmailSentDate').text(data.sentDate || 'Không xác định');
+    // Send an AJAX request to fetch the email details
+    $.ajax({
+        url: '/Categories/GetEmailDetails',
+        type: 'GET',
+        data: { emailId: emailId },
+        success: function (data) {
+            if (data) {
+                console.log(data.subject); // Check the subject
+                console.log(data.content); // Check the content
+                // Populate the modal fields with data
+                $('#viewEmailSender').text(data.sender || 'Không xác định');
+                
+                // Handle the recipients (To, Cc, Bcc)
+                $('#viewEmailTo').text(
+                    data.recipients && data.recipients.to && data.recipients.to.length > 0
+                        ? data.recipients.to.join(', ') 
+                        : 'Không có người nhận'
+                );
+                $('#viewEmailCc').text(
+                    data.recipients && data.recipients.cc && data.recipients.cc.length > 0
+                        ? data.recipients.cc.join(', ') 
+                        : 'Không có người nhận'
+                );
+                $('#viewEmailBcc').text(
+                    data.recipients && data.recipients.bcc && data.recipients.bcc.length > 0
+                        ? data.recipients.bcc.join(', ') 
+                        : 'Không có người nhận'
+                );
 
-                    // Handle attachments
-                    var attachmentList = '';
-                    if (data.attachments && data.attachments.length > 0) {
-                        data.attachments.forEach(function (attachment) {
-                            attachmentList += `<li>${attachment.fileName}</li>`;
-                        });
-                    } else {
-                        attachmentList = '<li>Không có file đính kèm</li>';
-                    }
-                    $('#viewEmailAttachments').html(attachmentList);
+                $('#viewEmailSubject').text(data.subject || 'Không có tiêu đề');
+                $('#viewEmailContent').html(data.content ? data.content.replace(/\n/g, '<br>') : 'Không có nội dung');
+                $('#viewEmailSentDate').text(data.sentDate || 'Không xác định');
 
-                    // Show the modal
-                    $('#viewEmailModal').modal('show');
+                // Handle attachments
+                var attachmentList = '';
+                if (data.attachments && data.attachments.length > 0) {
+                    data.attachments.forEach(function (attachment) {
+                        attachmentList += `<li>${attachment.fileName}</li>`;
+                    });
                 } else {
-                    alert('Dữ liệu không khả dụng.');
+                    attachmentList = '<li>Không có file đính kèm</li>';
                 }
-            },
-            error: function (xhr, status, error) {
-                console.error('Error fetching email details:', xhr.responseText);
-                alert('Không thể tải chi tiết email.');
+                $('#viewEmailAttachments').html(attachmentList);
+
+                // Show the modal
+                $('#viewEmailModal').modal('show');
+            } else {
+                alert('Dữ liệu không khả dụng.');
             }
-        });
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching email details:', xhr.responseText);
+            alert('Không thể tải chi tiết email.');
+        }
     });
+});
 
 // Handle input event for 'To' field
 $('#recipientTo').on('input', function() {

@@ -1772,7 +1772,7 @@ public async Task<IActionResult> EditReportDetail(IFormCollection form)
         }
     //Send Mail
         [HttpPost]
-        public async Task<IActionResult> SentEmail(string recipientEmail, string emailSubject, string emailContent, List<IFormFile> emailAttachment, int? threadId)
+        public async Task<IActionResult> SentEmail(IFormCollection form, List<IFormFile> emailAttachment)
         {
             var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             if (vietnamTimeZone == null)
@@ -1789,89 +1789,91 @@ public async Task<IActionResult> EditReportDetail(IFormCollection form)
                 return BadRequest("User not found.");
             }
 
-            string[] emails = recipientEmail.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (string userEmail in emails)
+            // Create the email once
+            Email thisMail = new Email
             {
-                // Email Actions
-                Email thisMail = new Email
+                SenderId = currentUserId,
+                Subject = form["emailSubject"],
+                Content = form["emailContent"],
+                SentDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone)
+            };
+
+            _context.Emails.Add(thisMail);
+            await _context.SaveChangesAsync(); // Save email once
+
+            // Thread Actions
+            if (int.TryParse(form["threadId"], out int threadId))
+            {
+                thisMail.ThreadId = threadId;
+            }
+            else
+            {
+                EmailThread newThread = new EmailThread
                 {
-                    SenderId = currentUserId,
-                    Subject = emailSubject,
-                    Content = emailContent,
-                    SentDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone)
+                    Subject = form["emailSubject"]
                 };
+                _context.EmailThreads.Add(newThread); // Add thread to DbContext
+                await _context.SaveChangesAsync(); // Save thread into the database
+                thisMail.ThreadId = newThread.ThreadId;
+            }
 
-                _context.Emails.Add(thisMail);
-                await _context.SaveChangesAsync(); // Lưu email trước khi tiếp tục
-
-                // Thread Actions
-                if (threadId.HasValue)
+            // Email Attachment Actions
+            foreach (var attachment in emailAttachment)
+            {
+                if (attachment.Length > 0)
                 {
-                    // Nếu có threadId (trả lời email), gán threadId vào email này
-                    thisMail.ThreadId = threadId.Value;
-                }
-                else
-                {
-                    // Nếu không có threadId, tạo một thread mới cho email này
-                    EmailThread newThread = new EmailThread
+                    using (var memoryStream = new MemoryStream())
                     {
-                        Subject = emailSubject
-                    };
-                    _context.EmailThreads.Add(newThread); // Thêm thread vào DbContext
-                    await _context.SaveChangesAsync(); // Lưu thread vào cơ sở dữ liệu
-                    thisMail.ThreadId = newThread.ThreadId; // Gán threadId cho email
-                }
+                        await attachment.CopyToAsync(memoryStream);
 
-                // Email Attachment Actions
-                foreach (var attachment in emailAttachment)
-                {
-                    if (attachment.Length > 0)
-                    {
-                        using (var memoryStream = new MemoryStream())
+                        var theseAttachments = new EmailAttachment
                         {
-                            // Copy file content to memory stream
-                            await attachment.CopyToAsync(memoryStream);
+                            FileName = attachment.FileName,
+                            FileData = memoryStream.ToArray(),
+                            EmailId = thisMail.EmailId
+                        };
 
-                            // Create a new EmailAttachment entry
-                            var theseAttachments = new EmailAttachment
-                            {
-                                FileName = attachment.FileName,
-                                FileData = memoryStream.ToArray(), // Convert stream to byte array
-                                EmailId = thisMail.EmailId
-                            };
-
-                            // Add to the context
-                            _context.EmailAttachments.Add(theseAttachments);
-                        }
+                        _context.EmailAttachments.Add(theseAttachments);
                     }
                 }
+            }
+            string Tos = form["recipientTo"];
+            string[] TosEmails = Tos.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string Ccs = form["recipientCc"];
+            string[] CcsEmails = Ccs.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string Bccs = form["recipientCc"];
+            string[] BccsEmails = Bccs.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            // Add recipients for To, Cc, Bcc
+            await AddRecipients(TosEmails, thisMail.EmailId, "To");
+            await AddRecipients(CcsEmails, thisMail.EmailId, "Cc");
+            await AddRecipients(BccsEmails, thisMail.EmailId, "Bcc");
 
-                // Email Recipient actions
+            await _context.SaveChangesAsync(); // Save all changes at once
+
+            TempData["Success"] = "Gửi Mail thành công!";
+            return RedirectToAction("SentEmail");
+        }
+
+        // Helper function to add recipients
+        private async Task AddRecipients(string[] emails, int emailId, string recipientType)
+        {
+            foreach (string userEmail in emails)
+            {
                 var recipientUser = _context.ApplicationUsers.FirstOrDefault(u => u.Email == userEmail);
                 if (recipientUser != null)
                 {
                     EmailRecipient thisOne = new EmailRecipient
                     {
                         UserId = recipientUser.Id,
-                        EmailId = thisMail.EmailId, // Gán đúng EmailId sau khi lưu email
-                        RecipientType = "To" // Hoặc bạn có thể thay "To" bằng "Cc", "Bcc" nếu cần
+                        EmailId = emailId,
+                        RecipientType = recipientType
                     };
 
                     _context.EmailRecipients.Add(thisOne);
                 }
-
             }
-    
-            await _context.SaveChangesAsync(); // Lưu tất cả thay đổi vào cơ sở dữ liệu một lần
-            TempData["Success"] =
-                    "Gửi Mail thành công!";
-            return RedirectToAction("SentEmail");
         }
-        public async Task<IActionResult> SendEmail (IFormCollection form)
-        {
-            return RedirectToAction("SentEmail");
-        }
+
     //Delete Email
         [HttpPost]
         public async Task<IActionResult> DeleteEmail(int emailId)

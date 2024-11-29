@@ -68,7 +68,31 @@ ViewData["Title"] = "Sent Email";
                             {
                                 <tr class="text-center">
                                     <td>@email.Sender</td>
-                                    <td> @string.Join(", ", email.Recipients.Select(r => r.User.Email))</td>
+                                    <td> @{
+                                        var currentUserEmail = User.Identity.Name;
+                                        var toRecipients = email.Recipients.Where(r => r.RecipientType == "To").Select(r => r.User.Email).ToList();
+                                        var ccRecipients = email.Recipients.Where(r => r.RecipientType == "Cc").Select(r => r.User.Email).ToList();
+                                        var bccRecipients = email.Recipients.Where(r => r.RecipientType == "Bcc").Select(r => r.User.Email).ToList();
+
+                                        // If the current user is sending, show Bcc recipients
+                                        if (User.Identity.Name != null)
+                                        {
+                                            bccRecipients = bccRecipients.Where(email => email == currentUserEmail).ToList();
+                                        }
+                                    }
+                                        @if (toRecipients.Any())
+                                        {
+                                            <strong>To:</strong> @string.Join(", ", toRecipients)<br>
+                                        }
+                                        @if (ccRecipients.Any())
+                                        {
+                                            <strong>Cc:</strong> @string.Join(", ", ccRecipients)<br>
+                                        }
+                                        @if (bccRecipients.Any())
+                                        {
+                                            <strong>Bcc:</strong> @string.Join(", ", bccRecipients)
+                                        }
+                                    </td>
                                     <td>@email.Subject</td>
                                     <td>@email.SentDate.ToString("yyyy-MM-dd")</td>
                                     <td>@email.Status</td>
@@ -159,7 +183,7 @@ ViewData["Title"] = "Sent Email";
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="addMailForm" method="post" action="@Url.Action("SendEmail", "Categories")" enctype="multipart/form-data">
+                <form id="addMailForm" method="post" action="@Url.Action("SentEmail", "Categories")" enctype="multipart/form-data">
                     @foreach (var emails in Model.Emails)
                     {
                     <input type="hidden" id="threadId" name="threadId" value="@emails.ThreadId" />

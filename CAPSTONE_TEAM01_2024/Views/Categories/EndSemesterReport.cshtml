@@ -747,6 +747,71 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
     </button>
 </div>
 
+<!-- Submit Report Modal -->
+<div class="modal fade" id="SubmitReportModal" tabindex="-1" aria-labelledby="SubmitSemesterReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="SubmitReportModalLabel">Nộp Báo Cáo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn nộp Báo Cáo này không?</p>
+                <form id="submitReportForm" asp-action="SubmitReport" method="post">
+                    <input type="hidden" id="SubmitReportId" name="ReportId" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger">Nộp</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Report Modal -->
+<div class="modal fade" id="EditSemesterReportModal" tabindex="-1" aria-labelledby="EditSemesterReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" >
+                <h5 class="modal-title" id="EditSemesterReportModalLabel">Chỉnh sửa Báo Cáo Cuối Kỳ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="EditSemesterReportForm" method="post" action="/Categories/EditReport">
+                <div class="modal-body" style="overflow-y: auto; max-height: 80vh;">
+                    <div class="mb-3">
+                        <input type="hidden" id="EditReportId" name="ReportId" class="form-control" required>
+                        <label for="EditPeriodId" class="form-label">Năm Học</label>
+                        <select class="form-select" id="EditPeriodId" name="PeriodId" class="form-control" required>
+                            @foreach (var item in Model.SchoolYears)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="EditReportType" class="form-label">Loại Báo Cáo</label>
+                        <input type="text" id="EditReportType" name="reportType" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="EditClassId" class="form-label">Mã Lớp</label>
+                        <select class="form-select" id="EditClassId" name="ClassId" class="form-control" required>
+                            @foreach (var item in Model.Class)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer" style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary save">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Edit Detail Modal -->
 <div class="modal fade" id="EditReportDetailModal" tabindex="-1" aria-labelledby="EditSemesterReportModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -1098,6 +1163,23 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
     //Add Modal JS
     function openAddReportModal() {
         var modal = new bootstrap.Modal(document.getElementById('AddReportModal'));
+        modal.show();
+    }
+    // Open modal Submit Report
+    function openSubmitSemesterReport(reportId) {
+        document.getElementById('SubmitReportId').value = reportId;
+        // Show the modal
+        var modal = new bootstrap.Modal(document.getElementById('SubmitReportModal'));
+        modal.show();
+    }
+    // Edit Report Modal JS
+    function openEditSemesterReport(reportId, periodId, reportType, classId) {
+        document.getElementById('EditReportId').value = reportId;
+        document.getElementById('EditPeriodId').value = periodId;
+        document.getElementById('EditReportType').value = reportType;
+        document.getElementById('EditClassId').value = classId;
+        // Show the modal
+        var modal = new bootstrap.Modal(document.getElementById('EditSemesterReportModal'));
         modal.show();
     }
 

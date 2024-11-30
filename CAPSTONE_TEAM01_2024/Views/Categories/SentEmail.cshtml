@@ -73,7 +73,7 @@ ViewData["Title"] = "Sent Email";
                                         var ccRecipients = email.Recipients.Where(r => r.RecipientType == "Cc").Select(r => r.User.Email).ToList();
                                         var bccRecipients = email.Recipients.Where(r => r.RecipientType == "Bcc").Select(r => r.User.Email).ToList();
 
-                                    }
+                                        }
                                         @if (toRecipients.Any())
                                         {
                                             <strong>To:</strong> @string.Join(", ", toRecipients)<br>

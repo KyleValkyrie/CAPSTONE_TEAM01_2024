@@ -1841,7 +1841,7 @@ public async Task<IActionResult> EditReportDetail(IFormCollection form)
             string[] TosEmails = Tos.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
             string Ccs = form["recipientCc"];
             string[] CcsEmails = Ccs.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
-            string Bccs = form["recipientCc"];
+            string Bccs = form["recipientBcc"];
             string[] BccsEmails = Bccs.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
             // Add recipients for To, Cc, Bcc
             await AddRecipients(TosEmails, thisMail.EmailId, "To");

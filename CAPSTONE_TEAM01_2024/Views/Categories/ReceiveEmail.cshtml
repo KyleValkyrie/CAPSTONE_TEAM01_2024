@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Receive Email";
-//Layout = "_PersonnelLayout";
     int number = (Model.Emails.PageIndex - 1) * Model.Emails.PageSize;
 }
 <div class="content-wrapper" style="min-height: 912.2px;">
@@ -60,16 +59,41 @@
                             <tbody id="data-table">
                                  @foreach (var email in Model.Emails)
                                 {
+                                    var ccRecipients = email.Recipients.Where(r => r.RecipientType == "Cc").Select(r => r.User.Email).ToList();
+                                    var toRecipients = email.Recipients.Where(r => r.RecipientType == "To").Select(r => r.User.Email).ToList();
+                                var bccRecipients = email.Recipients.Where(r => r.RecipientType == "Bcc").Select(r => r.User.Email).ToList();
                                     <tr class="text-center">
                                         <td>@email.Sender</td>
-                                        <td> @string.Join(", ", email.Recipients.Select(r => r.User.Email))</td>
+                                        <td>@if (toRecipients.Any())
+                                            {
+                                                <strong>To:</strong> @string.Join(", ", toRecipients)
+
+                                                <br>
+                                            }
+                                            @if (ccRecipients.Any())
+                                            {
+                                                <strong>Cc:</strong> @string.Join(", ", ccRecipients)
+
+                                                <br>
+                                            }
+
+                                            @if (bccRecipients.Any())
+                                            {
+                                                <strong>Bcc:</strong> @string.Join(", ", bccRecipients)
+                                            }
+                                        </td>
                                         <td>@email.Subject</td>
                                         <td>@email.SentDate</td>                              
                                         <td class="text-center">
                                         <button type="button" class="btn btn-outline-info btn-sm btn-view-email" data-bs-toggle="modal" data-bs-target="#DetailMailModal" data-email-id="@email.EmailId">
                                                 <i class="fa-solid fa-eye custom-icon"></i>
                                             </button>
-                                            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ReplyMailModal" data-sender-email="@email.Sender" data-thread-id="@email.ThreadId">
+                                        <button type="button" class="btn btn-outline-primary btn-sm btn-reply-email"
+                                                data-bs-toggle="modal" 
+                                                                         data-bs-target="#ReplyMailModal"
+                                                                         data-cc-email="@string.Join(", ", ccRecipients)"
+                                                                         data-sender-email="@string.Join(", ", toRecipients)" 
+                                                                         data-thread-id="@email.ThreadId">
                                                 <i class="fa-solid fa-reply custom-icon"></i>
                                             </button>
                                         </td>
@@ -138,42 +162,6 @@
         </main>
     </div>
 
-<!-- Modal Thêm Mail -->
-<div class="modal fade" id="addMailModal" tabindex="-1" aria-labelledby="addMailModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addMailModalLabel">Thêm Email</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addMailForm">
-                        <div class="mb-3">
-                            <label for="recipientEmail" class="form-label">Người Nhận</label>
-                            <input type="email" class="form-control" id="recipientEmail" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="emailSubject" class="form-label">Tiêu Đề</label>
-                            <input type="text" class="form-control" id="emailSubject" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="emailContent" class="form-label">Nội Dung</label>
-                            <textarea class="form-control" id="emailContent" rows="3" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="emailAttachment" class="form-label">Tệp Đính Kèm</label>
-                            <input type="file" class="form-control" id="emailAttachment">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-primary">Gửi Mail</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 <!-- Modal Xem Chi Tiết Email -->
 <div class="modal fade" id="DetailMailModal" tabindex="-1" aria-labelledby="DetailMailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -203,60 +191,88 @@
 
 <!-- Modal Trả Lời Email -->
 <div class="modal fade" id="ReplyMailModal" tabindex="-1" aria-labelledby="ReplyMailModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <<div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="ReplyMailModalLabel">Trả Lời Email</h5>
+                <h5 class="modal-title" id="addMailModalLabel">Thêm Email</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="replyMailForm" method="post" action="@Url.Action("SentEmail", "Categories")" enctype="multipart/form-data">
-                <input type="hidden" class="form-control" id="threadId" name="threadId">
+                <form id="addMailForm" method="post" action="@Url.Action("SentEmail", "Categories")" enctype="multipart/form-data">
+
+                    <input type="hidden" id="threadId" name="threadId" />
+
                     <div class="mb-3">
-                        <label for="replyRecipient" class="form-label">Người Nhận</label>
-                    <input type="email" class="form-control" id="replyRecipient" name="recipientEmail" readonly>
+                        <label for="recipientTo" class="form-label">Người Nhận</label>
+
+                        <!-- Recipient To -->
+                        <div class="input-group mb-2" style="width: 100%; position: relative;">
+                            <span class="input-group-text" style="width: 50px; display: inline-block;">To:</span>
+                            <div class="input-chip-container" style="position: relative; display: flex; flex-wrap: nowrap; align-items: center; border: 1px solid #ccc; border-radius: 4px; padding: 5px; flex-grow: 1; overflow-x: auto; white-space: nowrap; max-width: calc(100% - 60px);">
+                                <div id="recipientToChipList" class="chip-list" style="display: flex; gap: 5px; flex-grow: 1; overflow-x: auto; white-space: nowrap;"></div>
+                                <input type="email" id="recipientTo" class="form-control" style="flex-shrink: 0; max-width: 30%; border: none; outline: none; padding: 5px; font-size: 14px;" placeholder="Nhập tên người nhận" />
+                            </div>
+                            <!-- Dropdown suggestions for Recipient To -->
+                            <div id="recipientToSuggestions" class="suggestion-list" style="display: none; position: absolute; top: 100%; left: 0; background-color: white; border: 1px solid #ccc; width: 100%; z-index: 999; max-height: 150px; overflow-y: auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);"></div>
+                            <!-- Hidden input for form submission -->
+                            <input type="hidden" id="hiddenRecipientTo" name="recipientTo" />
+                            <div id="recipientToSuggestions" class="suggestion-list" style="display: none; position: absolute; top: 100%; left: 0; background-color: white; border: 1px solid #ccc; width: 100%; z-index: 999; max-height: 150px; overflow-y: auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);"></div>
+                        </div>
+
+                        <!-- Recipient Cc -->
+                        <div class="input-group mb-2" style="width: 100%; position: relative;">
+                            <span class="input-group-text" style="width: 50px; display: inline-block;">Cc:</span>
+                            <div class="input-chip-container" style="position: relative; display: flex; flex-wrap: nowrap; align-items: center; border: 1px solid #ccc; border-radius: 4px; padding: 5px; flex-grow: 1; overflow-x: auto; white-space: nowrap; max-width: calc(100% - 60px);">
+                                <div id="recipientCcChipList" class="chip-list" style="display: flex; gap: 5px; flex-grow: 1; overflow-x: auto; white-space: nowrap;"></div>
+                                <input type="email" id="recipientCc" class="form-control" style="flex-shrink: 0; max-width: 30%; border: none; outline: none; padding: 5px; font-size: 14px;" placeholder="Nhập tên người nhận" />
+                            </div>
+                            <!-- Dropdown suggestions for Recipient Cc -->
+                            <div id="recipientCcSuggestions" class="suggestion-list" style="display: none; position: absolute; top: 100%; left: 0; background-color: white; border: 1px solid #ccc; width: 100%; z-index: 999; max-height: 150px; overflow-y: auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);"></div>
+                            <!-- Hidden input for form submission -->
+                            <input type="hidden" id="hiddenRecipientCc" name="recipientCc" />
+                            <div id="recipientCcSuggestions" class="suggestion-list" style="display: none; position: absolute; top: 100%; left: 0; background-color: white; border: 1px solid #ccc; width: 100%; z-index: 999; max-height: 150px; overflow-y: auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);"></div>
+                        </div>
+
+                        <!-- Recipient Bcc -->
+                        <div class="input-group mb-2" style="width: 100%; position: relative;">
+                            <span class="input-group-text" style="width: 50px; display: inline-block;">Bcc:</span>
+                            <div class="input-chip-container" style="position: relative; display: flex; flex-wrap: nowrap; align-items: center; border: 1px solid #ccc; border-radius: 4px; padding: 5px; flex-grow: 1; overflow-x: auto; white-space: nowrap; max-width: calc(100% - 60px);">
+                                <div id="recipientBccChipList" class="chip-list" style="display: flex; gap: 5px; flex-grow: 1; overflow-x: auto; white-space: nowrap;"></div>
+                                <input type="email" id="recipientBcc" class="form-control" style="flex-shrink: 0; max-width: 30%; border: none; outline: none; padding: 5px; font-size: 14px;" placeholder="Nhập tên người nhận" />
+                            </div>
+                            <!-- Dropdown suggestions for Recipient Bcc -->
+                            <div id="recipientBccSuggestions" class="suggestion-list" style="display: none; position: absolute; top: 100%; left: 0; background-color: white; border: 1px solid #ccc; width: 100%; z-index: 999; max-height: 150px; overflow-y: auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);"></div>
+                            <!-- Hidden input for form submission -->
+                            <input type="hidden" id="hiddenRecipientBcc" name="recipientBcc" />
+                            <div id="recipientBccSuggestions" class="suggestion-list" style="display: none; position: absolute; top: 100%; left: 0; background-color: white; border: 1px solid #ccc; width: 100%; z-index: 999; max-height: 150px; overflow-y: auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="emailSubject" class="form-label">Tiêu Đề</label>
+                        <input type="text" class="form-control" id="emailSubject" name="emailSubject" required>
                     </div>
                     <div class="mb-3">
-                        <label for="replySubject" class="form-label">Tiêu Đề</label>
-                    <input type="text" class="form-control" id="replySubject" name="emailSubject" required>
+                        <label for="emailContent" class="form-label">Nội Dung</label>
+                        <textarea class="form-control" id="emailContent" name="emailContent" rows="3" required></textarea>
                     </div>
                     <div class="mb-3">
-                        <label for="replyContent" class="form-label">Nội Dung</label>
-                        <textarea class="form-control" id="replyContent" rows="3" name="emailContent" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="replyAttachment" class="form-label">Tệp Đính Kèm</label>
-                        <input type="file" class="form-control" id="replyAttachment" name="emailAttachment">
+                        <label for="emailAttachment" class="form-label">Tệp Đính Kèm</label>
+                        <input type="file" class="form-control" id="emailAttachment" name="emailAttachment" multiple>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        <button type="submit" class="btn btn-primary">Gửi Trả Lời</button>
+                        <button type="submit" class="btn btn-primary" id="sendEmailButton">Gửi Mail</button>
                     </div>
                 </form>
-            </div>             
+            </div>
+
         </div>
     </div>
 </div>
 
 <script>
-//Reply JS
-    // When the modal is about to be shown
-    document.getElementById('ReplyMailModal').addEventListener('show.bs.modal', function (event) {
-        // Get the button that triggered the modal
-        var button = event.relatedTarget;
-
-        // Extract datas from the data attribute
-        var senderEmail = button.getAttribute('data-sender-email');
-        var thread = button.getAttribute('data-thread-id');
-
-        // Find the recipient input field and set its value
-        var recipientInput = document.getElementById('replyRecipient');
-        recipientInput.value = senderEmail;
-
-        //Find the hidden id field and set its value
-        var threadId = document.getElementById('threadId');
-        threadId.value = thread;
-    });
 
 // Edit Modal JS
     $(document).on('click', '.btn-view-email', function () {
@@ -306,6 +322,245 @@
                 alert('Không thể tải chi tiết email.');
             }
         });
+    });
+
+// Handle input event for 'To' field
+    $('#recipientTo').on('input', function () {
+        const query = $(this).val();
+
+        if (query.length < 2) {
+            $('#recipientToSuggestions').hide(); // Hide if query is too short
+            return;
+        }
+
+        $.ajax({
+            url: '/Users/FindUser', // Ensure the URL is correct
+            data: { query: query },
+            success: function (data) {
+                console.log('AJAX Response:', data); // Log the JSON response here
+                renderSuggestions('#recipientToSuggestions', data, '#recipientTo', '#hiddenRecipientTo');
+            },
+            error: function (err) {
+                console.error('Error fetching users', err);
+            }
+        });
+    });
+
+    // Handle input event for 'Cc' field
+    $('#recipientCc').on('input', function () {
+        const query = $(this).val();
+
+        if (query.length < 2) {
+            $('#recipientCcSuggestions').hide(); // Hide if query is too short
+            return;
+        }
+
+        $.ajax({
+            url: '/Users/FindUser', // Ensure the URL is correct
+            data: { query: query },
+            success: function (data) {
+                console.log('AJAX Response:', data); // Log the JSON response here
+                renderSuggestions('#recipientCcSuggestions', data, '#recipientCc', '#hiddenRecipientCc');
+            },
+            error: function (err) {
+                console.error('Error fetching users', err);
+            }
+        });
+    });
+
+    // Handle input event for 'Bcc' field
+    $('#recipientBcc').on('input', function () {
+        const query = $(this).val();
+
+        if (query.length < 2) {
+            $('#recipientBccSuggestions').hide(); // Hide if query is too short
+            return;
+        }
+
+        $.ajax({
+            url: '/Users/FindUser', // Ensure the URL is correct
+            data: { query: query },
+            success: function (data) {
+                console.log('AJAX Response:', data); // Log the JSON response here
+                renderSuggestions('#recipientBccSuggestions', data, '#recipientBcc', '#hiddenRecipientBcc');
+            },
+            error: function (err) {
+                console.error('Error fetching users', err);
+            }
+        });
+    });
+
+//Autofill and tag system JS
+    // Render the suggestion list based on the data
+    function renderSuggestions(suggestionListId, data, field, hiddenField) {
+            const suggestionList = $(suggestionListId);
+            suggestionList.empty(); // Clear previous suggestions
+
+            if (data && data.length > 0) {
+                data.forEach(user => {
+                    const displayName = user.fullName ? user.fullName : user.email; // Use email if fullName is not available
+                    const role = user.roleName ? user.roleName : ''; // Get role
+
+                    const suggestionItem = $('<div>')
+                        .addClass('suggestion-item')
+                        .html(`
+                            <div style="font-weight: bold;">${displayName} - ${role}</div>
+                            <div>${user.email}</div>
+                        `)
+                        .css({
+                            'padding': '5px',
+                            'cursor': 'pointer',
+                            'font-size': '14px'
+                        })
+                        .hover(function () {
+                            $(this).css('background-color', '#f0f0f0');
+                        }, function () {
+                            $(this).css('background-color', 'transparent');
+                        })
+                        .click(function () {
+                            // Handle suggestion selection
+                            addChip(user.email, user.fullName, user.roleName, field, hiddenField); // Pass roleName here
+                            suggestionList.hide();  // Hide suggestions after selection
+                            $(field).val(''); // Clear the input field after selection
+                        });
+
+                    suggestionList.append(suggestionItem);
+                });
+
+                suggestionList.show(); // Show suggestions
+            } else {
+                suggestionList.hide(); // Hide if no results
+            }
+        }
+
+    // Add chip to the selected list and update the hidden field
+    function addChip(email, fullName, role, field, hiddenField) {
+            const chipList = $(field + 'ChipList');
+            const hiddenFieldInput = $(hiddenField);
+
+            const chipText = fullName ? `${fullName} - ${role}` : `${email} - ${role}`; // If no fullName, show email in the chip
+
+            const chip = $('<div>')
+                .addClass('chip')
+                .html(`
+                    <span>${chipText}</span>
+                    <span class="remove-chip" style="cursor: pointer; padding-left: 5px;">&times;</span>
+                `)
+                .css({
+                    'display': 'inline-flex', // Use inline-flex to prevent wrapping
+                    'background-color': '#e0e0e0',
+                    'padding': '5px 10px',
+                    'border-radius': '20px',
+                    'margin': '2px',
+                    'font-size': '14px',
+                    'white-space': 'nowrap', // Prevent chip content from breaking to the next line
+                    'align-items': 'center' // Ensure content is aligned properly inside the chip
+                });
+
+            // Append the chip to the list
+            chipList.append(chip);
+
+            // Add the email to the hidden input field (update the value)
+            let currentEmails = hiddenFieldInput.val();
+            if (currentEmails) {
+                currentEmails = currentEmails.split(',');
+            } else {
+                currentEmails = [];
+            }
+
+            if (!currentEmails.includes(email)) {
+                currentEmails.push(email);
+                hiddenFieldInput.val(currentEmails.join(','));
+            }
+
+            // Handle chip removal
+            chip.find('.remove-chip').click(function () {
+                $(this).parent().remove();
+                removeEmailFromHiddenField(email, hiddenFieldInput);
+            });
+
+            // Ensure the chip list doesn't wrap
+            chipList.css({
+                'display': 'flex',       // Prevent wrapping of chips
+                'flex-wrap': 'nowrap',    // Prevent chips from breaking into new lines
+                'overflow-x': 'auto'     // Allow horizontal scrolling if the chips exceed the container width
+            });
+        }
+
+    // Remove email from the hidden field when a chip is removed
+    function removeEmailFromHiddenField(email, hiddenField) {
+            let currentEmails = hiddenField.val().split(',');
+            currentEmails = currentEmails.filter(e => e !== email); // Remove the email
+            hiddenField.val(currentEmails.join(','));
+        }
+
+// Prefill the email details when the modal opens
+    $(document).on('click', '.btn-reply-email', function () {
+        var senderEmail = $(this).data('sender-email'); // Get the sender's email
+        var ccEmails = $(this).data('cc-email'); // Get the CC emails (comma-separated)
+        var threadId = $(this).data('thread-id'); // Get the thread ID
+
+        // Clear previous chips before adding new ones
+        $('#recipientToChipList').empty();
+        $('#recipientCcChipList').empty();
+
+        // Split the sender email (it should be a single email, but splitting it for consistency)
+        var senderEmailsArray = senderEmail.split(', ').map(function (email) {
+            return email.trim();
+        });
+
+        // Prefill the hidden "To" field with the sender's email
+        $('#hiddenRecipientTo').val(senderEmailsArray.join(', '));
+
+        // Query the user data for each sender email (if there are multiple, loop through)
+        senderEmailsArray.forEach(function (email) {
+            $.ajax({
+                url: '/Users/FindUser', // Ensure this URL is correct for fetching user data based on email
+                type: 'GET',
+                data: { query: email }, // Use the sender's email to find the user
+                success: function (data) {
+                    // Add the sender's email as a chip to the "To" field
+                    if (data && data.length > 0) {
+                        addChip(email, data[0].fullName, data[0].roleName, '#recipientTo', '#hiddenRecipientTo');
+                    } else {
+                        console.error('Sender email not found: ' + email);
+                    }
+                },
+                error: function (err) {
+                    console.error('Error fetching sender user data:', err);
+                }
+            });
+        });
+
+        // Split the CC emails and query user data for each CC email
+        var ccEmailsArray = ccEmails.split(', ').map(function (email) {
+            return email.trim();
+        });
+
+        // Prefill the hidden "Cc" field with the CC emails
+        $('#hiddenRecipientCc').val(ccEmailsArray.join(', '));
+
+        ccEmailsArray.forEach(function (email) {
+            $.ajax({
+                url: '/Users/FindUser', // Ensure this URL is correct for fetching user data based on email
+                type: 'GET',
+                data: { query: email },
+                success: function (ccData) {
+                    if (ccData && ccData.length > 0) {
+                        // Add each CC email as a chip to the "Cc" field
+                        addChip(email, ccData[0].fullName, ccData[0].roleName, '#recipientCc', 'hiddenRecipientCc');
+                    } else {
+                        console.error('CC email not found: ' + email);
+                    }
+                },
+                error: function (err) {
+                    console.error('Error fetching CC user data:', err);
+                }
+            });
+        });
+
+        // Open the modal (optional, if not already being triggered)
+        $('#ReplyMailModal').modal('show');
     });
 
 </script>

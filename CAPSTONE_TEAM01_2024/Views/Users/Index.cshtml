@@ -9,35 +9,33 @@
         @ViewData["message"]
     </p>
 }
-
 <div class="container-fluid d-flex flex-column justify-content-center align-items-center"
      id="Login_Content"
-     style="background-color: rgba(0,0,0,0.7);height:100vh;">
-    <div>
-        <div class="text-center">
-            <h1 class="fs-5 text-light p-0 m-0">TRƯỜNG ĐẠI HỌC</h1>
-            <h2 class="fs-1 text-light fw-bold p-0 m-0" style="letter-spacing: 6px">VĂN LANG</h2>
+     style="background-color: rgba(0,0,0,0.7); height: 100vh;">
+    <div style="width: 500px; height: 450px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden; position: relative; background-color: white;">
+        <!-- Red Header -->
+        <div style="height: 30%; width: 100%; background-color: #dc3545; position: relative; z-index: 1;"></div>
+
+        <!-- Larger Logo Circle -->
+        <div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; background-color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; z-index: 2;">
+            <img src="~/Resources/Img/logoVL.png" alt="Logo" style="width: 70%; height: 70%; object-fit: contain;" />
         </div>
-</div>
-    <div>
-        <h3 class="fs-1 text-light fw-bold p-3 m-3">HỆ THỐNG QUẢN LÝ CÔNG TÁC CỐ VẤN HỌC TẬP</h3>
-    </div>
-    <a id="Login_Button" class="button d-flex-column justify-content-center align-items-center text-center"
-       asp-controller="Users" asp-action="ExternalLogin" asp-route-provider="Microsoft"
-       style="width: 400px !important;
-               height: 400px !important;
-               background-color: rgba(128,128,128,0.5);
-               border: 5px solid gray;
-               padding-top:1.5%;
-               margin:0;
-               text-decoration:none;"
-        onmouseover="Hovered(this)"
-        onmouseout="Unhovered(this)">
-            <h1 class="fs-1 fw-bold text-light">ĐĂNG NHẬP</h1>
-            <img src="~/Resources/Img/logoVL.png" style="width:50%; height:auto" />
-            <h2 class="fs-4 text-light" id="instruction">Sử dụng tài khoản Email VLU</h2>
-    </a>
-    <div>
-        <h3 class="fs-5 text-light fw-bold p-4 m-4">&copy; 2024 - Bản quyền thuộc khoa Công Nghệ Thông Tin, trường đại học Văn Lang</h3>
+
+        <!-- White Content -->
+        <div style="padding-top: 100px; text-align: center;">
+            <a id="Login_Button" class="btn btn-danger d-flex-column justify-content-center align-items-center text-center"
+               asp-controller="Users" asp-action="ExternalLogin" asp-route-provider="Microsoft"
+               style="z-index: 4;">
+                Đăng nhập sử dụng tài khoản Email VLU
+            </a>
+            <!-- Left-Aligned Text Section -->
+            <div style="margin-top: 20px; text-align: left; padding: 0 20px;">
+                <h8>Trường hợp Quý Thầy/Cô gặp khó khăn trong việc đăng nhập, xin vui long liên hệ nhân sự phụ trách:</h8><br>
+                <h8>- MicrosoftTeams: bao.187pm06548@vanglanguni.vn</h8><br>
+                <h8>- Zalo: 039 460 9751 (Kyle Nguyễn)</h8><br>
+            </div>
+        </div>
     </div>
 </div>
+
+

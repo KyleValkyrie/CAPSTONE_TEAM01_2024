@@ -177,6 +177,72 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("EndSemesterReport");
             }
         }
+        
+         [HttpPost]
+        public async Task<IActionResult> EditReport(int reportId, int periodId, string reportType, string classId)
+        {
+            var reportToEdit = await _context.SemesterReports.FirstOrDefaultAsync(rp => rp.ReportId == reportId);
+            if (reportToEdit == null)
+            {
+                TempData["Error"] = "Không tìm thấy báo cáo.";
+                return RedirectToAction("EndSemesterReport");
+            }
+
+            var period = await _context.AcademicPeriods.FirstOrDefaultAsync(p => p.PeriodId == periodId);
+            if (period == null)
+            {
+                TempData["Error"] = "Không tìm thấy học kỳ.";
+                return RedirectToAction("EndSemesterReport");
+            }
+
+            if (string.IsNullOrWhiteSpace(reportType))
+            {
+                TempData["Error"] = "Loại báo cáo không được để trống.";
+                return RedirectToAction("EndSemesterReport");
+            }
+
+            if (string.IsNullOrWhiteSpace(classId))
+            {
+                TempData["Error"] = "Mã lớp không được để trống.";
+                return RedirectToAction("EndSemesterReport");
+            }
+
+            reportToEdit.PeriodName = period.PeriodName;
+            reportToEdit.ReportType = reportType;
+            reportToEdit.ClassId = classId;
+
+            _context.SemesterReports.Update(reportToEdit);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Thông tin Báo Cáo cập nhật thành công";
+            return RedirectToAction("EndSemesterReport");
+        }
+
+        //Submit Report
+        [HttpPost]
+        public async Task<IActionResult> SubmitReport(int reportId)
+        {
+            bool validated = await PlanValidation(reportId);
+            if (validated == false)
+            {
+                TempData["Error"] = "Báo Cáo chưa đầy đủ thông tin, vui lòng điền đầy đủ thông tin trước khi thử lại!";
+                return RedirectToAction("EndSemesterReport");
+            }
+
+            var reportToSubmit = await _context.SemesterReports.FirstOrDefaultAsync(rp => rp.ReportId == reportId);
+            if (reportToSubmit.StatusReport == "Đã Nộp")
+            {
+                TempData["Warning"] = "Báo Cáo đã được nộp, vui lòng chỉnh lại chi tiết và tiến hành nộp lại!";
+                return RedirectToAction("EndSemesterReport");
+            }
+
+            reportToSubmit.StatusReport = "Đã Nộp";
+            _context.SemesterReports.Update(reportToSubmit);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Nộp Báo Cáo thành công";
+            return RedirectToAction("EndSemesterReport");
+        }
+
        
         
        [HttpPost]

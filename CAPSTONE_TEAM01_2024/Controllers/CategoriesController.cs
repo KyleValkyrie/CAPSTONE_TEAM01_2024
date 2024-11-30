@@ -146,6 +146,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     }
 }
         
+        
+        
         //Delete Report
         [HttpPost]
         public async Task<IActionResult> DeleteReport(int reportId)
@@ -242,6 +244,54 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             TempData["Success"] = "Nộp Báo Cáo thành công";
             return RedirectToAction("EndSemesterReport");
         }
+        
+        //Duplicate Plan
+        [HttpPost]
+        public async Task<IActionResult> DuplicateReport(int reportId)
+        {
+            //Fetch the original SemesterReport
+            var originalReport = _context.SemesterReports
+                .Include(rp => rp.ReportDetails) // Load associated PlanDetails
+                .FirstOrDefault(sp => sp.ReportId == reportId);
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            //Duplicated Plan data
+            var dupReport = new SemesterReport{ 
+                ClassId = originalReport.ClassId,
+                ReportType = originalReport.ReportType,
+                PeriodId = originalReport.PeriodId,
+                CreationTimeReport = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone),
+                AdvisorName = User.Identity.Name,
+                PeriodName = originalReport.PeriodName,
+                StatusReport = "Nháp"
+            };
+            _context.SemesterReports.Add(dupReport);
+            await _context.SaveChangesAsync();
+
+            //Duplicate Plan details
+            foreach (var detail in originalReport.ReportDetails)
+            {
+                var duplicatedDetail = new ReportDetail
+                {
+                    ReportId = dupReport.ReportId, 
+                    TaskReport = detail.TaskReport,
+                    CriterionId = detail.CriterionId,
+                    HowToExecuteReport = detail.HowToExecuteReport,
+                    AttachmentReport = detail.AttachmentReport,
+                    SelfAssessment = detail.SelfAssessment,
+                    FacultyAssessment = detail.FacultyAssessment,
+                    SelfRanking = detail.SelfRanking,
+                    FacultyRanking = detail.FacultyRanking,
+                    
+                };
+
+                _context.ReportDetails.Add(duplicatedDetail);
+            }
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Nhân bản Báo Cáo thành công!";
+            return RedirectToAction("EndSemesterReport");
+        }
+
 
        
         

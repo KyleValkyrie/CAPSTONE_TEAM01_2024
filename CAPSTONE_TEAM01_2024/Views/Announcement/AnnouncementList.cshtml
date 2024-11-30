@@ -184,6 +184,7 @@ bool isNotAdvitors = !roles.Contains("Cố Vấn");
 					<div class="mb-3">
 						<label for="Detail" class="form-label">Nội Dung</label>
 						<textarea class="form-control" id="Detail" name="Detail" required></textarea>
+						<div id="error-message" class="text-danger"></div>
 					</div>
 					<div class="mb-3">
 						<label for="StartTime" class="form-label">Thời Gian Bắt Đầu</label>
@@ -321,4 +322,17 @@ bool isNotAdvitors = !roles.Contains("Cố Vấn");
 		var noResultsRow = document.getElementById('noresults');
 		noResultsRow.style.display = (visibleRows.length === 0) ? "table-row" : "none";
 	}
+// Special Characters
+	document.getElementById('Detail').addEventListener('input', function () {
+		var textarea = document.getElementById('Detail');
+		var errorMessage = document.getElementById('error-message');
+		var regex = /^[a-zA-Z0-9\s]*$/; // Only allows letters, numbers, and spaces
+
+		if (!regex.test(textarea.value)) {
+			errorMessage.textContent = 'Không được dùng ký tự đặc biệt';
+		} else {
+			errorMessage.textContent = '';
+		}
+	});
+
 </script>

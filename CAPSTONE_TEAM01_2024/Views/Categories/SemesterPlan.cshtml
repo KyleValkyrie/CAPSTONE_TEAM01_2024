@@ -167,7 +167,7 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                        <div class="col">
                             <nav class="navbar navbar-light bg-light">
                                 <form class="d-flex ms-auto">
-                                    <input class="form-control me-2" type="search" placeholder="Nhập nội dung tìm kiếm" aria-label="Search">
+                                    <input class="form-control me-2" type="search" id="searchInput" placeholder="Nhập nội dung tìm kiếm" aria-label="Search">
                                 </form>
                             </nav>
                         </div>
@@ -294,8 +294,9 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                                 </tr>
                             }
                             <tr id="noresults" style="display: none;">
-                                <td colspan="9" class="text-center">Không tìm thấy nội dung</td>
+                                <td colspan="8" class="text-center">Không tìm thấy nội dung</td>
                             </tr>
+                           
                         </tbody>
                     </table>
                     <!-- Pagination Controls -->
@@ -848,4 +849,39 @@ function openEditSemesterPlan(planId, periodId, planType, classId) {
         var modal = new bootstrap.Modal(document.getElementById('DeletePlanModal')); 
         modal.show(); 
     }
+    // Search JS
+          document.getElementById('searchInput').addEventListener('keyup', function () {
+                var searchValue = this.value.toLowerCase();
+                var rows = document.getElementById('data-table').getElementsByTagName('tr');
+                var noResultsRow = document.getElementById('noresults');
+
+                var hasResults = false;
+
+                for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    var cells = row.getElementsByTagName('td');
+                    var match = false;
+
+                    for (var j = 0; j < cells.length; j++) {
+                        var cell = cells[j];
+                        if (cell.textContent.toLowerCase().includes(searchValue)) {
+                            match = true;
+                            break;
+                        }
+                    }
+
+                    if (match) {
+                        row.style.display = '';
+                        hasResults = true;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+
+                if (!hasResults) {
+                    noResultsRow.style.display = '';
+                } else {
+                    noResultsRow.style.display = 'none';
+                }
+            });
 </script>

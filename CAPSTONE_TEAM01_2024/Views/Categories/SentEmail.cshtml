@@ -52,6 +52,26 @@ ViewData["Title"] = "Sent Email";
                     {
                     <div class="alert alert-danger">@TempData["Warning"]</div>
                     }
+                    <!-- Here, we dynamically append the success message from sessionStorage -->
+                    <script>
+                        window.onload = function () {
+                            // Get the success message from sessionStorage
+                            const successMessage = sessionStorage.getItem("emailSentSuccess");
+                            if (successMessage) {
+                                // Create an alert div dynamically
+                                const alertDiv = document.createElement("div");
+                                alertDiv.classList.add("alert", "alert-success");
+                                alertDiv.innerHTML = successMessage;
+
+                                // Append it before the table
+                                const cardBody = document.querySelector(".card-body");
+                                cardBody.insertBefore(alertDiv, cardBody.querySelector("table"));
+
+                                // Remove the message from sessionStorage after displaying it
+                                sessionStorage.removeItem("emailSentSuccess");
+                            }
+                        };
+                    </script>
                     <table class="table table-bordered" id="data-table">
                         <thead>
                         <tr class="text-center">
@@ -242,8 +262,16 @@ ViewData["Title"] = "Sent Email";
                     </div>
                     <div class="mb-3">
                         <label for="emailAttachment" class="form-label">Tệp Đính Kèm</label>
-                        <input type="file" class="form-control" id="emailAttachment" name="emailAttachment" multiple>
-
+                        <div class="custom-file-container">
+                            <label class="custom-file-label btn btn-outline-secondary" for="emailAttachment"
+                                   style="cursor: pointer; padding: 10px 20px; display: inline-block; border-radius: 5px; text-align: center; border: 1px solid #ccc;">
+                                <span id="uploadText">Chọn tệp để tải lên</span>
+                            </label>
+                            <input type="file" id="emailAttachment" name="emailAttachment" multiple
+                                   style="display: none;" />
+                            <ul id="fileQueue"
+                                style="margin-top: 10px; padding-left: 0; list-style: none;"></ul>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -333,7 +361,7 @@ ViewData["Title"] = "Sent Email";
     }
 
 // Detail Modal JS
-$(document).on('click', '.btn-view-email', function () {
+    $(document).on('click', '.btn-view-email', function () {
     var emailId = $(this).data('email-id'); // Get the emailId from the button's data attribute
 
     // Send an AJAX request to fetch the email details
@@ -393,8 +421,76 @@ $(document).on('click', '.btn-view-email', function () {
     });
 });
 
+//Custom Upload File JS
+    // File queue array
+    let fileQueue = [];
+
+    // File input change handler
+    document.getElementById("emailAttachment").addEventListener("change", function (e) {
+        const files = Array.from(e.target.files);
+
+        files.forEach(file => {
+            if (!fileQueue.some(f => f.name === file.name && f.size === file.size)) {
+                fileQueue.push(file);
+
+                // Add file to the queue display
+                const fileItem = document.createElement("div");
+                fileItem.classList.add("file-item");
+                fileItem.style.display = "flex";
+                fileItem.style.alignItems = "center";
+                fileItem.style.marginBottom = "5px";
+
+                fileItem.innerHTML = `
+                    <span style="flex-grow: 1;">${file.name}</span>
+                    <button type="button" class="btn btn-danger btn-sm" style="margin-left: 10px;" onclick="removeFile('${file.name}', ${file.size}, this)">X</button>
+                `;
+
+                document.getElementById("fileQueue").appendChild(fileItem);
+            }
+        });
+
+        // Reset file input to allow re-selection of the same file
+        e.target.value = "";
+    });
+
+    // Remove file from queue
+    function removeFile(fileName, fileSize, button) {
+        // Remove file from the queue array
+        fileQueue = fileQueue.filter(f => !(f.name === fileName && f.size === fileSize));
+
+        // Remove file item from the queue display
+        const fileItem = button.parentElement;
+        fileItem.remove();
+    }
+
+    // Form submission handler
+    document.getElementById("addMailForm").addEventListener("submit", function (e) {
+        // Prepare form data
+        const formData = new FormData(this);
+
+        // Append queued files to the FormData object
+        fileQueue.forEach(file => formData.append("emailAttachment", file));
+
+        // Submit the form data using fetch or XMLHttpRequest (for AJAX) or let the form submit normally
+        e.preventDefault();
+        fetch(this.action, {
+            method: "POST",
+            body: formData,
+        }).then(response => {
+            if (response.ok) {
+                // Store success message in sessionStorage
+                sessionStorage.setItem("emailSentSuccess", "Gửi Mail thành công!");
+
+                // Redirect or reload to reflect the server-side changes
+                window.location.href = response.url;  // Optional: redirect or refresh
+            } else {
+                console.error("Error sending email.");
+            }
+        });
+    });
+
 // Handle input event for 'To' field
-$('#recipientTo').on('input', function() {
+    $('#recipientTo').on('input', function() {
     const query = $(this).val();
     
     if (query.length < 2) {
@@ -416,7 +512,7 @@ $('#recipientTo').on('input', function() {
 });
 
 // Handle input event for 'Cc' field
-$('#recipientCc').on('input', function() {
+    $('#recipientCc').on('input', function() {
     const query = $(this).val();
     
     if (query.length < 2) {
@@ -438,7 +534,7 @@ $('#recipientCc').on('input', function() {
 });
 
 // Handle input event for 'Bcc' field
-$('#recipientBcc').on('input', function() {
+    $('#recipientBcc').on('input', function() {
     const query = $(this).val();
     
     if (query.length < 2) {
@@ -460,8 +556,8 @@ $('#recipientBcc').on('input', function() {
 });
 
 //Autofill and tag system JS
-// Render the suggestion list based on the data
-function renderSuggestions(suggestionListId, data, field, hiddenField) {
+    // Render the suggestion list based on the data
+    function renderSuggestions(suggestionListId, data, field, hiddenField) {
     const suggestionList = $(suggestionListId);
     suggestionList.empty(); // Clear previous suggestions
 
@@ -503,7 +599,7 @@ function renderSuggestions(suggestionListId, data, field, hiddenField) {
 }
 
 // Add chip to the selected list and update the hidden field
-function addChip(email, fullName, role, field, hiddenField) {
+    function addChip(email, fullName, role, field, hiddenField) {
     const chipList = $(field + 'ChipList');
     const hiddenFieldInput = $(hiddenField);
 
@@ -557,7 +653,7 @@ function addChip(email, fullName, role, field, hiddenField) {
 }
 
 // Remove email from the hidden field when a chip is removed
-function removeEmailFromHiddenField(email, hiddenField) {
+    function removeEmailFromHiddenField(email, hiddenField) {
     let currentEmails = hiddenField.val().split(',');
     currentEmails = currentEmails.filter(e => e !== email); // Remove the email
     hiddenField.val(currentEmails.join(','));

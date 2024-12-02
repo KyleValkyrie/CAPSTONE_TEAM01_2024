@@ -1819,6 +1819,7 @@ public async Task<IActionResult> EditReportDetail(IFormCollection form)
                     .Include(e => e.Recipients)
                     .ThenInclude(r => r.User)
                     .Where(e => e.Recipients.Any(r => r.User.UserName == User.Identity.Name))
+                    .OrderByDescending(e => e.SentDate)
                     .Select(e => new Email
                     {
                         EmailId = e.EmailId,
@@ -1857,6 +1858,7 @@ public async Task<IActionResult> EditReportDetail(IFormCollection form)
                     .Include(e => e.Recipients)
                     .ThenInclude(r => r.User)
                     .Where(e => e.SenderId == currentUser.Id)
+                    .OrderByDescending(e=>e.SentDate)
                     .Select(e => new Email
                     {
                         EmailId = e.EmailId,
@@ -2049,7 +2051,6 @@ public async Task<IActionResult> EditReportDetail(IFormCollection form)
                 Sender = email.Sender.UserName
             });
         }
-
     }
 }
    

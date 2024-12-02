@@ -27,7 +27,19 @@
     
 
     /* CSS cụ thể cho các modal nhỏ */
-    #fileModal .modal-dialog,
+    #fileModal1_1 .modal-dialog,
+    #fileModal2_1 .modal-dialog,
+    #fileModal3_1 .modal-dialog,
+    #fileModal3_2 .modal-dialog,
+    #fileModal4_1 .modal-dialog,
+    #fileModal4_2 .modal-dialog,
+    #fileModal5_1 .modal-dialog,
+    #fileModal5_2 .modal-dialog,
+    #fileModal5_3 .modal-dialog,
+    #fileModal6_1 .modal-dialog,
+    #fileModal7_1 .modal-dialog,
+    #fileModal8_1 .modal-dialog,
+    #fileModal8_2 .modal-dialog,
     #EditSemesterReportModal .modal-dialog,
     #SubmitReportModal .modal-dialog,
     #DeleteReportModal .modal-dialog {
@@ -35,7 +47,7 @@
     }
 
     /* Định dạng cho các modal để phân biệt */
-    #fileModal .modal-header,
+    
     #EditSemesterReportModal .modal-header,
     #SubmitReportModal .modal-header,
     #DeleteReportModal .modal-header {
@@ -455,18 +467,32 @@
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea name="HowToExecute1_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
-                        
-                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
-                        <div id="uploadedFilesInfo1_1" class="file-info" style="cursor: pointer;">
-                            0 files uploaded
+                        <!-- Input file -->
+                        <input type="file" class="upload-file" data-target="fileList1_1" name="files1_1[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileModal1_1">
+                            Xem danh sách file đã upload
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="fileModal1_1" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="fileModalLabel1_1">Danh sách file đã upload</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="fileList1_1" class="list-group">
+                                            <!-- Danh sách file sẽ hiển thị tại đây -->
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList1_1" class="file-list"  style="  display: none;">
-                            <!-- Các file sẽ được thêm vào đây -->
-                        </ul>
-
-                        <input type="file" id="upload1_1" name="files1_1[]" multiple>
                     </div>
                 </div>
                 <!-- Rows for Tiêu Chí 2 -->
@@ -477,18 +503,32 @@
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea name="HowToExecute2_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
-                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
-                        <div id="uploadedFilesInfo2_1" class="file-info" style="cursor: pointer;">
-                            0 files uploaded
+                        <!-- Input file -->
+                        <input type="file" class="upload-file" data-target="fileList2_1" name="files2_1[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileModal2_1">
+                            Xem danh sách file đã upload
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="fileModal2_1" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="fileModalLabel2_1">Danh sách file đã upload</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="fileList2_1" class="list-group">
+                                            <!-- Danh sách file sẽ hiển thị tại đây -->
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList2_1" class="file-list" style="display: none;">
-                            <!-- Các file sẽ được thêm vào đây -->
-                        </ul>
-
-                        <input type="file" id="upload2_1" name="files2_1[]" multiple>
-                                    
                     </div>
                 </div>
                 <!-- Rows for Tiêu Chí 3 -->
@@ -501,29 +541,60 @@
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea name="HowToExecute3_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
-                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
-                        <div id="uploadedFilesInfo3_1" class="file-info" style="cursor: pointer;">
-                            0 files uploaded
+                        <!-- Input file -->
+                        <input type="file" class="upload-file" data-target="fileList3_1" name="files3_1[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileModal4_2">
+                            Xem danh sách file đã upload
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="fileModal3_1" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="fileModalLabel3_1">Danh sách file đã upload</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="fileList3_1" class="list-group">
+                                            <!-- Danh sách file sẽ hiển thị tại đây -->
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList3_1" class="file-list" style="display: none;">
-                            <!-- Các file sẽ được thêm vào đây -->
-                        </ul>
 
-                        <input type="file" id="upload3_1" name="files3_1[]" multiple>
                         <textarea name="HowToExecute3_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
-                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
-                        <div id="uploadedFilesInfo3_2" class="file-info" style="cursor: pointer;">
-                            0 files uploaded
+                        <!-- Input file -->
+                        <input type="file" class="upload-file" data-target="fileList3_2" name="files3_2[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileModal3_2">
+                            Xem danh sách file đã upload
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="fileModal3_2" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="fileModalLabel3_2">Danh sách file đã upload</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="fileList3_2" class="list-group">
+                                            <!-- Danh sách file sẽ hiển thị tại đây -->
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList3_2" class="file-list" style="display: none;">
-                            <!-- Các file sẽ được thêm vào đây -->
-                        </ul>
-
-                        <input type="file" id="upload3_2" name="files3_2[]" multiple>
 
                     </div>
                 </div>
@@ -537,29 +608,59 @@
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea name="HowToExecute4_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
-                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
-                        <div id="uploadedFilesInfo4_1" class="file-info" style="cursor: pointer;">
-                            0 files uploaded
+                        <!-- Input file -->
+                        <input type="file" class="upload-file" data-target="fileList4_1" name="files4_1[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileModal4_1">
+                            Xem danh sách file đã upload
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="fileModal4_1" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="fileModalLabel4_1">Danh sách file đã upload</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="fileList4_1" class="list-group">
+                                            <!-- Danh sách file sẽ hiển thị tại đây -->
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList4_1" class="file-list" style="display: none;">
-                            <!-- Các file sẽ được thêm vào đây -->
-                        </ul>
-
-                        <input type="file" id="upload4_1" name="files4_1[]" multiple>
                         <textarea name="HowToExecute4_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
-                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
-                        <div id="uploadedFilesInfo4_2" class="file-info" style="cursor: pointer;">
-                            0 files uploaded
+                        <!-- Input file -->
+                        <input type="file" class="upload-file" data-target="fileList4_2" name="files4_2[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileModal4_2">
+                            Xem danh sách file đã upload
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="fileModal4_2" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="fileModalLabel4_2">Danh sách file đã upload</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="fileList4_2" class="list-group">
+                                            <!-- Danh sách file sẽ hiển thị tại đây -->
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList4_2" class="file-list" style="display: none;">
-                            <!-- Các file sẽ được thêm vào đây -->
-                        </ul>
-
-                        <input type="file" id="upload4_2" name="files4_2[]" multiple>
 
                     </div>
                 </div>
@@ -575,41 +676,86 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea name="HowToExecute5_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
-                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
-                        <div id="uploadedFilesInfo5_1" class="file-info" style="cursor: pointer;">
-                            0 files uploaded
+                        <!-- Input file -->
+                        <input type="file" class="upload-file" data-target="fileList5_1" name="files5_1[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileModal5_1">
+                            Xem danh sách file đã upload
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="fileModal5_1" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="fileModalLabel5_1">Danh sách file đã upload</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="fileList5_1" class="list-group">
+                                            <!-- Danh sách file sẽ hiển thị tại đây -->
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList5_1" class="file-list" style="display: none;">
-                            <!-- Các file sẽ được thêm vào đây -->
-                        </ul>
-
-                        <input type="file" id="upload5_1" name="files5_1[]" multiple>
                         <textarea name="HowToExecute5_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
-                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
-                        <div id="uploadedFilesInfo5_2" class="file-info" style="cursor: pointer;">
-                            0 files uploaded
+                        <!-- Input file -->
+                        <input type="file" class="upload-file" data-target="fileList5_2" name="files5_2[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileModal5_2">
+                            Xem danh sách file đã upload
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="fileModal5_2" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="fileModalLabel5_2">Danh sách file đã upload</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="fileList5_2" class="list-group">
+                                            <!-- Danh sách file sẽ hiển thị tại đây -->
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList5_2" class="file-list" style="display: none;">
-                            <!-- Các file sẽ được thêm vào đây -->
-                        </ul>
-
-                        <input type="file" id="upload5_2" name="files5_2[]" multiple>
+                        <!-- 5_3 -->
                         <textarea name="HowToExecute5_3" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
-                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
-                        <div id="uploadedFilesInfo5_3" class="file-info" style="cursor: pointer;">
-                            0 files uploaded
+                        <!-- Input file -->
+                        <input type="file" class="upload-file" data-target="fileList5_3" name="files5_3[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileModal5_3">
+                            Xem danh sách file đã upload
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="fileModal5_3" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="fileModalLabel5_3">Danh sách file đã upload</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="fileList5_3" class="list-group">
+                                            <!-- Danh sách file sẽ hiển thị tại đây -->
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList5_3" class="file-list" style="display: none;">
-                            <!-- Các file sẽ được thêm vào đây -->
-                        </ul>
-
-                        <input type="file" id="upload5_3" name="files5_3[]" multiple>
 
                     </div>
                 </div>
@@ -621,17 +767,31 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea name="HowToExecute6_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
-                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
-                        <div id="uploadedFilesInfo6_1" class="file-info" style="cursor: pointer;">
-                            0 files uploaded
+                        <!-- Input file -->
+                        <input type="file" class="upload-file" data-target="fileList6_1" name="files6_1[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileModal6_1">
+                            Xem danh sách file đã upload
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="fileModal6_1" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="fileModalLabel6_1">Danh sách file đã upload</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="fileList6_1" class="list-group">
+                                            <!-- Danh sách file sẽ hiển thị tại đây -->
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList6_1" class="file-list" style="display: none;">
-                            <!-- Các file sẽ được thêm vào đây -->
-                        </ul>
-
-                        <input type="file" id="upload6_1" name="files6_1[]" multiple>
 
                     </div>
                 </div>
@@ -643,17 +803,32 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea name="HowToExecute7_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
-                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
-                        <div id="uploadedFilesInfo7_1" class="file-info" style="cursor: pointer;">
-                            0 files uploaded
+                        <!-- Input file -->
+                        <input type="file" class="upload-file" data-target="fileList7_1" name="files7_1[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileModal7_1">
+                            Xem danh sách file đã upload
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="fileModal7_1" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="fileModalLabel7_1">Danh sách file đã upload</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="fileList7_1" class="list-group">
+                                            <!-- Danh sách file sẽ hiển thị tại đây -->
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList7_1" class="file-list" style="display: none;">
-                            <!-- Các file sẽ được thêm vào đây -->
-                        </ul>
-
-                        <input type="file" id="upload7_1" name="files7_1[]" multiple>
 
                     </div>
                 </div>

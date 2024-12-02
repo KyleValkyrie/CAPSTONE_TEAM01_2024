@@ -10,7 +10,24 @@
 }
 
 <style>
+    .list-group-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .list-group-item img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        margin-right: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+    
+
     /* CSS cụ thể cho các modal nhỏ */
+    #fileModal .modal-dialog,
     #EditSemesterReportModal .modal-dialog,
     #SubmitReportModal .modal-dialog,
     #DeleteReportModal .modal-dialog {
@@ -18,6 +35,7 @@
     }
 
     /* Định dạng cho các modal để phân biệt */
+    #fileModal .modal-header,
     #EditSemesterReportModal .modal-header,
     #SubmitReportModal .modal-header,
     #DeleteReportModal .modal-header {
@@ -326,8 +344,8 @@
                                 </td>
                             </tr>
                         }
-                        <tr>
-                            <td colspan="9" class="text-center">Không tìm thấy nội dung</td>
+                        <tr id="noresults" style="display: none;">
+                            <td colspan="8" class="text-center">Không tìm thấy nội dung</td>
                         </tr>
                         </tbody>
                     </table>
@@ -648,33 +666,63 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
 
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                        <!-- 8_1 -->
                         <textarea name="HowToExecute8_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
-                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
-                        <div id="uploadedFilesInfo8_1" class="file-info" style="cursor: pointer;">
-                            0 files uploaded
+                        <!-- Input file -->
+                        <input type="file" class="upload-file" data-target="fileList8_1" name="files8_1[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileModal8_1">
+                            Xem danh sách file đã upload
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="fileModal8_1" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="fileModalLabel8_1">Danh sách file đã upload</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="fileList8_1" class="list-group">
+                                            <!-- Danh sách file sẽ hiển thị tại đây -->
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList8_1" class="file-list" style="display: none;">
-                            <!-- Các file sẽ được thêm vào đây -->
-                        </ul>
-
-                        <input type="file" id="upload8_1" name="files8_2[]" multiple>
+                        <!-- 8_2 -->
                         <textarea name="HowToExecute8_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
-                        <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
-                        <div id="uploadedFilesInfo8_2" class="file-info" style="cursor: pointer;">
-                            0 files uploaded
+                        <!-- Input file -->
+                        <input type="file" class="upload-file" data-target="fileList8_2" name="files8_2[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileModal8_2">
+                            Xem danh sách file đã upload
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="fileModal8_2" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="fileModalLabel8_2">Danh sách file đã upload</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="fileList8_2" class="list-group">
+                                            <!-- Danh sách file sẽ hiển thị tại đây -->
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList8_2" class="file-list" style="display: none;">
-                            <!-- Các file sẽ được thêm vào đây -->
-                        </ul>
-
-                        <input type="file" id="upload8_2" name="files8_2[]" multiple>   
 
                     </div>
-                        
                 </div>
                 <!--CVHT Danh Gia-->
                 <div style="display: flex; flex-direction: row; gap: 10px; margin-bottom: 20px;margin-top: 20px;margin-left: 10px;">
@@ -731,21 +779,6 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
     </div>
 </div>
 
-<!-- Modal hiển thị các file đã upload -->
-<div id="filesModal" style="display: none; position: fixed; top: 50%; left: 50%;
-                            transform: translate(-50%, -50%); background: #fff;
-                            border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                            padding: 20px; width: 400px;">
-    <h3>Uploaded Files</h3>
-    <ul id="fileList" style="list-style: none; padding: 0; font-size: 14px;">
-        <!-- Các file sẽ được thêm vào đây -->
-    </ul>
-    <button onclick="closeFilesModal()" style="padding: 8px 16px; background-color: #007bff;
-                                               color: white; border: none; border-radius: 4px;
-                                               cursor: pointer;">
-        Close
-    </button>
-</div>
 
 <!-- Submit Report Modal -->
 <div class="modal fade" id="SubmitReportModal" tabindex="-1" aria-labelledby="SubmitSemesterReportModalLabel" aria-hidden="true">
@@ -1067,16 +1100,33 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <input type="file" id="upload8_1" name="Editfiles8_1[]" multiple>
                         <textarea name="HowToExecute8_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Phần tử để hiển thị thông tin upload và khi click sẽ xổ danh sách các file -->
-                        <div id="uploadedFilesInfo8_2" class="file-info" style="cursor: pointer;">
+                        <div id="uploadedFilesInfo8_2" class="file-info" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#fileModal">
                             0 files uploaded
                         </div>
 
-                        <!-- Danh sách các file sẽ được hiển thị khi click vào phần tử -->
-                        <ul id="fileList8_2" class="file-list" style="display: none;">
-                            <!-- Các file sẽ được thêm vào đây -->
-                        </ul>
+                        <!-- Modal để hiển thị danh sách file -->
+                        <div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="fileModalLabel">Uploaded Files</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="fileList8_2" class="file-list">
+                                            <!-- Danh sách file sẽ được thêm vào đây -->
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
+                        <!-- Input file -->
                         <input type="file" id="upload8_2" name="Editfiles8_2[]" multiple>
+
 
                     </div>
 
@@ -1159,6 +1209,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
     </div>
 </div>
 
+
 <script>
     //Add Modal JS
     function openAddReportModal() {
@@ -1182,91 +1233,77 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
         var modal = new bootstrap.Modal(document.getElementById('EditSemesterReportModal'));
         modal.show();
     }
-
-    // Giả sử bạn có một API endpoint như sau:
-    // - `/api/files/{id}`: Lấy danh sách các file của phần tử có id là `{id}`
-    // - `/api/files/delete/{fileId}`: Xóa một file với fileId
-
+    
     // Giả lập ID của phần tử
     const elementIds = ["1_1", "2_1" ,"3_1", "3_2", "4_1", "4_2", "5_1", "5_2", "5_3", "6_1", "7_1", "8_1","8_2"]; // Thêm các id khác nếu cần
 
-    // Lấy dữ liệu từ server (API endpoint giả sử)
-    function fetchFiles(id) {
-        // Thay URL này bằng endpoint thật của bạn
-        return fetch(`/api/files/${id}`)
-            .then(response => response.json())
-            .then(data => data.files || [])
-            .catch(error => {
-                console.error("Error fetching files:", error);
-                return [];
-            });
-    }
+    document.querySelectorAll(".upload-file").forEach((fileInput) => {
+        fileInput.addEventListener("change", function () {
+            const targetId = this.getAttribute("data-target");
+            const fileList = document.getElementById(targetId);
+            fileList.innerHTML = ""; // Xóa danh sách hiện tại
 
-    // Cập nhật số lượng file cho phần tử
-    function updateUploadedFilesInfo(id) {
-        const filesInfoElement = document.getElementById("uploadedFilesInfo" + id);
+            const files = Array.from(this.files);
 
-        // Lấy danh sách file từ server
-        fetchFiles(id).then(files => {
-            filesInfoElement.textContent = `${files.length} files uploaded`;
-
-            // Cập nhật lại danh sách file khi có sự thay đổi
-            const fileList = document.getElementById("fileList" + id);
-            fileList.innerHTML = ''; // Xóa các mục cũ
             files.forEach((file, index) => {
-                const li = document.createElement("li");
-                li.innerHTML = `
-                <span>${file.name}</span>
-                <span class="delete-icon" onclick="deleteFile(${id}, ${file.id})">X</span>
-            `;
-                fileList.appendChild(li);
-            });
-        });
-    }
+                const listItem = document.createElement("li");
+                listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
 
-    // Hiển thị hoặc ẩn danh sách file khi click vào phần tử
-    function toggleFileList(id) {
-        const fileList = document.getElementById("fileList" + id);
-        // Nếu danh sách đang ẩn, hiển thị nó
-        if (fileList.style.display === "none") {
-            fileList.style.display = "block";
-            updateUploadedFilesInfo(id); // Cập nhật danh sách file khi xổ xuống
-        } else {
-            // Nếu danh sách đang hiển thị, ẩn nó
-            fileList.style.display = "none";
-        }
-    }
-
-    // Xóa file khỏi server
-    function deleteFile(id, fileId) {
-        // Gửi yêu cầu xóa file tới server
-        fetch(`/api/files/delete/${fileId}`, {
-            method: "DELETE"
-        })
-            .then(response => {
-                if (response.ok) {
-                    // Nếu xóa thành công, cập nhật lại số lượng file
-                    updateUploadedFilesInfo(id);
-                    alert("File deleted successfully!");
-                } else {
-                    alert("Error deleting file");
+                // Nếu là file hình ảnh, hiển thị ảnh
+                if (file.type.startsWith("image/")) {
+                    const img = document.createElement("img");
+                    img.src = URL.createObjectURL(file);
+                    img.alt = file.name;
+                    img.classList.add("me-2", "rounded");
+                    img.style.width = "50px";
+                    img.style.height = "50px";
+                    img.style.objectFit = "cover";
+                    listItem.appendChild(img);
                 }
-            })
-            .catch(error => {
-                console.error("Error deleting file:", error);
-                alert("Error deleting file");
+
+                // Thêm tên file
+                const fileName = document.createElement("span");
+                fileName.textContent = file.name;
+                listItem.appendChild(fileName);
+
+                // Tạo nút xóa với icon "X"
+                const removeBtn = document.createElement("button");
+                removeBtn.classList.add("btn", "btn-sm", "btn-danger", "d-flex", "align-items-center");
+
+                const removeIcon = document.createElement("i");
+                removeIcon.classList.add("bi", "bi-x-circle-fill"); // Biểu tượng Bootstrap Icons
+                removeBtn.appendChild(removeIcon);
+
+                removeBtn.addEventListener("click", () => {
+                    removeFile(fileInput, index);
+                });
+
+                listItem.appendChild(removeBtn);
+                fileList.appendChild(listItem);
             });
+        });
+    });
+
+    function removeFile(fileInput, index) {
+        const files = Array.from(fileInput.files);
+
+        files.splice(index, 1); // Xóa file khỏi danh sách
+
+        // Sử dụng DataTransfer để cập nhật lại danh sách file
+        const dataTransfer = new DataTransfer();
+        files.forEach((file) => {
+            dataTransfer.items.add(file);
+        });
+
+        fileInput.files = dataTransfer.files;
+
+        // Kích hoạt sự kiện change để cập nhật danh sách hiển thị
+        fileInput.dispatchEvent(new Event("change"));
     }
 
-    // Cập nhật số lượng file ngay khi tải trang
-    window.onload = function () {
-        elementIds.forEach(id => {
-            updateUploadedFilesInfo(id); // Cập nhật số lượng file
-            document.getElementById("uploadedFilesInfo" + id).onclick = function () {
-                toggleFileList(id); // Hiển thị hoặc ẩn danh sách khi click
-            };
-        });
-    };
+
+
+
 
     //Delete Report
     function openDeleteModal(reportId) {
@@ -1278,7 +1315,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
         modal.show();
     }
 
-    // Edit Report Detail Modal JS
+    
     // Edit Report Detail Modal JS
     const reportDetailsData = @Html.Raw(Json.Serialize(Model.ReportDetails)); // Đảm bảo không null
     const pattern = [1, 2, 3, 1, 2, 1, 2, 1, 2, 1];

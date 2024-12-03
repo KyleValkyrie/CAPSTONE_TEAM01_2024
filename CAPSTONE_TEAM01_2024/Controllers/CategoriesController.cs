@@ -291,84 +291,9 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             TempData["Success"] = "Nhân bản Báo Cáo thành công!";
             return RedirectToAction("EndSemesterReport");
         }
-
-
-       
         
-       [HttpPost]
-public async Task<IActionResult> EditReportDetail(IFormCollection form)
-{
-    // Lấy giá trị ReportIds từ form
-    var reportIdsString = form["DetailIds"].ToString();
-    var reportIds = reportIdsString.Split(',')
-        .Select(id => {
-            int reportId;
-            return int.TryParse(id.Trim(), out reportId) ? reportId : (int?)null;
-        })
-        .Where(id => id.HasValue) // Loại bỏ các giá trị không hợp lệ
-        .Select(id => id.Value)
-        .ToArray();
-
-    if (!reportIds.Any())
-    {
-        TempData["Error"] = "Các ID báo cáo không hợp lệ!";
-        return RedirectToAction("EndSemesterReport");
-    }
-
-    List<ReportDetail> detailsToEdit = new List<ReportDetail>();
-
-    // Kiểm tra và chỉnh sửa từng chi tiết báo cáo
-    for (int i = 0; i < reportIds.Length; i++)
-    {
-        var detail = await _context.ReportDetails.FirstOrDefaultAsync(r => r.DetailReportlId == reportIds[i]);
-        if (detail != null)
-        {
-            detail.TaskReport = form[$"EditTask{i + 1}"];
-            detail.HowToExecuteReport = form[$"EditHowToExecute{i + 1}"];
-            detail.SelfAssessment = form[$"EditSelfAssessment{i + 1}"];
-            detail.SelfRanking = Enum.TryParse<ReportDetail.Ranking>(form[$"EditSelfRanking{i + 1}"], out var selfRanking) ? selfRanking : ReportDetail.Ranking.E;
-            detail.FacultyAssessment = form[$"EditFacultyAssessment{i + 1}"];
-            detail.FacultyRanking = Enum.TryParse<ReportDetail.Ranking>(form[$"EditFacultyRanking{i + 1}"], out var facultyRanking) ? facultyRanking : ReportDetail.Ranking.E;
-
-            detailsToEdit.Add(detail);
-
-            // Xử lý tệp đính kèm
-            var fileNames = form[$"Editfiles{i + 1}[]"];
-            if (!string.IsNullOrWhiteSpace(fileNames))
-            {
-                var attachments = fileNames.Select(fileName => new AttachmentReport
-                {
-                    FileNames = fileName,
-                    FilePath = Path.Combine("Uploads", fileName),
-                    FileDatas = Array.Empty<byte>(),
-                    DetailReportlId = detail.DetailReportlId
-                }).ToList();
-
-                // Xóa tệp đính kèm cũ
-                _context.AttachmentReports.RemoveRange(detail.AttachmentReport);
-                detail.AttachmentReport = attachments;
-            }
-        }
-    }
-
-    // Cập nhật trạng thái báo cáo
-    var report = await _context.SemesterReports.FirstOrDefaultAsync(r => r.ReportId == reportIds[0]);
-    if (report != null)
-    {
-        report.StatusReport = "Nháp";  // Cập nhật trạng thái
-        _context.SemesterReports.Update(report);
-    }
-
-    // Cập nhật tất cả các chi tiết báo cáo
-    _context.ReportDetails.UpdateRange(detailsToEdit);
-
-    // Lưu thay đổi vào cơ sở dữ liệu
-    await _context.SaveChangesAsync();
-
-    TempData["Success"] = "Cập nhật báo cáo thành công!";
-    return RedirectToAction("EndSemesterReport");
-}
-
+        //Edit  Report Detail
+      
 
 
 //ClassList actions

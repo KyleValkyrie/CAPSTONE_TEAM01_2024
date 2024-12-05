@@ -24,7 +24,7 @@
                             <div class="col">
                                 <nav class="navbar navbar-light bg-light">
                                     <form class="d-flex ms-auto">
-                                        <input class="form-control me-2" type="search" placeholder="Nhập nội dung tìm kiếm" aria-label="Search">
+                                      <input class="form-control me-2" type="search" id="searchInput" placeholder="Nhập nội dung tìm kiếm" aria-label="Search">
                                     </form>
                                 </nav>
                             </div>
@@ -46,7 +46,7 @@
                         {
                             <div class="alert alert-danger">@TempData["Warning"]</div>
                         }
-                        <table class="table table-bordered">
+                    <table class="table table-bordered" id="data-table">
                             <thead>
                                 <tr class="text-center">
                                     <th>Người Gửi</th>
@@ -99,7 +99,7 @@
                                         </td>
                                     </tr>
                                 }
-                            <tr id="noresults" style="display: none;">
+                                <tr id="noresults" style="display: none;">
                                     <td colspan="5" class="text-center">Không tìm thấy nội dung</td>
                                 </tr>
                             </tbody>
@@ -284,7 +284,35 @@
 </div>
 
 <script>
+    
+        // Search JS
+        document.getElementById('searchInput').addEventListener('input', function () {
+            var input, filter, table, tr, td, i, txtValue, found;
+            input = document.getElementById('searchInput');
+            filter = input.value.toUpperCase();
+            table = document.getElementById('data-table');
+            tr = table.getElementsByTagName('tr');
+            found = false; // Initialize found as false
 
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName('td');
+                if (td.length > 0) { // Ensure td elements exist
+                    let match = false;
+                    for (let j = 0; j < td.length; j++) {
+                        txtValue = td[j].textContent || td[j].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            match = true;
+                            break;
+                        }
+                    }
+                    tr[i].style.display = match ? "" : "none";
+                    found = found || match;
+                }
+            }
+            // Display 'không tìm thấy nội dung' if nothing is found
+            var noResultsRow = document.getElementById('noresults');
+            noResultsRow.style.display = found ? "none" : "table-row";
+        });
     // Detail Modal JS
     $(document).on('click', '.btn-view-email', function () {
         var emailId = $(this).data('email-id'); // Get the emailId from the button's data attribute

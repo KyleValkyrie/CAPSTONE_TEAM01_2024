@@ -211,7 +211,7 @@
                         <div class="col">
                             <nav class="navbar navbar-light bg-light">
                                 <form class="d-flex ms-auto">
-                                    <input class="form-control me-2" type="search" placeholder="Nhập nội dung tìm kiếm" aria-label="Search">
+                                    <input class="form-control me-2" type="search" id="searchInput" placeholder="Nhập nội dung tìm kiếm" aria-label="Search">
                                 </form>
                             </nav>
                         </div>
@@ -231,7 +231,7 @@
                     {
                         <div class="alert alert-danger">@TempData["Warning"]</div>
                     }
-                    <table class="table table-striped">
+                    <table class="table table-striped" id="data-table">
                         <thead>
                         <tr class="text-center">
                             <th>#</th>
@@ -326,9 +326,9 @@
                                 </td>
                             </tr>
                         }
-                        <tr>
-                            <td colspan="9" class="text-center">Không tìm thấy nội dung</td>
-                        </tr>
+                             <tr id="noresults" style="display: none;">
+                                <td colspan="8" class="text-center">Không tìm thấy nội dung</td>
+                            </tr>
                         </tbody>
                     </table>
                     <!-- Pagination Controls -->
@@ -1095,6 +1095,34 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
 </div>
 
 <script>
+      // Search JS
+    document.getElementById('searchInput').addEventListener('input', function () {
+        var input, filter, table, tr, td, i, txtValue, found;
+        input = document.getElementById('searchInput');
+        filter = input.value.toUpperCase();
+        table = document.getElementById('data-table');
+        tr = table.getElementsByTagName('tr');
+        found = false; // Initialize found as false
+
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName('td');
+            if (td.length > 0) { // Ensure td elements exist
+                let match = false;
+                for (let j = 0; j < td.length; j++) {
+                    txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        match = true;
+                        break;
+                    }
+                }
+                tr[i].style.display = match ? "" : "none";
+                found = found || match;
+            }
+        }
+        // Display 'không tìm thấy nội dung' if nothing is found
+        var noResultsRow = document.getElementById('noresults');
+        noResultsRow.style.display = found ? "none" : "table-row";
+    });
     //Add Modal JS
     function openAddReportModal() {
         var modal = new bootstrap.Modal(document.getElementById('AddReportModal'));

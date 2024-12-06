@@ -60,7 +60,7 @@ bool isNotAdvitors = !roles.Contains("Cố Vấn");
 					{
 						<div class="alert alert-danger">@TempData["Warning"]</div>
 					}
-					<table class="table table-striped">
+					<table class="table table-striped" id="data-table">
 						<thead>
 							<tr class="text-center">
 								<th scope="col">#</th>
@@ -75,7 +75,7 @@ bool isNotAdvitors = !roles.Contains("Cố Vấn");
 
 							</tr>
 						</thead>
-						<tbody id="classTable">
+						<tbody id="data-table">
 							@foreach (var announcement in Model)
 							{
 							<tr>
@@ -287,41 +287,35 @@ bool isNotAdvitors = !roles.Contains("Cố Vấn");
 		var id = button.getAttribute('data-id');
 		document.getElementById('DeleteAnnouncementId').value = id;
 	}
-//Search JS
-	document.getElementById('searchInput').addEventListener('input', function () {
-		var query = this.value;
+ // Search JS
+        document.getElementById('searchInput').addEventListener('input', function () {
+            var input, filter, table, tr, td, i, txtValue, found;
+            input = document.getElementById('searchInput');
+            filter = input.value.toUpperCase();
+            table = document.getElementById('data-table');
+            tr = table.getElementsByTagName('tr');
+            found = false; // Initialize found as false
 
-		if (query.trim() === "") {
-			// If the query is empty, reload the entire table
-			fetch('@Url.Action("AnnouncementListPartial", "Announcement")')
-				.then(response => response.text())
-				.then(data => {
-					document.getElementById('classTable').innerHTML = data;
-					toggleNoResults();
-				});
-		} else {
-			// Otherwise, perform the search
-			$.ajax({
-				type: "GET",
-				url: '@Url.Action("SearchAnnouncements", "Announcement")',
-				data: { query: query },
-				success: function (data) {
-					document.getElementById('classTable').innerHTML = data;
-					toggleNoResults();
-				},
-				error: function () {
-					alert('Lỗi khi tìm kiếm. Vui lòng thử lại.');
-				}
-			});
-		}
-	});
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName('td');
+                if (td.length > 0) { // Ensure td elements exist
+                    let match = false;
+                    for (let j = 0; j < td.length; j++) {
+                        txtValue = td[j].textContent || td[j].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            match = true;
+                            break;
+                        }
+                    }
+                    tr[i].style.display = match ? "" : "none";
+                    found = found || match;
+                }
+            }
+            // Display 'không tìm thấy nội dung' if nothing is found
+            var noResultsRow = document.getElementById('noresults');
+            noResultsRow.style.display = found ? "none" : "table-row";
+        });
 
-	function toggleNoResults() {
-		var rows = document.getElementById('classTable').getElementsByTagName('tr');
-		var visibleRows = Array.from(rows).filter(row => row.style.display !== 'none' && row.id !== 'noresults');
-		var noResultsRow = document.getElementById('noresults');
-		noResultsRow.style.display = (visibleRows.length === 0) ? "table-row" : "none";
-	}
 // Special Characters
 	document.getElementById('Detail').addEventListener('input', function () {
 		var textarea = document.getElementById('Detail');

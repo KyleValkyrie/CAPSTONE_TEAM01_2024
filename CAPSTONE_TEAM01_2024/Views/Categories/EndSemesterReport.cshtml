@@ -1471,6 +1471,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                             </div>
                         </div>
 
+
                         <!-- 8_2 -->
                         <textarea name="EditHowToExecute8_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
@@ -1506,13 +1507,13 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                 <div style="display: flex; flex-direction: row; gap: 10px; margin-bottom: 20px;margin-top: 20px;margin-left: 10px;">
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <label for="selfAssessment" style="white-space: nowrap; font-weight: bold;">Cá Nhân Tự Đánh Giá:</label>
-                        <textarea id="selfAssessment" name="EditselfAssessment"
+                        <textarea id="EditselfAssessment" name="EditselfAssessment"
                                   placeholder="Nhập đánh giá"
                                   style="flex: 1; width: 850px; height: 50px;overflow-y: auto; "></textarea>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <label for="ranking" style="white-space: nowrap; font-weight: bold;">Cá Nhân Tự Xếp Loại:</label>
-                        <select id="ranking" name="Editranking"
+                        <select id="Editranking" name="Editranking"
                                 style="width: 120px; padding: 8px; border: 1px solid #ccc; border-radius: 8px; margin-left: 20px;">
                             <option value="A">A</option>
                             <option value="B">B</option>
@@ -1528,7 +1529,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
 
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <label for="FaculityAssessment" style="white-space: nowrap; font-weight: bold;">BCN Khoa Đánh Giá:</label>
-                        <textarea id="FaculityAssessment" name="EditFaculityAssessment"
+                        <textarea id="EditFaculityAssessment" name="EditFaculityAssessment"
                                   placeholder="Nhập đánh giá"
                                   style="flex: 1; width: 850px; height: 50px;overflow-y: auto;margin-left: 13px; "></textarea>
 
@@ -1536,7 +1537,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     <div style="display: flex; align-items: center; gap: 10px;margin-left: 10px;">
                         <label for="ranking" style="white-space: nowrap; font-weight: bold;">BCN Khoa Xếp Loại:</label>
                         <!-- Combo box -->
-                        <select id="Faculityranking" name="EditFaculityranking"
+                        <select id="EditFaculityranking" name="EditFaculityranking"
                                 style="width: 120px; padding: 8px; border: 1px solid #ccc; border-radius: 8px; margin-left: 20px;">
                             <option value="A">A</option>
                             <option value="B">B</option>
@@ -1546,16 +1547,16 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         </select>
                     </div>
                 </div>
-                <!-- Modal Footer -->
-                <div class="modal-footer" style="display: flex; justify-content: flex-end; width: 100%; align-items: center;">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Lưu</button> <!-- Submit button to send the form -->
-                </div>
+                    <!-- Modal Footer -->
+                    <div class="modal-footer" style="display: flex; justify-content: flex-end; width: 100%; align-items: center;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button> <!-- Submit button to send the form -->
+                    </div>
 
-            </form>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
 
 <!-- Delete Report Modal -->
@@ -1739,9 +1740,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
         // Kích hoạt sự kiện change để cập nhật danh sách hiển thị
         fileInput.dispatchEvent(new Event("change"));
     }
-
-
-
+    
     //Delete Report
     function openDeleteModal(reportId) {
         // Cập nhật giá trị ReportId vào hidden field của form
@@ -1753,25 +1752,25 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
     }
 
     
+  
     // Edit Report Detail Modal JS
     const reportDetailsData = @Html.Raw(Json.Serialize(Model.ReportDetails)); // Đảm bảo không null
     const pattern = [1, 2, 3, 1, 2, 1, 2, 1, 2, 1];
 
     function openEditReportDetailModal(reportId, periodId, classId, status) {
-        // Ghi log để kiểm tra dữ liệu
         console.log('Report Details Data:', reportDetailsData);
         console.log('Opening modal for Report ID:', reportId);
 
-        // Lọc dữ liệu chi tiết theo ReportId
+        // Lọc thông tin chi tiết báo cáo theo ReportId
         const relevantDetails = reportDetailsData.filter(detail => detail.reportId === reportId);
+
         if (relevantDetails.length === 0) {
             console.warn('No details found for Report ID:', reportId);
-            return; // Thoát nếu không có dữ liệu
+            return;
         }
 
         console.log('Relevant Details:', relevantDetails);
 
-        // Duyệt qua từng chi tiết và ánh xạ vào modal
         let cycle = 0;
         relevantDetails.forEach(detail => {
             const {
@@ -1783,120 +1782,107 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                 facultyRanking,
                 selfAssessment,
                 selfRanking,
-                files // Lấy danh sách file
+                files
             } = detail;
 
-            // Map CriterionId and Task to unique modal fields
-            const taskField = document.querySelector(`textarea[name="EditTask${criterionId}_${pattern[cycle]}"]`);
-            if (taskField) {
-                taskField.value = taskReport || '';
-            } else {
-                console.warn(`Task field for Criterion ID ${criterionId}_${pattern[cycle]} not found.`);
-            }
+            // Map và cập nhật thông tin vào các trường modal thông qua helper functions
+            updateModalFields(cycle, criterionId, taskReport, howToExecuteReport, facultyAssessment, selfAssessment, facultyRanking, selfRanking);
+            handleFileAttachments(files, criterionId, cycle);
 
-            const howToExecuteField = document.querySelector(`textarea[name="EditHowToExecute${criterionId}_${pattern[cycle]}"]`);
-            if (howToExecuteField) {
-                howToExecuteField.value = howToExecuteReport || '';
-            } else {
-                console.warn(`HowToExecute field for Criterion ID ${criterionId}_${pattern[cycle]} not found.`);
-            }
-
-            const facultyAssessmentField = document.querySelector(`textarea[name="EditFacultyAssessment${criterionId}_${pattern[cycle]}"]`);
-            if (facultyAssessmentField) {
-                facultyAssessmentField.value = facultyAssessment || '';
-            } else {
-                console.warn(`FacultyAssessment field for Criterion ID ${criterionId}_${pattern[cycle]} not found.`);
-            }
-
-            const rankingField = document.querySelector(`select[name="EditFacultyRanking${criterionId}_${pattern[cycle]}"]`);
-            if (rankingField) {
-                rankingField.value = facultyRanking || ''; // Default to 'E' if no ranking exists
-            } else {
-                console.warn(`FacultyRanking field for Criterion ID ${criterionId}_${pattern[cycle]} not found.`);
-            }
-
-            // Xử lý các trường SelfAssessment và SelfRanking
-            const selfAssessmentField = document.querySelector(`textarea[name="EditselfAssessment"]`);
-            if (selfAssessmentField) {
-                selfAssessmentField.value = selfAssessment || '';
-            } else {
-                console.warn('SelfAssessment field not found.');
-            }
-
-            const selfRankingField = document.querySelector(`select[name="Editranking"]`);
-            if (selfRankingField) {
-                selfRankingField.value = selfRanking || ''; // Default to 'E'
-            } else {
-                console.warn('SelfRanking field not found.');
-            }
-
-            // Cập nhật hidden field với DetailIds
+            // Cập nhật Detail IDs
             const detailIdsField = document.getElementById('DetailIds');
             if (detailIdsField) {
                 detailIdsField.value += (detailIdsField.value ? ',' : '') + detailReportId;
-            } else {
-                console.warn('DetailIds field not found.');
-            }
-
-            // Hiển thị danh sách file
-            const fileListElement = document.getElementById(`EditfileList${criterionId}_${pattern[cycle]}`);
-            if (fileListElement) {
-               
-                if (files && files.length > 0) {
-                    files.forEach(file => {
-                        const listItem = document.createElement("li");
-                        listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
-
-                        // Nếu là file hình ảnh, hiển thị ảnh
-                        if (file.url.match(/\.(jpeg|jpg|gif|png)$/)) {
-                            const img = document.createElement("img");
-                            img.src = file.url;
-                            img.alt = file.name;
-                            img.style.width = "50px";
-                            img.style.height = "50px";
-                            img.style.objectFit = "cover";
-                            img.classList.add("me-2", "rounded");
-                            listItem.appendChild(img);
-                        }
-
-                        // Thêm tên file
-                        const fileName = document.createElement("span");
-                        fileName.textContent = file.name;
-                        listItem.appendChild(fileName);
-
-                        // Thêm nút tải về
-                        const downloadBtn = document.createElement("a");
-                        downloadBtn.href = file.url;
-                        downloadBtn.classList.add("btn", "btn-sm", "btn-primary");
-                        downloadBtn.textContent = "Tải về";
-                        downloadBtn.setAttribute("download", file.name);
-                        listItem.appendChild(downloadBtn);
-
-                        fileListElement.appendChild(listItem);
-                    });
-                } else {
-                    fileListElement.innerHTML = "<li class='list-group-item text-danger'>Không có file nào được tải lên.</li>";
-                }
-            } else {
-                console.warn(`File list element for Criterion ID ${criterionId}_${pattern[cycle]} not found.`);
             }
 
             cycle++;
             if (cycle >= pattern.length) {
-                console.warn('Pattern array is too short for the number of details.');
-                cycle = 0; // Reset nếu vượt quá pattern
+                console.warn('Pattern index exceeds array length. Resetting.');
+                cycle = 0;
             }
         });
 
         // Hiển thị modal
         const modalElement = document.getElementById('EditReportDetailModal');
         if (modalElement) {
-            var modal = new bootstrap.Modal(modalElement);
+            const modal = new bootstrap.Modal(modalElement);
             modal.show();
         } else {
             console.error('EditReportDetailModal element not found in DOM.');
         }
     }
+
+    // Cập nhật thông tin cho các trường modal
+    function updateModalFields(cycle, criterionId, taskReport, howToExecuteReport, facultyAssessment, selfAssessment, facultyRanking, selfRanking) {
+        const taskField = document.querySelector(`textarea[name="EditTask${criterionId}_${pattern[cycle]}"]`);
+        if (taskField) taskField.value = taskReport || '';
+
+        const howToExecuteField = document.querySelector(`textarea[name="EditHowToExecute${criterionId}_${pattern[cycle]}"]`);
+        if (howToExecuteField) howToExecuteField.value = howToExecuteReport || '';
+
+        const facultyAssessmentField = document.querySelector(`textarea[name="EditFaculityAssessment"]`);
+        if (facultyAssessmentField) facultyAssessmentField.value = facultyAssessment || '';
+
+        const facultyRankingField = document.querySelector(`select[name="EditFaculityranking${criterionId}_${pattern[cycle]}"]`);
+        if (facultyRankingField) {
+            facultyRankingField.value = facultyRanking || '';
+        }
+
+        const selfAssessmentField = document.querySelector(`textarea[name="EditselfAssessment"]`);
+        if (selfAssessmentField) selfAssessmentField.value = selfAssessment || '';
+
+        const selfRankingField = document.querySelector(`select[name="Editranking${criterionId}_${pattern[cycle]}"]`);
+        if (selfRankingField) {
+            selfRankingField.value = selfRanking || 'B';
+        }
+    }
+
+    // Xử lý danh sách file đính kèm và hiển thị thông tin trong modal
+    function handleFileAttachments(files, criterionId, cycle) {
+        const fileListElement = document.getElementById(`EditfileList${criterionId}_${pattern[cycle]}`);
+        if (!fileListElement) {
+            console.warn(`File list element not found for ${criterionId}_${pattern[cycle]}`);
+            return;
+        }
+
+        fileListElement.innerHTML = ''; // Clear previous file data
+
+        if (files && files.length > 0) {
+            files.forEach(file => {
+                const listItem = document.createElement("li");
+                listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+
+                // Kiểm tra nếu là hình ảnh, hiển thị thumbnail
+                if (file.url.match(/\.(jpeg|jpg|gif|png)$/i)) {
+                    const img = document.createElement("img");
+                    img.src = file.url;
+                    img.alt = file.name;
+                    img.style.width = "50px";
+                    img.style.height = "50px";
+                    img.style.objectFit = "cover";
+                    img.classList.add("me-2", "rounded");
+                    listItem.appendChild(img);
+                }
+
+                const fileName = document.createElement("span");
+                fileName.textContent = file.name;
+                listItem.appendChild(fileName);
+
+                const downloadBtn = document.createElement("a");
+                downloadBtn.href = file.url;
+                downloadBtn.classList.add("btn", "btn-sm", "btn-primary");
+                downloadBtn.textContent = "Tải về";
+                downloadBtn.setAttribute("download", file.name);
+                listItem.appendChild(downloadBtn);
+
+                fileListElement.appendChild(listItem);
+            });
+        } else {
+            fileListElement.innerHTML = "<li class='list-group-item text-danger'>Không có file nào được tải lên.</li>";
+        }
+    }
+
+
 
 
 

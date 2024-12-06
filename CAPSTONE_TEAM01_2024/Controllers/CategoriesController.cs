@@ -293,6 +293,45 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         }
         
         //Edit  Report Detail
+        [HttpPost]
+        public async Task<IActionResult> GetReportDetails(int reportId) 
+        {
+            if (reportId <= 0)
+            {
+                return BadRequest("Invalid Report ID.");
+            }
+
+            var reportDetails = await _context.ReportDetails
+                .Include(r => r.AttachmentReport)
+                .Where(rd => rd.ReportId == reportId)
+                .Select(rd => new
+                {
+                    rd.ReportId,
+                    rd.DetailReportlId,
+                    rd.CriterionId,
+                    rd.TaskReport,
+                    rd.HowToExecuteReport,
+                    rd.FacultyAssessment,
+                    rd.FacultyRanking,
+                    rd.SelfAssessment,
+                    rd.SelfRanking,
+                    Files = rd.AttachmentReport.Select(f => new
+                    {
+                        f.FileNames,
+                        f.FilePath
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            if (!reportDetails.Any())
+            {
+                return NotFound("No data found.");
+            }
+
+            return Json(reportDetails); // Chọn trả về dữ liệu JSON
+        }
+
+
       
 
 

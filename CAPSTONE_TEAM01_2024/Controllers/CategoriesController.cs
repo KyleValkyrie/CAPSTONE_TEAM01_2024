@@ -24,6 +24,7 @@ using MimeKit;
 using NuGet.Protocol.Plugins;
 using static MimeKit.TextPart;
 using System.Linq;
+using Microsoft.AspNetCore.StaticFiles;
 
 
 namespace CAPSTONE_TEAM01_2024.Controllers
@@ -2047,10 +2048,45 @@ public async Task<IActionResult> EditReportDetail(IFormCollection form)
                 Subject = email.Subject,
                 Content = email.Content,
                 SentDate = email.SentDate,
-                Attachments = email.Attachments.Select(a => new { a.FileName }).ToList(),
+                Attachments = email.Attachments.Select(a => new
+                {
+                    a.AttachmentId, // Include the attachmentId
+                    a.FileName           // Return the file name
+                }).ToList(),
                 Sender = email.Sender.UserName
             });
         }
+    //Download files
+        [HttpGet]
+        public async Task<IActionResult> DownloadAttachment(int attachmentId)
+        {
+            var attachment = await _context.EmailAttachments
+                .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
+
+            if (attachment == null)
+            {
+                return NotFound();
+            }
+
+            // Return the file as a download
+            // Set the file name and the content type (e.g., PDF, Image, etc.)
+            var fileName = attachment.FileName;
+            var fileBytes = attachment.FileData; // Byte array containing the file data
+            
+            // Using FileExtensionContentTypeProvider to get MIME type dynamically
+            var provider = new FileExtensionContentTypeProvider();
+            var contentType = "application/octet-stream"; // Default content type
+
+            if (!provider.TryGetContentType(fileName, out contentType))
+            {
+                contentType = "application/octet-stream"; // Use generic binary type if no match
+            }
+
+            // Set the Content-Disposition header to prompt the user to download the file
+            Response.Headers.Add("Content-Disposition", $"attachment; filename*=UTF-8''{Uri.EscapeDataString(fileName)}");
+            return File(fileBytes, contentType, fileName);
+        }
+
     }
 }
    

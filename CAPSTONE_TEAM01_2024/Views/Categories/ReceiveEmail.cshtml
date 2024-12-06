@@ -326,7 +326,7 @@
                     var attachmentList = '';
                     if (data.attachments && data.attachments.length > 0) {
                         data.attachments.forEach(function (attachment) {
-                            attachmentList += `<li>${attachment.fileName}</li>`;
+                             attachmentList += `<li><button class="btn btn-link" onclick="downloadAttachment(${attachment.attachmentId})">${attachment.fileName}</button></li>`;
                         });
                     } else {
                         attachmentList = '<li>Không có file đính kèm</li>';
@@ -345,6 +345,52 @@
             }
         });
     });
+
+// Download attachment function
+    function downloadAttachment(attachmentId) {
+        console.log("Attempting to download attachment with ID:", attachmentId);
+
+        if (attachmentId) {
+            $.ajax({
+                url: '/Categories/DownloadAttachment',
+                type: 'GET',
+                data: { attachmentId: attachmentId },
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function (data, status, xhr) {
+                    var disposition = xhr.getResponseHeader('Content-Disposition');
+                    var fileName = "downloaded_file";
+
+                    // Parse file name from Content-Disposition header
+                    if (disposition) {
+                        // Try to get filename*= first (preferred for modern browsers)
+                        var fileNameMatch = disposition.match(/filename\*=UTF-8''([^;]+)|filename="([^"]+)"/);
+                        if (fileNameMatch) {
+                            // Decode UTF-8 encoded filename
+                            fileName = decodeURIComponent(fileNameMatch[1] || fileNameMatch[2]);
+                        }
+                    }
+
+                    var blob = new Blob([data], { type: xhr.getResponseHeader('Content-Type') });
+                    var url = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName; // Set the extracted file name
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                },
+                error: function (xhr, status, error) {
+                    console.error(`Error: ${status}, Message: ${error}, Response: ${xhr.responseText}`);
+                    alert('Không thể tải file đính kèm.');
+                }
+            });
+        } else {
+            alert("Attachment ID is undefined or invalid.");
+        }
+    }
+
 
 // Handle input event for 'To' field
     $('#recipientTo').on('input', function () {

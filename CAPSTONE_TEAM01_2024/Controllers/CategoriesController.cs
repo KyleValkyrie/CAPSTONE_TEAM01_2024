@@ -24,6 +24,7 @@ using MimeKit;
 using NuGet.Protocol.Plugins;
 using static MimeKit.TextPart;
 using System.Linq;
+using Microsoft.AspNetCore.StaticFiles;
 
 
 namespace CAPSTONE_TEAM01_2024.Controllers
@@ -146,6 +147,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     }
 }
         
+        
+        
         //Delete Report
         [HttpPost]
         public async Task<IActionResult> DeleteReport(int reportId)
@@ -177,82 +180,160 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("EndSemesterReport");
             }
         }
-       
         
-       [HttpPost]
-public async Task<IActionResult> EditReportDetail(IFormCollection form)
-{
-    // Lấy giá trị ReportIds từ form
-    var reportIdsString = form["DetailIds"].ToString();
-    var reportIds = reportIdsString.Split(',')
-        .Select(id => {
-            int reportId;
-            return int.TryParse(id.Trim(), out reportId) ? reportId : (int?)null;
-        })
-        .Where(id => id.HasValue) // Loại bỏ các giá trị không hợp lệ
-        .Select(id => id.Value)
-        .ToArray();
-
-    if (!reportIds.Any())
-    {
-        TempData["Error"] = "Các ID báo cáo không hợp lệ!";
-        return RedirectToAction("EndSemesterReport");
-    }
-
-    List<ReportDetail> detailsToEdit = new List<ReportDetail>();
-
-    // Kiểm tra và chỉnh sửa từng chi tiết báo cáo
-    for (int i = 0; i < reportIds.Length; i++)
-    {
-        var detail = await _context.ReportDetails.FirstOrDefaultAsync(r => r.DetailReportlId == reportIds[i]);
-        if (detail != null)
+         [HttpPost]
+        public async Task<IActionResult> EditReport(int reportId, int periodId, string reportType, string classId)
         {
-            detail.TaskReport = form[$"EditTask{i + 1}"];
-            detail.HowToExecuteReport = form[$"EditHowToExecute{i + 1}"];
-            detail.SelfAssessment = form[$"EditSelfAssessment{i + 1}"];
-            detail.SelfRanking = Enum.TryParse<ReportDetail.Ranking>(form[$"EditSelfRanking{i + 1}"], out var selfRanking) ? selfRanking : ReportDetail.Ranking.E;
-            detail.FacultyAssessment = form[$"EditFacultyAssessment{i + 1}"];
-            detail.FacultyRanking = Enum.TryParse<ReportDetail.Ranking>(form[$"EditFacultyRanking{i + 1}"], out var facultyRanking) ? facultyRanking : ReportDetail.Ranking.E;
-
-            detailsToEdit.Add(detail);
-
-            // Xử lý tệp đính kèm
-            var fileNames = form[$"Editfiles{i + 1}[]"];
-            if (!string.IsNullOrWhiteSpace(fileNames))
+            var reportToEdit = await _context.SemesterReports.FirstOrDefaultAsync(rp => rp.ReportId == reportId);
+            if (reportToEdit == null)
             {
-                var attachments = fileNames.Select(fileName => new AttachmentReport
-                {
-                    FileNames = fileName,
-                    FilePath = Path.Combine("Uploads", fileName),
-                    FileDatas = Array.Empty<byte>(),
-                    DetailReportlId = detail.DetailReportlId
-                }).ToList();
-
-                // Xóa tệp đính kèm cũ
-                _context.AttachmentReports.RemoveRange(detail.AttachmentReport);
-                detail.AttachmentReport = attachments;
+                TempData["Error"] = "Không tìm thấy báo cáo.";
+                return RedirectToAction("EndSemesterReport");
             }
+
+            var period = await _context.AcademicPeriods.FirstOrDefaultAsync(p => p.PeriodId == periodId);
+            if (period == null)
+            {
+                TempData["Error"] = "Không tìm thấy học kỳ.";
+                return RedirectToAction("EndSemesterReport");
+            }
+
+            if (string.IsNullOrWhiteSpace(reportType))
+            {
+                TempData["Error"] = "Loại báo cáo không được để trống.";
+                return RedirectToAction("EndSemesterReport");
+            }
+
+            if (string.IsNullOrWhiteSpace(classId))
+            {
+                TempData["Error"] = "Mã lớp không được để trống.";
+                return RedirectToAction("EndSemesterReport");
+            }
+
+            reportToEdit.PeriodName = period.PeriodName;
+            reportToEdit.ReportType = reportType;
+            reportToEdit.ClassId = classId;
+
+            _context.SemesterReports.Update(reportToEdit);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Thông tin Báo Cáo cập nhật thành công";
+            return RedirectToAction("EndSemesterReport");
         }
-    }
 
-    // Cập nhật trạng thái báo cáo
-    var report = await _context.SemesterReports.FirstOrDefaultAsync(r => r.ReportId == reportIds[0]);
-    if (report != null)
-    {
-        report.StatusReport = "Nháp";  // Cập nhật trạng thái
-        _context.SemesterReports.Update(report);
-    }
+        //Submit Report
+        [HttpPost]
+        public async Task<IActionResult> SubmitReport(int reportId)
+        {
+            bool validated = await PlanValidation(reportId);
+            if (validated == false)
+            {
+                TempData["Error"] = "Báo Cáo chưa đầy đủ thông tin, vui lòng điền đầy đủ thông tin trước khi thử lại!";
+                return RedirectToAction("EndSemesterReport");
+            }
 
-    // Cập nhật tất cả các chi tiết báo cáo
-    _context.ReportDetails.UpdateRange(detailsToEdit);
+            var reportToSubmit = await _context.SemesterReports.FirstOrDefaultAsync(rp => rp.ReportId == reportId);
+            if (reportToSubmit.StatusReport == "Đã Nộp")
+            {
+                TempData["Warning"] = "Báo Cáo đã được nộp, vui lòng chỉnh lại chi tiết và tiến hành nộp lại!";
+                return RedirectToAction("EndSemesterReport");
+            }
 
-    // Lưu thay đổi vào cơ sở dữ liệu
-    await _context.SaveChangesAsync();
+            reportToSubmit.StatusReport = "Đã Nộp";
+            _context.SemesterReports.Update(reportToSubmit);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Nộp Báo Cáo thành công";
+            return RedirectToAction("EndSemesterReport");
+        }
+        
+        //Duplicate Plan
+        [HttpPost]
+        public async Task<IActionResult> DuplicateReport(int reportId)
+        {
+            //Fetch the original SemesterReport
+            var originalReport = _context.SemesterReports
+                .Include(rp => rp.ReportDetails) // Load associated PlanDetails
+                .FirstOrDefault(sp => sp.ReportId == reportId);
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            //Duplicated Plan data
+            var dupReport = new SemesterReport{ 
+                ClassId = originalReport.ClassId,
+                ReportType = originalReport.ReportType,
+                PeriodId = originalReport.PeriodId,
+                CreationTimeReport = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone),
+                AdvisorName = User.Identity.Name,
+                PeriodName = originalReport.PeriodName,
+                StatusReport = "Nháp"
+            };
+            _context.SemesterReports.Add(dupReport);
+            await _context.SaveChangesAsync();
 
-    TempData["Success"] = "Cập nhật báo cáo thành công!";
-    return RedirectToAction("EndSemesterReport");
-}
+            //Duplicate Plan details
+            foreach (var detail in originalReport.ReportDetails)
+            {
+                var duplicatedDetail = new ReportDetail
+                {
+                    ReportId = dupReport.ReportId, 
+                    TaskReport = detail.TaskReport,
+                    CriterionId = detail.CriterionId,
+                    HowToExecuteReport = detail.HowToExecuteReport,
+                    AttachmentReport = detail.AttachmentReport,
+                    SelfAssessment = detail.SelfAssessment,
+                    FacultyAssessment = detail.FacultyAssessment,
+                    SelfRanking = detail.SelfRanking,
+                    FacultyRanking = detail.FacultyRanking,
+                    
+                };
 
+                _context.ReportDetails.Add(duplicatedDetail);
+            }
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Nhân bản Báo Cáo thành công!";
+            return RedirectToAction("EndSemesterReport");
+        }
+        
+        //Edit  Report Detail
+        [HttpPost]
+        public async Task<IActionResult> GetReportDetails(int reportId) 
+        {
+            if (reportId <= 0)
+            {
+                return BadRequest("Invalid Report ID.");
+            }
+
+            var reportDetails = await _context.ReportDetails
+                .Include(r => r.AttachmentReport)
+                .Where(rd => rd.ReportId == reportId)
+                .Select(rd => new
+                {
+                    rd.ReportId,
+                    rd.DetailReportlId,
+                    rd.CriterionId,
+                    rd.TaskReport,
+                    rd.HowToExecuteReport,
+                    rd.FacultyAssessment,
+                    rd.FacultyRanking,
+                    rd.SelfAssessment,
+                    rd.SelfRanking,
+                    Files = rd.AttachmentReport.Select(f => new
+                    {
+                        f.FileNames,
+                        f.FilePath
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            if (!reportDetails.Any())
+            {
+                return NotFound("No data found.");
+            }
+
+            return Json(reportDetails); // Chọn trả về dữ liệu JSON
+        }
+
+
+      
 
 
 //ClassList actions
@@ -1703,6 +1784,7 @@ public async Task<IActionResult> EditReportDetail(IFormCollection form)
                     .Include(e => e.Recipients)
                     .ThenInclude(r => r.User)
                     .Where(e => e.Recipients.Any(r => r.User.UserName == User.Identity.Name))
+                    .OrderByDescending(e => e.SentDate)
                     .Select(e => new Email
                     {
                         EmailId = e.EmailId,
@@ -1741,6 +1823,7 @@ public async Task<IActionResult> EditReportDetail(IFormCollection form)
                     .Include(e => e.Recipients)
                     .ThenInclude(r => r.User)
                     .Where(e => e.SenderId == currentUser.Id)
+                    .OrderByDescending(e=>e.SentDate)
                     .Select(e => new Email
                     {
                         EmailId = e.EmailId,
@@ -1929,9 +2012,43 @@ public async Task<IActionResult> EditReportDetail(IFormCollection form)
                 Subject = email.Subject,
                 Content = email.Content,
                 SentDate = email.SentDate,
-                Attachments = email.Attachments.Select(a => new { a.FileName }).ToList(),
+                Attachments = email.Attachments.Select(a => new
+                {
+                    a.AttachmentId, // Include the attachmentId
+                    a.FileName           // Return the file name
+                }).ToList(),
                 Sender = email.Sender.UserName
             });
+        }
+    //Download files
+        [HttpGet]
+        public async Task<IActionResult> DownloadAttachment(int attachmentId)
+        {
+            var attachment = await _context.EmailAttachments
+                .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
+
+            if (attachment == null)
+            {
+                return NotFound();
+            }
+
+            // Return the file as a download
+            // Set the file name and the content type (e.g., PDF, Image, etc.)
+            var fileName = attachment.FileName;
+            var fileBytes = attachment.FileData; // Byte array containing the file data
+            
+            // Using FileExtensionContentTypeProvider to get MIME type dynamically
+            var provider = new FileExtensionContentTypeProvider();
+            var contentType = "application/octet-stream"; // Default content type
+
+            if (!provider.TryGetContentType(fileName, out contentType))
+            {
+                contentType = "application/octet-stream"; // Use generic binary type if no match
+            }
+
+            // Set the Content-Disposition header to prompt the user to download the file
+            Response.Headers.Add("Content-Disposition", $"attachment; filename*=UTF-8''{Uri.EscapeDataString(fileName)}");
+            return File(fileBytes, contentType, fileName);
         }
 
     }

@@ -3,6 +3,144 @@
     ViewData["CategoryVisibility"] = ViewData["CategoryVisibility"];
 }
 
-<!-- Page content -->
-<!-- Navigation links -->
-Statistics here
+<div class="content-wrapper" style="min-height: 912.2px;">
+    <!-- Content Header (Page header) -->
+    <header class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h3 class="m-0">Dashboard</h3>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Bar Chart 1 -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header" style="background-color:mediumseagreen">
+                            <h4 class="card-title">Số Lượng Kế Hoạch</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart">
+                                <canvas id="barChart1" style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Bar Chart 2 -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header" style="background-color: #1b6ec2">
+                            <h4 class="card-title">Số Lượng Báo Cáo</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart">
+                                <canvas id="barChart2" style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Plugin to add shadow
+        const shadowPlugin = {
+            id: 'shadowPlugin',
+            beforeDraw: function (chart) {
+                const ctx = chart.ctx;
+                ctx.save();
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetX = 5;
+                ctx.shadowOffsetY = 5;
+            },
+            afterDraw: function (chart) {
+                chart.ctx.restore();
+            }
+        };
+
+        // Register plugin
+        Chart.register(shadowPlugin);
+
+        // Bar Chart 1 Configuration
+        var barCtx1 = document.getElementById('barChart1').getContext('2d');
+        var barChart1 = new Chart(barCtx1, {
+            type: 'bar',
+            data: {
+                labels: ['2022', '2023', '2024', '2025', '2026'],
+                datasets: [
+                    {
+                        label: 'Số Lượng ',
+                        data: [35, 22, 10, 27, 19, 8],
+                        backgroundColor: [
+                            'rgba(60, 179, 113, 0.8)'
+
+                        ],
+                        borderColor: [
+                            'rgba(60, 179, 113, 0.8)'
+
+                        ],
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Bar Chart 2 Configuration
+        var barCtx2 = document.getElementById('barChart2').getContext('2d');
+        var barChart2 = new Chart(barCtx2, {
+            type: 'bar',
+            data: {
+                labels: ['2022', '2023', '2024', '2025', '2026'],
+                datasets: [
+                    {
+                        label: 'Số Lượng',
+                        data: [12, 19, 3, 5, 2, 3],
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(153, 102, 255, 0.8)',
+                            'rgba(255, 159, 64, 0.8)',
+                            'rgba(255, 99, 132, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>

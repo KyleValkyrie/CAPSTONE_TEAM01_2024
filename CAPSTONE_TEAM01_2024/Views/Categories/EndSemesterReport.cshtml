@@ -1613,6 +1613,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
     });
     //Add Modal JS
     function openAddReportModal() {
+        console.log(bootstrap.Modal);
         var modal = new bootstrap.Modal(document.getElementById('AddReportModal'));
         modal.show();
     }
@@ -1715,7 +1716,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
 
 
       //Edit file or picture
-      let fileStore = {}; // Đối tượng lưu trữ các danh sách file theo từng input
+      let editfileStore = {}; // Đối tượng lưu trữ các danh sách file theo từng input
 
       // Xử lý khi thay đổi file
       document.querySelectorAll(".Edit-upload-file").forEach((fileInput) => {
@@ -1724,21 +1725,21 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
               const fileList = document.getElementById(targetId);
 
               // Nếu chưa có danh sách file, khởi tạo
-              if (!fileStore[targetId]) {
-                  fileStore[targetId] = [];
+              if (!editfileStore[targetId]) {
+                  editfileStore[targetId] = [];
               }
 
               const newFiles = Array.from(this.files);
 
               // Thêm file mới vào danh sách (tránh trùng lặp)
               newFiles.forEach((file) => {
-                  if (!fileStore[targetId].some((f) => f.name === file.name && f.size === file.size)) {
-                      fileStore[targetId].push(file);
+                  if (!editfileStore[targetId].some((f) => f.name === file.name && f.size === file.size)) {
+                      editfileStore[targetId].push(file);
                   }
               });
 
               // Hiển thị danh sách file
-              renderFileList(fileList, fileStore[targetId], fileInput, targetId);
+              renderEditFileList(fileList, editfileStore[targetId], fileInput, targetId);
 
               // Reset input để có thể chọn lại file
               this.value = "";
@@ -1746,7 +1747,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
       });
 
       // Hàm hiển thị danh sách file
-      function renderFileList(fileList, files, fileInput, targetId) {
+      function renderEditFileList(fileList, files, fileInput, targetId) {
           fileList.innerHTML = ""; // Xóa danh sách cũ
 
           files.forEach((file, index) => {
@@ -1780,10 +1781,10 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
 
               removeBtn.addEventListener("click", () => {
                   // Xóa file khỏi danh sách
-                  fileStore[targetId].splice(index, 1);
+                  editfileStore[targetId].splice(index, 1);
 
                   // Cập nhật lại danh sách hiển thị
-                  renderFileList(fileList, fileStore[targetId], fileInput, targetId);
+                  renderEditFileList(fileList, editfileStore[targetId], fileInput, targetId);
               });
 
               listItem.appendChild(removeBtn);

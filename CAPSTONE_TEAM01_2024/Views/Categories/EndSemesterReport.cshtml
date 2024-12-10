@@ -1637,139 +1637,162 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
     // Giả lập ID của phần tử
     const elementIds = ["1_1", "2_1" ,"3_1", "3_2", "4_1", "4_2", "5_1", "5_2", "5_3", "6_1", "7_1", "8_1","8_2"]; // Thêm các id khác nếu cần
     // Upload file or picture
-    document.querySelectorAll(".upload-file").forEach((fileInput) => {
-        fileInput.addEventListener("change", function () {
-            const targetId = this.getAttribute("data-target");
-            const fileList = document.getElementById(targetId);
-            fileList.innerHTML = ""; // Xóa danh sách hiện tại
+      let fileStore = {}; // Đối tượng lưu trữ các danh sách file theo từng input
 
-            const files = Array.from(this.files);
+      // Xử lý khi thay đổi file
+      document.querySelectorAll(".upload-file").forEach((fileInput) => {
+          fileInput.addEventListener("change", function () {
+              const targetId = this.getAttribute("data-target");
+              const fileList = document.getElementById(targetId);
 
-            files.forEach((file, index) => {
-                const listItem = document.createElement("li");
-                listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+              // Nếu chưa có danh sách file, khởi tạo
+              if (!fileStore[targetId]) {
+                  fileStore[targetId] = [];
+              }
 
-                // Nếu là file hình ảnh, hiển thị ảnh
-                if (file.type.startsWith("image/")) {
-                    const img = document.createElement("img");
-                    img.src = URL.createObjectURL(file);
-                    img.alt = file.name;
-                    img.classList.add("me-2", "rounded");
-                    img.style.width = "50px";
-                    img.style.height = "50px";
-                    img.style.objectFit = "cover";
-                    listItem.appendChild(img);
-                }
+              const newFiles = Array.from(this.files);
 
-                // Thêm tên file
-                const fileName = document.createElement("span");
-                fileName.textContent = file.name;
-                listItem.appendChild(fileName);
+              // Thêm file mới vào danh sách (tránh trùng lặp)
+              newFiles.forEach((file) => {
+                  if (!fileStore[targetId].some((f) => f.name === file.name && f.size === file.size)) {
+                      fileStore[targetId].push(file);
+                  }
+              });
 
-                // Tạo nút xóa với icon "X"
-                const removeBtn = document.createElement("button");
-                removeBtn.classList.add("btn", "btn-sm", "btn-danger", "d-flex", "align-items-center");
+              // Hiển thị danh sách file
+              renderFileList(fileList, fileStore[targetId], fileInput, targetId);
 
-                const removeIcon = document.createElement("i");
-                removeIcon.classList.add("bi", "bi-x-circle-fill"); // Biểu tượng Bootstrap Icons
-                removeBtn.appendChild(removeIcon);
+              // Reset input để có thể chọn lại file
+              this.value = "";
+          });
+      });
 
-                removeBtn.addEventListener("click", () => {
-                    removeFile(fileInput, index);
-                });
+      // Hàm hiển thị danh sách file
+      function renderFileList(fileList, files, fileInput, targetId) {
+          fileList.innerHTML = ""; // Xóa danh sách cũ
 
-                listItem.appendChild(removeBtn);
-                fileList.appendChild(listItem);
-            });
-        });
-    });
+          files.forEach((file, index) => {
+              const listItem = document.createElement("li");
+              listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
 
-    function removeFile(fileInput, index) {
-        const files = Array.from(fileInput.files);
+              // Hiển thị ảnh nếu là hình ảnh
+              if (file.type.startsWith("image/")) {
+                  const img = document.createElement("img");
+                  img.src = URL.createObjectURL(file);
+                  img.alt = file.name;
+                  img.classList.add("me-2", "rounded");
+                  img.style.width = "50px";
+                  img.style.height = "50px";
+                  img.style.objectFit = "cover";
+                  listItem.appendChild(img);
+              }
 
-        files.splice(index, 1); // Xóa file khỏi danh sách
+              // Hiển thị tên file
+              const fileName = document.createElement("span");
+              fileName.textContent = file.name;
+              listItem.appendChild(fileName);
 
-        // Sử dụng DataTransfer để cập nhật lại danh sách file
-        const dataTransfer = new DataTransfer();
-        files.forEach((file) => {
-            dataTransfer.items.add(file);
-        });
+              // Nút xóa
+              const removeBtn = document.createElement("button");
+              removeBtn.classList.add("btn", "btn-sm", "btn-danger", "d-flex", "align-items-center");
 
-        fileInput.files = dataTransfer.files;
+              const removeIcon = document.createElement("i");
+              removeIcon.classList.add("bi", "bi-x-circle-fill"); // Biểu tượng Bootstrap Icons
+              removeBtn.appendChild(removeIcon);
 
-        // Kích hoạt sự kiện change để cập nhật danh sách hiển thị
-        fileInput.dispatchEvent(new Event("change"));
-    }
-    
-    //Edit file or picture
-    document.querySelectorAll(".Edit-upload-file").forEach((fileInput) => {
-        fileInput.addEventListener("change", function () {
-            const targetId = this.getAttribute("data-target");
-            const fileList = document.getElementById(targetId);
+              removeBtn.addEventListener("click", () => {
+                  // Xóa file khỏi danh sách
+                  fileStore[targetId].splice(index, 1);
 
-            // Reset danh sách file
-            fileList.innerHTML = "";
+                  // Cập nhật lại danh sách hiển thị
+                  renderFileList(fileList, fileStore[targetId], fileInput, targetId);
+              });
 
-            // Lấy danh sách file đã tải lên
-            const files = Array.from(this.files);
+              listItem.appendChild(removeBtn);
+              fileList.appendChild(listItem);
+          });
+      }
 
-            files.forEach((file, index) => {
-                const listItem = document.createElement("li");
-                listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
 
-                // Nếu là file hình ảnh, hiển thị ảnh
-                if (file.type.startsWith("image/")) {
-                    const img = document.createElement("img");
-                    img.src = URL.createObjectURL(file);
-                    img.alt = file.name;
-                    img.classList.add("me-2", "rounded");
-                    img.style.width = "50px";
-                    img.style.height = "50px";
-                    img.style.objectFit = "cover";
-                    listItem.appendChild(img);
-                }
+      //Edit file or picture
+      let fileStore = {}; // Đối tượng lưu trữ các danh sách file theo từng input
 
-                // Thêm tên file
-                const fileName = document.createElement("span");
-                fileName.textContent = file.name;
-                listItem.appendChild(fileName);
+      // Xử lý khi thay đổi file
+      document.querySelectorAll(".Edit-upload-file").forEach((fileInput) => {
+          fileInput.addEventListener("change", function () {
+              const targetId = this.getAttribute("data-target");
+              const fileList = document.getElementById(targetId);
 
-                // Tạo nút xóa với icon "X"
-                const removeBtn = document.createElement("button");
-                removeBtn.classList.add("btn", "btn-sm", "btn-danger", "d-flex", "align-items-center");
+              // Nếu chưa có danh sách file, khởi tạo
+              if (!fileStore[targetId]) {
+                  fileStore[targetId] = [];
+              }
 
-                const removeIcon = document.createElement("i");
-                removeIcon.classList.add("bi", "bi-x-circle-fill"); // Biểu tượng Bootstrap Icons
-                removeBtn.appendChild(removeIcon);
+              const newFiles = Array.from(this.files);
 
-                removeBtn.addEventListener("click", () => {
-                    removeFile(fileInput, index);
-                });
+              // Thêm file mới vào danh sách (tránh trùng lặp)
+              newFiles.forEach((file) => {
+                  if (!fileStore[targetId].some((f) => f.name === file.name && f.size === file.size)) {
+                      fileStore[targetId].push(file);
+                  }
+              });
 
-                listItem.appendChild(removeBtn);
-                fileList.appendChild(listItem);
-            });
-        });
-    });
+              // Hiển thị danh sách file
+              renderFileList(fileList, fileStore[targetId], fileInput, targetId);
 
-    function removeFile(fileInput, index) {
-        const files = Array.from(fileInput.files);
+              // Reset input để có thể chọn lại file
+              this.value = "";
+          });
+      });
 
-        files.splice(index, 1); // Xóa file khỏi danh sách
+      // Hàm hiển thị danh sách file
+      function renderFileList(fileList, files, fileInput, targetId) {
+          fileList.innerHTML = ""; // Xóa danh sách cũ
 
-        // Sử dụng DataTransfer để cập nhật lại danh sách file
-        const dataTransfer = new DataTransfer();
-        files.forEach((file) => {
-            dataTransfer.items.add(file);
-        });
+          files.forEach((file, index) => {
+              const listItem = document.createElement("li");
+              listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
 
-        fileInput.files = dataTransfer.files;
+              // Hiển thị ảnh nếu là hình ảnh
+              if (file.type.startsWith("image/")) {
+                  const img = document.createElement("img");
+                  img.src = URL.createObjectURL(file);
+                  img.alt = file.name;
+                  img.classList.add("me-2", "rounded");
+                  img.style.width = "50px";
+                  img.style.height = "50px";
+                  img.style.objectFit = "cover";
+                  listItem.appendChild(img);
+              }
 
-        // Kích hoạt sự kiện change để cập nhật danh sách hiển thị
-        fileInput.dispatchEvent(new Event("change"));
-    }
-    
-    //Delete Report
+              // Hiển thị tên file
+              const fileName = document.createElement("span");
+              fileName.textContent = file.name;
+              listItem.appendChild(fileName);
+
+              // Nút xóa
+              const removeBtn = document.createElement("button");
+              removeBtn.classList.add("btn", "btn-sm", "btn-danger", "d-flex", "align-items-center");
+
+              const removeIcon = document.createElement("i");
+              removeIcon.classList.add("bi", "bi-x-circle-fill"); // Biểu tượng Bootstrap Icons
+              removeBtn.appendChild(removeIcon);
+
+              removeBtn.addEventListener("click", () => {
+                  // Xóa file khỏi danh sách
+                  fileStore[targetId].splice(index, 1);
+
+                  // Cập nhật lại danh sách hiển thị
+                  renderFileList(fileList, fileStore[targetId], fileInput, targetId);
+              });
+
+              listItem.appendChild(removeBtn);
+              fileList.appendChild(listItem);
+          });
+      }
+
+
+      //Delete Report
     function openDeleteModal(reportId) {
         // Cập nhật giá trị ReportId vào hidden field của form
         document.getElementById('DeleteReportId').value = reportId;

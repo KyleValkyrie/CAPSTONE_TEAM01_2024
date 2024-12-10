@@ -1806,7 +1806,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
     
   
     // Edit Report Detail Modal JS
-    const reportDetailsData = @Html.Raw(Json.Serialize(Model.ReportDetails)); // Đảm bảo không null
+      const reportDetailsData = @Html.Raw(Json.Serialize(Model.ReportDetails));// Đảm bảo không null
     const pattern = [1, 2, 3, 1, 2, 1, 2, 1, 2, 1];
 
     function openEditReportDetailModal(reportId, periodId, classId, status) {
@@ -1815,6 +1815,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
 
         // Lọc thông tin chi tiết báo cáo theo ReportId
         const relevantDetails = reportDetailsData.filter(detail => detail.reportId === reportId);
+        console.log('Relevant Details:', relevantDetails);
+
 
         if (relevantDetails.length === 0) {
             console.warn('No details found for Report ID:', reportId);

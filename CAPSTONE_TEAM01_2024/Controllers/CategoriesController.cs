@@ -120,6 +120,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 .Select(fileName => new AttachmentReport
                 {
                     FileNames = fileName,
+                    FilePath = Path.Combine("Uploads", fileName), // Điều chỉnh đường dẫn thực tế
                     FileDatas = Array.Empty<byte>(), // Nếu cần lưu dữ liệu thực của tệp
                     DetailReportlId = report.ReportId
                 }).ToList(),

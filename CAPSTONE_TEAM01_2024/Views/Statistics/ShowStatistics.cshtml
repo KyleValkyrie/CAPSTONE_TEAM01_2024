@@ -2,52 +2,132 @@
     ViewData["Title"] = "Show Statistic";
     ViewData["CategoryVisibility"] = ViewData["CategoryVisibility"];
 }
+<style>
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100px;
+    }
+    .card-header i {
+        font-size: 2.5rem;
+    }
+    .card-body h5 {
+        font-size: 1.2rem;
+        color: #555;
+    }
+</style>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 <div class="content-wrapper" style="min-height: 912.2px;">
     <!-- Content Header (Page header) -->
     <header class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-6">
+                <div class="col-sm-6 ms-5">
                     <h3 class="m-0">Dashboard</h3>
                 </div>
             </div>
         </div>
     </header>
 
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <!-- Bar Chart 1 -->
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header" style="background-color:mediumseagreen">
-                            <h4 class="card-title">Số Lượng Kế Hoạch</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart">
-                                <canvas id="barChart1" style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;"></canvas>
-                            </div>
-                        </div>
+    <!-- Nội dung chính -->
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Card 1 -->
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+                <div class="card shadow text-center">
+                    <div class="card-header bg-warning text-white d-flex align-items-center justify-content-center">
+                        <i class="material-icons" style="font-size: 2.5rem;">account_circle</i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Tài Khoản</h5>
+                        <h3>102</h3>
+                        <p class="text-muted"><i class="material-icons" style="font-size: 1.2rem; vertical-align: middle">supervisor_account</i> Đã Đăng Nhập Vào Hệ Thống </p>
                     </div>
                 </div>
-                <!-- Bar Chart 2 -->
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header" style="background-color: #1b6ec2">
-                            <h4 class="card-title">Số Lượng Báo Cáo</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart">
-                                <canvas id="barChart2" style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;"></canvas>
-                            </div>
-                        </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+                <div class="card shadow text-center">
+                    <div class="card-header bg-danger text-white d-flex align-items-center justify-content-center">
+                        <i class="material-icons" style="font-size: 2.5rem;">class</i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Tổng Lớp</h5>
+                        <h3>17</h3>
+                        <p class="text-muted"><i class="material-icons" style="font-size: 1.2rem; vertical-align: middle">school</i> Đã Được Tạo</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+                <div class="card shadow text-center">
+                    <div class="card-header bg-success text-white d-flex align-items-center justify-content-center">
+                        <i class="material-icons" style="font-size: 2.5rem;">date_range</i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Năm Học</h5>
+                        <h3>4</h3>
+                        <p class="text-muted"><i class="material-icons" style="font-size: 1.2rem; vertical-align: middle" >today</i> Đã Được Tạo</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 4 -->
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+                <div class="card shadow text-center">
+                    <div class="card-header bg-info text-white d-flex align-items-center justify-content-center">
+                        <i class="material-icons" style="font-size: 2.5rem;">group</i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">aaa</h5>
+                        <h3>bbbbb</h3>
+                        <p class="text-muted">
+                            <i class="material-icons" style="font-size: 1.2rem; vertical-align: middle;">update</i>
+                            ccccc
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+
+        <!-- Charts -->
+        <div class="row">
+            <!-- Chart 1 -->
+            <div class="col-lg-6 col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5>Số Lượng Kế Hoạch</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="barChart1"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- Chart 2 -->
+            <div class="col-lg-6 col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5>Số Lượng Báo Cáo</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="barChart2"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+
+
 
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
@@ -84,12 +164,18 @@
                         label: 'Số Lượng ',
                         data: [35, 22, 10, 27, 19, 8],
                         backgroundColor: [
-                            'rgba(60, 179, 113, 0.8)'
-
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(153, 102, 255, 0.8)',
+                            'rgba(255, 159, 64, 0.8)',
+                            'rgba(255, 99, 132, 0.8)'
                         ],
                         borderColor: [
-                            'rgba(60, 179, 113, 0.8)'
-
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(255, 99, 132, 1)'
                         ],
                         borderWidth: 1
                     }
@@ -97,6 +183,11 @@
             },
             options: {
                 responsive: true,
+                plugins: {
+                    legend: {
+                        display: false // Tắt hiển thị legend
+                    }
+                },
                 scales: {
                     y: {
                         beginAtZero: true
@@ -135,6 +226,11 @@
             },
             options: {
                 responsive: true,
+                plugins: {
+                    legend: {
+                        display: false // Tắt hiển thị legend
+                    }
+                },
                 scales: {
                     y: {
                         beginAtZero: true
@@ -144,3 +240,4 @@
         });
     });
 </script>
+

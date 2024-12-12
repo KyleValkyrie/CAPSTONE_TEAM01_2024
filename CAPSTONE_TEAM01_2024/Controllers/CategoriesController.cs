@@ -25,6 +25,7 @@ using NuGet.Protocol.Plugins;
 using static MimeKit.TextPart;
 using System.Linq;
 using Microsoft.AspNetCore.StaticFiles;
+using System.Net.Mail;
 
 
 namespace CAPSTONE_TEAM01_2024.Controllers
@@ -40,7 +41,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         }
 
 //SemesterReport actions
-        //Render SemesterReport
+    //Render SemesterReport
         public async Task<IActionResult> EndSemesterReport(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["Page"] =" EndSemesterReport";
@@ -79,77 +80,126 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             ViewBag.Warning = TempData["Warning"];
             ViewBag.Success = TempData["Success"];
             ViewBag.Error = TempData["Error"]; return View(viewModel);
-        }   
-        // Add SemesterReport
-        [HttpPost] 
-        public async Task<IActionResult> AddReport(SemesterReport report, IFormCollection form) 
+        }
+    // Add SemesterReport
+        [HttpPost]
+        public async Task<IActionResult> AddReport(SemesterReport report, IFormCollection form)
         {
-    // Setup data for SemesterReport
-    var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
-    report.CreationTimeReport = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
-    report.AdvisorName = User.Identity.Name;
-    var period = await _context.AcademicPeriods.FirstOrDefaultAsync(p => p.PeriodId == report.PeriodId);
-    report.PeriodName = period.PeriodName;
-    report.StatusReport = "Nháp";
+        // Check validity
+            var existedReport = await _context.SemesterReports.FirstOrDefaultAsync(sr => sr.ClassId == report.ClassId && sr.PeriodId == report.PeriodId);
+            if (existedReport != null)
+            {
+                TempData["Warning"] = "Đã tồn tại báo cáo cùng thời gian và lớp, xin hãy chọn lại thông tin phù hợp";
+                return RedirectToAction("EndSemesterReport");
+            }
+        // Get the SE Asia Standard Time timezone
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+        // Convert the time to Vietnam time
+            var vietnamTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
 
-    // Add new SemesterReport
-    var existingReport = await _context.SemesterReports.FirstOrDefaultAsync(rp =>
-        rp.AcademicPeriod == report.AcademicPeriod &&
-        rp.ClassId == report.ClassId &&
-        rp.AdvisorName == report.AdvisorName);
-    
-    if (existingReport == null)
-    {
-        _context.SemesterReports.Add(report);
-        await _context.SaveChangesAsync();
+        // Handling SemesterReports table
+            report.PeriodName = await _context.AcademicPeriods.Where(ap => ap.PeriodId == report.PeriodId)
+                                                              .Select(ap => ap.PeriodName)
+                                                              .FirstOrDefaultAsync();
+            report.AdvisorName = User.Identity.Name;
+            report.CreationTimeReport = vietnamTime;
+            report.StatusReport = "Nháp";
+            report.SelfAssessment = report.SelfAssessment;
+            report.SelfRanking = report.SelfRanking;
+            _context.SemesterReports.Add(report);
+            await _context.SaveChangesAsync();
 
-        // Setup data for ReportDetails
-        var detailIds = new List<string>
-        {
-            "1_1", "2_1", "3_1", "3_2", "4_1", "4_2", 
-            "5_1", "5_2", "5_3", "6_1", "7_1", "8_1", "8_2"
-        };
+            //Handling ReportDetails table
+            var rpID = report.ReportId;
+            List<ReportDetail> listToAdd = new List<ReportDetail>();
 
-        var details = detailIds.Select(id => new ReportDetail
-        {
-            ReportId = report.ReportId,
-            CriterionId = int.Parse(id.Split('_')[0]),
-            TaskReport = form[$"Task{id}"],
-            HowToExecuteReport = form[$"HowToExecute{id}"],
-            AttachmentReport = form[$"files{id}[]"]
-                .Select(fileName => new AttachmentReport
+            // Define the criterion groups (each group contains the task numbers)
+            var criterionTasks = new[]
+            {
+                new { CriterionId = 1, TaskCount = 1 },
+                new { CriterionId = 2, TaskCount = 1 },
+                new { CriterionId = 3, TaskCount = 2 },
+                new { CriterionId = 4, TaskCount = 2 },
+                new { CriterionId = 5, TaskCount = 3 },
+                new { CriterionId = 6, TaskCount = 1 },
+                new { CriterionId = 7, TaskCount = 1 },
+                new { CriterionId = 8, TaskCount = 2 }
+            };
+
+            foreach (var criterion in criterionTasks)
+            {
+                for (int i = 1; i <= criterion.TaskCount; i++)
                 {
-                    FileNames = fileName,
-                    FilePath = Path.Combine("Uploads", fileName), // Điều chỉnh đường dẫn thực tế
-                    FileDatas = Array.Empty<byte>(), // Nếu cần lưu dữ liệu thực của tệp
-                    DetailReportlId = report.ReportId
-                }).ToList(),
-            // Add SelfAssessment and SelfRanking
-            SelfAssessment = form["selfAssessment"], // Get personal assessment from form
-            SelfRanking = Enum.TryParse<ReportDetail.Ranking>(form["ranking"], out var selfRank) ? selfRank : ReportDetail.Ranking.E, // Default to "E" if invalid
-            // Add FacultyAssessment and FacultyRanking
-            FacultyAssessment = form["FaculityAssessment"], // Get faculty assessment from form
-            FacultyRanking = Enum.TryParse<ReportDetail.Ranking>(form["Faculityranking"], out var facultyRank) ? facultyRank : ReportDetail.Ranking.E // Default to "E" if invalid
-        }).ToList();
+                    listToAdd.Add(new ReportDetail()
+                    {
+                        ReportId = rpID,
+                        CriterionId = criterion.CriterionId,
+                        TaskReport = form[$"Task{criterion.CriterionId}_{i}"],
+                        HowToExecuteReport = form[$"HowToExecute{criterion.CriterionId}_{i}"]
+                    });
+                }
+            }
+
+            // Add filled list to the context and save
+            _context.ReportDetails.AddRange(listToAdd);
+            await _context.SaveChangesAsync();
 
 
-        // Add new ReportDetails
-        await _context.ReportDetails.AddRangeAsync(details);
-        await _context.SaveChangesAsync();
+            // Handling ReportDetails table
+            // List to hold all attachment reports
+            List<AttachmentReport> attToAdd = new List<AttachmentReport>();
 
-        TempData["Success"] = "Thêm Báo Cáo thành công! Trạng thái hiện tại là nháp, vui lòng nộp Báo Cáo để thay đổi trạng thái!";
-        return RedirectToAction("EndSemesterReport");
-    }
-    else
-    {
-        TempData["Warning"] = "Đã tồn tại Báo Cáo trong thời gian và lớp tương tự!";
-        return RedirectToAction("EndSemesterReport");
-    }
-}
-        
-        
-        
-        //Delete Report
+            // List of file name patterns and corresponding indices for DetailReportlId in listToAdd
+            var fileNamePatterns = new[]
+            {
+                new { Pattern = "files1_1[]", Index = 0 },
+                new { Pattern = "files2_1[]", Index = 1 },
+                new { Pattern = "files3_1[]", Index = 2 },
+                new { Pattern = "files3_2[]", Index = 3 },
+                new { Pattern = "files4_1[]", Index = 4 },
+                new { Pattern = "files4_2[]", Index = 5 },
+                new { Pattern = "files5_1[]", Index = 6 },
+                new { Pattern = "files5_2[]", Index = 7 },
+                new { Pattern = "files5_3[]", Index = 8 },
+                new { Pattern = "files6_1[]", Index = 9 },
+                new { Pattern = "files7_1[]", Index = 10 },
+                new { Pattern = "files8_1[]", Index = 11 },
+                new { Pattern = "files8_2[]", Index = 12 }
+            };
+            // Process each file pattern and its corresponding DetailReportlId
+            foreach (var pattern in fileNamePatterns)
+            {
+                // Get files matching the current pattern
+                var files = form.Files.Where(f => f.Name == pattern.Pattern).ToList();
+
+                // Process each file
+                foreach (IFormFile f in files)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await f.CopyToAsync(memoryStream); // Copy file content to memory stream
+
+                        // Create attachment
+                        var attachment = new AttachmentReport()
+                        {
+                            FileNames = f.FileName,
+                            FileDatas = memoryStream.ToArray(), // Convert memory stream to byte array
+                            DetailReportlId = listToAdd[pattern.Index].DetailReportlId // Use the corresponding DetailReportlId
+                        };
+
+                        attToAdd.Add(attachment); // Add the attachment to the list
+                    }
+                }
+            }
+            // After processing all attachments, save them to the database
+            _context.AttachmentReports.AddRange(attToAdd);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Thêm báo cáo thành công!";
+            return RedirectToAction("EndSemesterReport");
+        }
+
+    //Delete Report
         [HttpPost]
         public async Task<IActionResult> DeleteReport(int reportId)
         {
@@ -180,8 +230,9 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("EndSemesterReport");
             }
         }
-        
-         [HttpPost]
+
+    //Edit Report
+        [HttpPost]
         public async Task<IActionResult> EditReport(int reportId, int periodId, string reportType, string classId)
         {
             var reportToEdit = await _context.SemesterReports.FirstOrDefaultAsync(rp => rp.ReportId == reportId);
@@ -277,12 +328,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     TaskReport = detail.TaskReport,
                     CriterionId = detail.CriterionId,
                     HowToExecuteReport = detail.HowToExecuteReport,
-                    AttachmentReport = detail.AttachmentReport,
-                    SelfAssessment = detail.SelfAssessment,
-                    FacultyAssessment = detail.FacultyAssessment,
-                    SelfRanking = detail.SelfRanking,
-                    FacultyRanking = detail.FacultyRanking,
-                    
+                    AttachmentReport = detail.AttachmentReport                
                 };
 
                 _context.ReportDetails.Add(duplicatedDetail);
@@ -312,14 +358,9 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     rd.CriterionId,
                     rd.TaskReport,
                     rd.HowToExecuteReport,
-                    rd.FacultyAssessment,
-                    rd.FacultyRanking,
-                    rd.SelfAssessment,
-                    rd.SelfRanking,
                     Files = rd.AttachmentReport.Select(f => new
                     {
                         f.FileNames,
-                        f.FilePath
                     }).ToList()
                 })
                 .ToListAsync();
@@ -331,10 +372,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return Json(reportDetails); // Chọn trả về dữ liệu JSON
         }
-
-
-      
-
 
 //ClassList actions
         //Render ClassList
@@ -1936,8 +1973,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             TempData["Success"] = "Gửi Mail thành công!";
             return RedirectToAction("SentEmail");
         }
-
-        // Helper function to add recipients
+    // Helper function to add recipients
         private async Task AddRecipients(string[] emails, int emailId, string recipientType)
         {
             foreach (string userEmail in emails)
@@ -1956,7 +1992,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 }
             }
         }
-
     //Delete Email
         [HttpPost]
         public async Task<IActionResult> DeleteEmail(int emailId)

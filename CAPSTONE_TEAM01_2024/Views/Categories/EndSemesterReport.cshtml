@@ -444,7 +444,7 @@
                 <h5 class="modal-title" id="AddSemesterReportModalLabel">Thêm Báo Cáo Cuối Kỳ</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="addReportForm" method="post" action="/Categories/AddReport"> 
+            <form id="addReportForm" method="post" action="/Categories/AddReport" enctype="multipart/form-data">
                 <!-- Dropdown Options -->
                 <div class="fields-row" style="display: flex; align-items: center; gap: 10px; width: 100%; font-weight: bold; padding-bottom: 5px;">
                     <div style="flex: 1; text-align: center;">Báo Cáo CVHT </div>
@@ -925,7 +925,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <label for="ranking" style="white-space: nowrap; font-weight: bold;">Cá Nhân Tự Xếp Loại:</label>
-                        <select id="ranking" name="ranking"
+                        <select id="ranking" name="selfRanking"
                                 style="width: 120px; padding: 8px; border: 1px solid #ccc; border-radius: 8px; margin-left: 20px;">
                             @if (isNotFaculty)
                             {
@@ -1557,7 +1557,6 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
             </div>
         </div>
     </div>
-
 
 <!-- Delete Report Modal -->
 <div class="modal fade" id="DeleteReportModal" tabindex="-1" aria-labelledby="DeleteSemesterReportModalLabel" aria-hidden="true">

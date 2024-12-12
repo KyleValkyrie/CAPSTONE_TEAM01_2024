@@ -9,8 +9,6 @@ public class AttachmentReport
     [Required]
     public string FileNames { get; set; }
     [Required]
-    public string FilePath { get; set; }
-    [Required]
     public byte[] FileDatas { get; set; }
     [Required]
     public int DetailReportlId { get; set; }

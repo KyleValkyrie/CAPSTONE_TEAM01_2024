@@ -109,7 +109,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             _context.SemesterReports.Add(report);
             await _context.SaveChangesAsync();
 
-            //Handling ReportDetails table
+        //Handling ReportDetails table
             var rpID = report.ReportId;
             List<ReportDetail> listToAdd = new List<ReportDetail>();
 
@@ -145,7 +145,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             await _context.SaveChangesAsync();
 
 
-            // Handling ReportDetails table
+        // Handling ReportDetails table
             // List to hold all attachment reports
             List<AttachmentReport> attToAdd = new List<AttachmentReport>();
 
@@ -272,7 +272,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("EndSemesterReport");
         }
 
-        //Submit Report
+    //Submit Report
         [HttpPost]
         public async Task<IActionResult> SubmitReport(int reportId)
         {
@@ -297,7 +297,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("EndSemesterReport");
         }
         
-        //Duplicate Plan
+    //Duplicate Plan
         [HttpPost]
         public async Task<IActionResult> DuplicateReport(int reportId)
         {
@@ -339,8 +339,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("EndSemesterReport");
         }
         
-        //Edit  Report Detail
-        [HttpPost]
+    //View Report Detail
+        [HttpGet]
         public async Task<IActionResult> GetReportDetails(int reportId) 
         {
             if (reportId <= 0)
@@ -358,10 +358,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     rd.CriterionId,
                     rd.TaskReport,
                     rd.HowToExecuteReport,
-                    Files = rd.AttachmentReport.Select(f => new
-                    {
-                        f.FileNames,
-                    }).ToList()
                 })
                 .ToListAsync();
 
@@ -373,8 +369,39 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return Json(reportDetails); // Chọn trả về dữ liệu JSON
         }
 
+    //Edit Report Details
+        [HttpPost]
+        public async Task<IActionResult> EditReportDetail(IFormCollection form)
+        {
+            return RedirectToAction("EndSemesterReport");
+        }
+
+
+    //Get Attachments
+        [HttpGet]
+        public async Task<IActionResult> GetReportAttachments(int detailId)
+        {
+            // Fetch the list of attachments for the specified report and detail
+            var attachments = await _context.AttachmentReports
+                .Where(a => a.DetailReportlId == detailId)
+                .Select(a => new
+                {
+                    a.FileNames
+                })
+                .ToListAsync();
+
+            if (attachments == null || !attachments.Any())
+            {
+                return NotFound("No attachments found.");
+            }
+
+            // Return the attachments as JSON
+            return Json(attachments);
+        }
+
+
 //ClassList actions
-        //Render ClassList
+    //Render ClassList
         public async Task<IActionResult> ClassList(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "ClassList";

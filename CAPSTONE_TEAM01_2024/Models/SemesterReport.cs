@@ -39,12 +39,12 @@ namespace CAPSTONE_TEAM01_2024.Models
         public ICollection<ReportDetail> ReportDetails { get; set; } = new List<ReportDetail>();
 
         // Cá Nhân Tự Đánh Giá và Xếp Loại
-        public string SelfAssessment { get; set; } // Cá nhân tự đánh giá
-        public char SelfRanking { get; set; } // Cá nhân tự xếp loại
+        public string? SelfAssessment { get; set; } // Cá nhân tự đánh giá
+        public char? SelfRanking { get; set; } // Cá nhân tự xếp loại
 
 
         // BCN Khoa Đánh Giá và Xếp Loại
-        public string FacultyAssessment { get; set; } // BCN Khoa đánh giá
-        public char FacultyRanking { get; set; } // BCN Khoa xếp loại
+        public string? FacultyAssessment { get; set; } // BCN Khoa đánh giá
+        public char? FacultyRanking { get; set; } // BCN Khoa xếp loại
     }
 }

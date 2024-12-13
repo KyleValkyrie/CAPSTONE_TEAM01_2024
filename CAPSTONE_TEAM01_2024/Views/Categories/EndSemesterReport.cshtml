@@ -225,6 +225,7 @@
     }
 
 </style>
+
 <div class="content-wrapper" style="min-height: 912.2px;">
     <!-- Content Header (Page header) -->
     <header class="content-header">
@@ -1073,7 +1074,9 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="EditHowToExecute1_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList1_1" name="Editfiles1_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal1_1">
+                        <!-- Button with dynamic detailId -->
+                        <button type="button" class="btn btn-secondary mt-1"  data-bs-toggle="modal" data-bs-target="#EditfileModal1_1" 
+                                              id="buttonForDetail0" data-detail-id="0" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
@@ -1109,7 +1112,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="EditHowToExecute2_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList2_1" name="Editfiles2_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal2_1">
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal2_1"
+                                id="buttonForDetail1" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
@@ -1147,7 +1151,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="EditHowToExecute3_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList3_1" name="Editfiles3_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal3_1">
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal3_1"
+                                id="buttonForDetail2" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
@@ -1175,7 +1180,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="EditHowToExecute3_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList3_2" name="Editfiles3_2[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal3_2">
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal3_2"
+                                id="buttonForDetail3" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
@@ -1213,7 +1219,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="EditHowToExecute4_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList4_1" name="Editfiles4_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal4_1">
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal4_1"
+                                id="buttonForDetail4" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
@@ -1240,7 +1247,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="EditHowToExecute4_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList4_2" name="Editfiles4_2[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal4_2">
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal4_2"
+                                id="buttonForDetail5" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
@@ -1281,7 +1289,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="EditHowToExecute5_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList5_1" name="Editfiles5_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal5_1">
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal5_1"
+                                id="buttonForDetail6" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
@@ -1308,7 +1317,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="EditHowToExecute5_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList5_2" name="Editfiles5_2[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal5_2">
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal5_2"
+                                id="buttonForDetail7" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
@@ -1336,7 +1346,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="EditHowToExecute5_3" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList5_3" name="Editfiles5_3[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal5_3">
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal5_3"
+                                id="buttonForDetail8" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
@@ -1372,7 +1383,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="EditHowToExecute6_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList6_1" name="Editfiles6_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal6_1">
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal6_1"
+                            id="buttonForDetail9" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
@@ -1408,7 +1420,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="EditHowToExecute7_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList7_1" name="Editfiles7_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal7_1">
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal7_1"
+                                id="buttonForDetail10" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
@@ -1447,7 +1460,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="EditHowToExecute8_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList8_1" name="Editfiles8_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal8_1">
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal8_1"
+                                id="buttonForDetail11" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
@@ -1476,7 +1490,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="EditHowToExecute8_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList8_2" name="Editfiles8_2[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal8_2">
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal8_2"
+                                id="buttonForDetail12" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
@@ -1802,141 +1817,125 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
         modal.show();
     }
 
-    
-  
     // Edit Report Detail Modal JS
-      const reportDetailsData = @Html.Raw(Json.Serialize(Model.ReportDetails));// Đảm bảo không null
-    const pattern = [1, 2, 3, 1, 2, 1, 2, 1, 2, 1];
+    function openEditReportDetailModal(reportId) {
+        console.log('Fetching details for Report ID:', reportId);
 
-    function openEditReportDetailModal(reportId, periodId, classId, status) {
-        console.log('Report Details Data:', reportDetailsData);
-        console.log('Opening modal for Report ID:', reportId);
+        // Fetch report details using AJAX
+        fetch(`/Categories/GetReportDetails?reportId=${reportId}`, {
+            method: 'GET',  // Ensure this matches the server method
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error fetching report details: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(relevantDetails => {
+                console.log('Fetched Details:', relevantDetails);
 
-        // Lọc thông tin chi tiết báo cáo theo ReportId
-        const relevantDetails = reportDetailsData.filter(detail => detail.reportId === reportId);
-        console.log('Relevant Details:', relevantDetails);
+                if (!relevantDetails || relevantDetails.length === 0) {
+                    console.error('No details returned from the server.');
+                    return;
+                }
 
+                // Fill modal fields with data
+                fillModalFields(relevantDetails);
 
-        if (relevantDetails.length === 0) {
-            console.warn('No details found for Report ID:', reportId);
-            return;
-        }
+                // Open the modal
+                openModal();
+            })
+            .catch(error => {
+                console.error('Error fetching or processing report details:', error);
+            });
+    }
 
-        console.log('Relevant Details:', relevantDetails);
-
-        let cycle = 0;
-        relevantDetails.forEach(detail => {
-            const {
-                detailReportId,
-                criterionId,
-                taskReport,
-                howToExecuteReport,
-                facultyAssessment,
-                facultyRanking,
-                selfAssessment,
-                selfRanking,
-                files
-            } = detail;
-
-            // Map và cập nhật thông tin vào các trường modal thông qua helper functions
-            updateModalFields(cycle, criterionId, taskReport, howToExecuteReport, facultyAssessment, selfAssessment, facultyRanking, selfRanking);
-            handleFileAttachments(files, criterionId, cycle);
-
-            // Cập nhật Detail IDs
-            const detailIdsField = document.getElementById('DetailIds');
-            if (detailIdsField) {
-                detailIdsField.value += (detailIdsField.value ? ',' : '') + detailReportId;
-            }
-
-            cycle++;
-            if (cycle >= pattern.length) {
-                console.warn('Pattern index exceeds array length. Resetting.');
-                cycle = 0;
-            }
-        });
-
-        // Hiển thị modal
+    function openModal() {
         const modalElement = document.getElementById('EditReportDetailModal');
         if (modalElement) {
             const modal = new bootstrap.Modal(modalElement);
             modal.show();
+            console.log('Modal should now be visible.');
         } else {
             console.error('EditReportDetailModal element not found in DOM.');
         }
     }
 
-    // Cập nhật thông tin cho các trường modal
-    function updateModalFields(cycle, criterionId, taskReport, howToExecuteReport, facultyAssessment, selfAssessment, facultyRanking, selfRanking) {
-        const taskField = document.querySelector(`textarea[name="EditTask${criterionId}_${pattern[cycle]}"]`);
-        if (taskField) taskField.value = taskReport || '';
+    function fillModalFields(details) {
+        const pattern = [
+            '1_1', '2_1', '3_1', '3_2', '4_1', '4_2',
+            '5_1', '5_2', '5_3', '6_1', '7_1', '8_1', '8_2'
+        ];
 
-        const howToExecuteField = document.querySelector(`textarea[name="EditHowToExecute${criterionId}_${pattern[cycle]}"]`);
-        if (howToExecuteField) howToExecuteField.value = howToExecuteReport || '';
+        let cycle = 0;
 
-        const facultyAssessmentField = document.querySelector(`textarea[name="EditFaculityAssessment"]`);
-        if (facultyAssessmentField) facultyAssessmentField.value = facultyAssessment || '';
+        details.forEach(detail => {
+            console.log('Detail:', detail);
 
-        const facultyRankingField = document.querySelector(`select[name="EditFaculityranking${criterionId}_${pattern[cycle]}"]`);
-        if (facultyRankingField) {
-            facultyRankingField.value = facultyRanking || '';
-        }
+            // Ensure detailReportlId is being passed correctly from backend
+            const { criterionId, howToExecuteReport, detailReportlId } = detail;
 
-        const selfAssessmentField = document.querySelector(`textarea[name="EditselfAssessment"]`);
-        if (selfAssessmentField) selfAssessmentField.value = selfAssessment || '';
+            // Dynamically set the data-detail-id for the button that will open the mini modal
+            const button = document.querySelector(`#buttonForDetail${cycle}`);
+            if (button) {
+                // Set data-detail-id to the correct value
+                button.setAttribute('data-detail-id', detailReportlId);
+                console.log(`Set data-detail-id to ${detailReportlId}`);
+            } else {
+                console.warn(`Button not found for detail: #buttonForDetail${cycle}`);
+            }
 
-        const selfRankingField = document.querySelector(`select[name="Editranking${criterionId}_${pattern[cycle]}"]`);
-        if (selfRankingField) {
-            selfRankingField.value = selfRanking || 'B';
-        }
+            // Handle the pattern cycling and populating fields
+            const fieldSelector = `textarea[name="EditHowToExecute${pattern[cycle]}"]`;
+            const field = document.querySelector(fieldSelector);
+
+            if (field) {
+                field.value = howToExecuteReport || '';  // Set the value or empty string if undefined
+            }
+
+            // Move to the next cycle in the pattern
+            cycle = (cycle + 1) % pattern.length;
+        });
     }
 
-    // Xử lý danh sách file đính kèm và hiển thị thông tin trong modal
-    function handleFileAttachments(files, criterionId, cycle) {
-        const fileListElement = document.getElementById(`EditfileList${criterionId}_${pattern[cycle]}`);
-        if (!fileListElement) {
-            console.warn(`File list element not found for ${criterionId}_${pattern[cycle]}`);
-            return;
-        }
+    function fetchAttachmentsFromButton(button) {
+        const detailId = button.getAttribute('data-detail-id');
+        const modalId = button.getAttribute('data-bs-target'); // Dynamically get the target modal ID
+        console.log(`Fetching attachments for Detail ID: ${detailId} into modal ${modalId}`);
 
-        fileListElement.innerHTML = ''; // Clear previous file data
+        // Fetch attachments based on detailId
+        fetch(`/Categories/GetReportAttachments?detailId=${detailId}`)
+            .then(response => response.json())
+            .then(attachments => {
+                console.log('Fetched Attachments:', attachments);  // Log the entire response to see its structure
 
-        if (files && files.length > 0) {
-            files.forEach(file => {
-                const listItem = document.createElement("li");
-                listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+                const modalBodySelector = `${modalId} .modal-body`; // Target the specific modal-body
+                const modalBody = document.querySelector(modalBodySelector);
 
-                // Kiểm tra nếu là hình ảnh, hiển thị thumbnail
-                if (file.url.match(/\.(jpeg|jpg|gif|png)$/i)) {
-                    const img = document.createElement("img");
-                    img.src = file.url;
-                    img.alt = file.name;
-                    img.style.width = "50px";
-                    img.style.height = "50px";
-                    img.style.objectFit = "cover";
-                    img.classList.add("me-2", "rounded");
-                    listItem.appendChild(img);
+                if (modalBody) {
+                    if (attachments && attachments.length > 0) {
+                        modalBody.innerHTML = ''; // Clear previous content
+
+                        attachments.forEach(attachment => {
+                            console.log('Individual Attachment:', attachment);  // Log each attachment object
+
+                            const attachmentElement = document.createElement('p');
+                            attachmentElement.textContent = `${attachment.fileNames || 'No File Name'}`;  // Fallback if fileNames is undefined
+                            modalBody.appendChild(attachmentElement);
+                        });
+
+                        console.log('Attachments displayed:', attachments);
+                    } else {
+                        console.warn('No attachments found.');
+                        modalBody.innerHTML = '<p>No attachments found.</p>';
+                    }
+                } else {
+                    console.error(`Modal body not found for selector: ${modalBodySelector}`);
                 }
-
-                const fileName = document.createElement("span");
-                fileName.textContent = file.name;
-                listItem.appendChild(fileName);
-
-                const downloadBtn = document.createElement("a");
-                downloadBtn.href = file.url;
-                downloadBtn.classList.add("btn", "btn-sm", "btn-primary");
-                downloadBtn.textContent = "Tải về";
-                downloadBtn.setAttribute("download", file.name);
-                listItem.appendChild(downloadBtn);
-
-                fileListElement.appendChild(listItem);
+            })
+            .catch(error => {
+                console.error('Error fetching attachments:', error);
             });
-        } else {
-            fileListElement.innerHTML = "<li class='list-group-item text-danger'>Không có file nào được tải lên.</li>";
-        }
     }
-
-
-
-
 
 </script>

@@ -348,6 +348,16 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return BadRequest("Invalid Report ID.");
             }
 
+            var assessmentDatas = await _context.SemesterReports
+                .Where(sr => sr.ReportId == reportId)
+                .Select(sr => new
+                {
+                    sr.SelfAssessment,
+                    sr.SelfRanking,
+                    sr.FacultyAssessment,
+                    sr.FacultyRanking
+                })
+                .FirstOrDefaultAsync();
             var reportDetails = await _context.ReportDetails
                 .Include(r => r.AttachmentReport)
                 .Where(rd => rd.ReportId == reportId)
@@ -365,13 +375,19 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             {
                 return NotFound("No data found.");
             }
+            // Combine both assessment data and report details into a single object
+            var result = new
+            {
+                AssessmentData = assessmentDatas,
+                ReportDetails = reportDetails
+            };
 
-            return Json(reportDetails); // Chọn trả về dữ liệu JSON
+            return Json(result); // Return the combined data as JSON
         }
 
     //Edit Report Details
         [HttpPost]
-        public async Task<IActionResult> EditReportDetail(IFormCollection form)
+        public async Task<IActionResult> EditReportDetail(SemesterReport report, IFormCollection form)
         {
             return RedirectToAction("EndSemesterReport");
         }

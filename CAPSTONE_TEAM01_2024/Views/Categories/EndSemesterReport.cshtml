@@ -1307,7 +1307,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         removeButton.className = 'btn btn-danger btn-sm';
                         removeButton.textContent = 'Remove';
                         removeButton.onclick = function () {
-                            removeFileFromList(listItem);
+                            removeFileFromList(listItem, file.attachmentReportId);
                         };
 
                         // Append the file name and remove button to the list item
@@ -1336,10 +1336,27 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
     }
 
     // Function to handle file removal
-    function removeFileFromList(listItem) {
+    function removeFileFromList(listItem, proofId) {
         // Confirm removal
         if (confirm("Are you sure you want to remove this file?")) {
-            listItem.remove(); // Remove the file item from the list
+            // Send a delete request to the backend
+            $.ajax({
+                url: '/Categories/DeleteProof',  // Your backend endpoint for deleting files
+                method: 'POST',
+                data: { proofId: proofId },  // Send the proofId to identify the file
+                success: function (response) {
+                    if (response.success) {
+                        // If successful, remove the file item from the list
+                        listItem.remove();
+                    } else {
+                        alert('Failed to delete the file. Please try again.');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error deleting file:", error);
+                    alert("Failed to delete the file. Please try again.");
+                }
+            });
         }
     }
 

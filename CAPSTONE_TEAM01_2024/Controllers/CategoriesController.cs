@@ -445,9 +445,27 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             Response.Headers.Add("Content-Disposition", $"attachment; filename*=UTF-8''{Uri.EscapeDataString(fileName)}");
             return File(fileBytes, contentType, fileName);
         }
+    //Delete Proofs
+        [HttpPost]
+        public async Task<IActionResult> DeleteProof(int proofId)
+        {
+            var attachment = await _context.AttachmentReports
+                .FirstOrDefaultAsync(a => a.AttachmentReportId == proofId);
 
-//ClassList actions
-    //Render ClassList
+            if (attachment == null)
+            {
+                return Json(new { success = false, message = "File not found." });
+            }
+
+            _context.AttachmentReports.Remove(attachment);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
+        }
+
+
+        //ClassList actions
+        //Render ClassList
         public async Task<IActionResult> ClassList(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "ClassList";

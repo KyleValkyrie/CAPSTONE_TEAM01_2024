@@ -358,6 +358,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     sr.FacultyRanking
                 })
                 .FirstOrDefaultAsync();
+
             var reportDetails = await _context.ReportDetails
                 .Include(r => r.AttachmentReport)
                 .Where(rd => rd.ReportId == reportId)
@@ -371,6 +372,9 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 })
                 .ToListAsync();
 
+            //var attachments =await _context.AttachmentReports
+            //        .Where(a => a.DetailReport.ReportId == reportId)
+            //        .ToListAsync();
             if (!reportDetails.Any())
             {
                 return NotFound("No data found.");
@@ -379,7 +383,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             var result = new
             {
                 AssessmentData = assessmentDatas,
-                ReportDetails = reportDetails
+                ReportDetails = reportDetails,
+                //Attachments = attachments
             };
 
             return Json(result); // Return the combined data as JSON
@@ -392,7 +397,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("EndSemesterReport");
         }
 
-
     //Get Attachments
         [HttpGet]
         public async Task<IActionResult> GetReportAttachments(int detailId)
@@ -402,19 +406,45 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 .Where(a => a.DetailReportlId == detailId)
                 .Select(a => new
                 {
-                    a.FileNames
+                    a.FileNames,
+                    a.DetailReportlId,
+                    a.AttachmentReportId
                 })
                 .ToListAsync();
-
-            if (attachments == null || !attachments.Any())
-            {
-                return NotFound("No attachments found.");
-            }
-
             // Return the attachments as JSON
             return Json(attachments);
         }
 
+    //Download Proofs
+        [HttpGet]
+        public async Task<IActionResult> DownloadProof(int proofId)
+        {
+            var attachment = await _context.AttachmentReports
+                .FirstOrDefaultAsync(a => a.AttachmentReportId == proofId);
+
+            if (attachment == null)
+            {
+                return NotFound();
+            }
+
+            // Return the file as a download
+            // Set the file name and the content type (e.g., PDF, Image, etc.)
+            var fileName = attachment.FileNames;
+            var fileBytes = attachment.FileDatas; // Byte array containing the file data
+
+            // Using FileExtensionContentTypeProvider to get MIME type dynamically
+            var provider = new FileExtensionContentTypeProvider();
+            var contentType = "application/octet-stream"; // Default content type
+
+            if (!provider.TryGetContentType(fileName, out contentType))
+            {
+                contentType = "application/octet-stream"; // Use generic binary type if no match
+            }
+
+            // Set the Content-Disposition header to prompt the user to download the file
+            Response.Headers.Add("Content-Disposition", $"attachment; filename*=UTF-8''{Uri.EscapeDataString(fileName)}");
+            return File(fileBytes, contentType, fileName);
+        }
 
 //ClassList actions
     //Render ClassList

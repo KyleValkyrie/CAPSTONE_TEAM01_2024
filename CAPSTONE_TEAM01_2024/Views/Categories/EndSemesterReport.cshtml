@@ -811,10 +811,10 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea id="EditHowToExecute1_1" name="HowToExecute1_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
-                        <input type="file" class="Edit-upload-file" data-target="EditfileList1_1" name="Editfiles1_1[]" multiple>
+                        <input type="file" class="Edit-upload-file" data-target="EditfileList1_1" id="Editfiles1_1[]" name="files1_1[]" multiple>
                         <!-- Button with dynamic detailId -->
-                        <button type="button" class="btn btn-secondary mt-1"  data-bs-toggle="modal" data-bs-target="#EditfileModal1_1" 
-                                              id="buttonForDetail0" data-detail-id="0" onclick="fetchAttachmentsFromButton(this)">
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
+                                id="buttonForDetail0" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
                     </div>
@@ -828,8 +828,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea id="EditHowToExecute2_1" name="HowToExecute2_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
-                        <input type="file" class="Edit-upload-file" data-target="EditfileList2_1" name="Editfiles2_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal2_1"
+                        <input type="file" class="Edit-upload-file" data-target="EditfileList2_1" id="Editfiles2_1[]" name="files2_1[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
                                 id="buttonForDetail1" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
@@ -847,15 +847,15 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea id="EditHowToExecute3_1" name="HowToExecute3_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList3_1" name="Editfiles3_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal3_1"
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
                                 id="buttonForDetail2" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
                         <textarea id="EditHowToExecute3_2" name="HowToExecute3_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
-                        <input type="file" class="Edit-upload-file" data-target="EditfileList3_2" name="Editfiles3_2[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal3_2"
+                        <input type="file" class="Edit-upload-file" data-target="EditfileList3_2" id="Editfiles3_2[]" name="files3_2[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
                                 id="buttonForDetail3" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
@@ -871,16 +871,16 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea id="EditHowToExecute4_1" name="HowToExecute4_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
-                        <input type="file" class="Edit-upload-file" data-target="EditfileList4_1" name="Editfiles4_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal4_1"
+                        <input type="file" class="Edit-upload-file" data-target="EditfileList4_1" id="Editfiles4_1[]" name="files4_1[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
                                 id="buttonForDetail4" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
                         <textarea id="EditHowToExecute4_2" name="HowToExecute4_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
-                        <input type="file" class="Edit-upload-file" data-target="EditfileList4_2" name="Editfiles4_2[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal4_2"
+                        <input type="file" class="Edit-upload-file" data-target="EditfileList4_2" id="Editfiles4_2[]" name="files4_2[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
                                 id="buttonForDetail5" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
@@ -899,16 +899,16 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea id="EditHowToExecute5_1" name="HowToExecute5_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
-                        <input type="file" class="Edit-upload-file" data-target="EditfileList5_1" name="Editfiles5_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal5_1"
+                        <input type="file" class="Edit-upload-file" data-target="EditfileList5_1" id="Editfiles5_1[]" name="files5_1[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
                                 id="buttonForDetail6" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
 
                         <textarea id="EditHowToExecute5_2" name="HowToExecute5_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
-                        <input type="file" class="Edit-upload-file" data-target="EditfileList5_2" name="Editfiles5_2[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal5_2"
+                        <input type="file" class="Edit-upload-file" data-target="EditfileList5_2" id="Editfiles5_2[]" name="files5_2[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
                                 id="buttonForDetail7" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
@@ -916,8 +916,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <!-- 5_3 -->
                         <textarea id="EditHowToExecute5_3" name="HowToExecute5_3" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
-                        <input type="file" class="Edit-upload-file" data-target="EditfileList5_3" name="Editfiles5_3[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal5_3"
+                        <input type="file" class="Edit-upload-file" data-target="EditfileList5_3" id="Editfiles5_3[]" name="files5_3[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
                                 id="buttonForDetail8" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
@@ -933,8 +933,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea id="EditHowToExecute6_1"  name="HowToExecute6_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
-                        <input type="file" class="Edit-upload-file" data-target="EditfileList6_1" name="Editfiles6_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal6_1"
+                        <input type="file" class="Edit-upload-file" data-target="EditfileList6_1" id="Editfiles6_1[]" name="files6_1[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
                             id="buttonForDetail9" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
@@ -949,8 +949,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea id="EditHowToExecute7_1" name="EditHowToExecute7_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
-                        <input type="file" class="Edit-upload-file" data-target="EditfileList7_1" name="Editfiles7_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal7_1"
+                        <input type="file" class="Edit-upload-file" data-target="EditfileList7_1" id="Editfiles7_1[]" name="files7_1[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
                                 id="buttonForDetail10" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
@@ -968,8 +968,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <!-- 8_1 -->
                         <textarea id="EditHowToExecute8_1" name="HowToExecute8_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
-                        <input type="file" class="Edit-upload-file" data-target="EditfileList8_1" name="Editfiles8_1[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal8_1"
+                        <input type="file" class="Edit-upload-file" data-target="EditfileList8_1" id="Editfiles8_1[]" name="files8_1[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
                                 id="buttonForDetail11" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
@@ -977,8 +977,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <!-- 8_2 -->
                         <textarea id="EditHowToExecute8_2" name="HowToExecute8_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
-                        <input type="file" class="Edit-upload-file" data-target="EditfileList8_2" name="Editfiles8_2[]" multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#EditfileModal8_2"
+                        <input type="file" class="Edit-upload-file" data-target="EditfileList8_2" id="Editfiles8_2[]" name="files8_2[]" multiple>
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
                                 id="buttonForDetail12" data-detail-id="" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
                         </button>
@@ -1206,7 +1206,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
         inputField.files = newFileList.files; // Update the input's files
     }
 
-//Edit Report Detail JS
+//View Report Detail JS
     function openEditSemesterReportModal(reportId) {
         var modal = document.getElementById("EditReportDetailModal");
         $(modal).modal('show');
@@ -1247,9 +1247,13 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     // Find the element with the generated ID
                     const element = document.getElementById(`EditHowToExecute${elementId}`);
 
+                    const detailIdHolder = document.getElementById(`buttonForDetail${index}`);
+
                     if (element) {
                         // Insert the "howToExecuteReport" value into the element
                         element.textContent = detail.howToExecuteReport;
+                        //Modify data field for button
+                        detailIdHolder.setAttribute("data-detail-id", detail.detailReportlId);
                     } else {
                         console.warn(`Element with ID ${elementId} not found`);
                     }
@@ -1259,6 +1263,84 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                 // Log any errors that occur during the fetch request
                 console.error("Error fetching report details:", error);
             });
+    }
+
+//File viewing in report detail:
+    // Function to fetch and load the attachments when the button is clicked
+    function fetchAttachmentsFromButton(button) {
+        // Get the associated 'detail-id' from the button
+        var detailId = $(button).data('detail-id');
+
+        // Get the display element for the file list
+        const display = document.getElementById('fileList');
+
+        // Check if the detailId is present
+        if (!detailId) {
+            alert("No detail ID found for this button.");
+            return;
+        }
+
+        // Perform the AJAX request to fetch attachments from the server
+        $.ajax({
+            url: '/Categories/GetReportAttachments',  // Your backend endpoint
+            method: 'GET',
+            data: { detailId: detailId },  // Send the detailId as a query parameter
+            success: function (data) {
+                // Clear the current list
+                display.innerHTML = '';
+
+                // Check if data contains files
+                if (data && data.length > 0) {
+                    // Loop through the data and create list items
+                    data.forEach(file => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+
+                        // Create a clickable file name for download
+                        const fileLink = document.createElement('a');
+                        fileLink.href = `/Categories/DownloadProof?proofId=${file.attachmentReportId}`; // Use the correct API endpoint
+                        fileLink.target = "_blank";  // Open the file in a new tab
+                        fileLink.textContent = file.fileNames;
+
+                        // Create a remove button
+                        const removeButton = document.createElement('button');
+                        removeButton.className = 'btn btn-danger btn-sm';
+                        removeButton.textContent = 'Remove';
+                        removeButton.onclick = function () {
+                            removeFileFromList(listItem);
+                        };
+
+                        // Append the file name and remove button to the list item
+                        listItem.appendChild(fileLink);
+                        listItem.appendChild(removeButton);
+
+                        // Append the list item to the file list
+                        display.appendChild(listItem);
+                    });
+                } else {
+                    // Show a message if no files are found
+                    const noFilesMessage = document.createElement('li');
+                    noFilesMessage.className = 'list-group-item text-center';
+                    noFilesMessage.textContent = 'Không có tệp nào được tải lên.';
+                    display.appendChild(noFilesMessage);
+                }
+
+                // Show the modal
+                $('#fileListModal').modal('show');
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching attachments:", error);
+                alert("Failed to fetch attachments. Please try again.");
+            }
+        });
+    }
+
+    // Function to handle file removal
+    function removeFileFromList(listItem) {
+        // Confirm removal
+        if (confirm("Are you sure you want to remove this file?")) {
+            listItem.remove(); // Remove the file item from the list
+        }
     }
 
 </script>

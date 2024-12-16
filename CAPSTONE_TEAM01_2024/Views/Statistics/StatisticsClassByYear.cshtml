@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Show Statistic Major";
+    ViewData["Title"] = "Show Statistic Class By Year";
 }
 <style>
     /* Tinh chỉnh ComboBox */
@@ -17,13 +17,14 @@
         border-color: #495057;
         background-color: #f2f2f2;
     }
-    #MajorFilter {
+    #ToClassFilter,
+    #FromClassFilter {
         font-size: 14px;
         padding: 6px 12px;
         height: auto;
     }
 
-    #exportFileMajor {
+    #exportFileClass {
         font-size: 14px;
         padding: 8px 16px;
     }
@@ -35,7 +36,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h3 class="m-0">Thống Kê Ngành Lớp Học</h3>
+                    <h3 class="m-0">Thống Kê Lớp Chủ Nhiệm </h3>
                 </div>
             </div>
         </div>
@@ -48,26 +49,36 @@
                 <div class="card-body">
                     <!-- ComboBox thiết kế -->
                     <div class="form-group">
-                        <label for="MajorFilter" style="font-size: 14px; color: #555;"></label>
+                        <label for="FromClassFilter" style="font-size: 14px; color: #555;">Từ Niên Khóa:</label>
                         <select
-                            id="MajorFilter"
+                            id="FromClassFilter"
                             class=" form-select-lg"
                             onchange="filterTable()"
                         >
-                            <option selected="">Lựa chọn Ngành</option>
-                            <option value="">7480104 - Hệ thống Thông tin (CTTC)</option>
-                            <option value="">7480201 - Công nghệ Thông tin (CTTC)</option>
-                            <option value="">7480201 - Công nghệ Thông tin (CTĐB)</option>
-                            <option value="">7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)	</option>
+                            <option selected="">Lựa chọn Niên Khoóa</option>
+                            <option value="">2024-2027</option>
+                        </select>
+                        <label for="ToClassFilter" style="font-size: 14px; color: #555;">Đến Niên Khóa:</label>
+                        <select
+                            id="ToClassFilter"
+                            class=" form-select-lg"
+                            onchange="filterTable()"
+                        >
+                            <option selected="">Lựa chọn Niên Khoóa</option>
+                            <option value="">2025-2028</option>
                         </select>
                         <button
-                            id="exportFileMajor"
+                            type="button"
                             class="btn btn-primary shadow-sm"
-                            onclick="exportFile()"
-                            style="font-size: 14px; margin-left: 15px"
+                            onclick="handleStatistics()"
+                            style="font-size: 14px; margin-left: 15px;"
                         >
-                            <i class="fas fa-file-export me-2"></i> Xuất File
+                            <i class="fas fa-chart-bar me-2"></i> Thống kê
                         </button>
+
+                        <a type="button" class="btn btn-secondary" href="">
+                            <i class="bi bi-download"></i> Xuất File
+                        </a>
                     </div>
 
                     <!-- Bảng thông tin (trống) -->
@@ -76,10 +87,8 @@
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Mã Lớp</th>
-                            <th scope="col">Cố Vấn</th>
+                            <th scope="col">CVHT</th>
                             <th scope="col">Niên Khóa</th>
-                            <th scope="col">Ngành</th>
-                            <th scope="col">Số Lượng SV</th>
                         </tr>
                         </thead>
                         <tbody class="text-center">

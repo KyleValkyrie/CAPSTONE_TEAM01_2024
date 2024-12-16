@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Show Statistic Status Student";
+    ViewData["Title"] = "Statistic Evalution";
 }
 <style>
     /* Tinh chỉnh ComboBox */
@@ -36,7 +36,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h3 class="m-0">Thống Kê Trạng Thái SV</h3>
+                    <h3 class="m-0">Thống Kê Đánh Giá</h3>
                 </div>
             </div>
         </div>
@@ -49,26 +49,38 @@
                 <div class="card-body">
                     <!-- ComboBox thiết kế -->
                     <div class="form-group">
-                        <label for="StatusStudentFilter" style="font-size: 14px; color: #555;"></label>
+                        <label for="FromEvalutionFilter" style="font-size: 14px; color: #555;">Từ Niên Khóa:</label>
                         <select
-                            id="StatusStudentFilter"
+                            id="FromEvalutionFilter"
                             class=" form-select-lg"
                             onchange="filterTable()"
                         >
-                            <option selected="">Lựa chọn Trạng Thái </option>
-                            <option value="">Đang học</option>
-                            <option value="">Bảo Lưu</option>
-                            <option value="">Nghỉ Học</option>
+                            <option selected="">Lựa Chọn Niên Khóa </option>
+                            <option value="">2022-2025</option>
                            
                         </select>
-                        <button
-                            id="exportFileStatusStudent"
-                            class="btn btn-primary shadow-sm"
-                            onclick="exportFile()"
-                            style="font-size: 14px; margin-left: 15px"
+                        <label for="ToEvalutionFilter" style="font-size: 14px; color: #555;">Đến Niên Khóa:</label>
+                        <select
+                            id="ToEvalutionFilter"
+                            class=" form-select-lg"
+                            onchange="filterTable()"
                         >
-                            <i class="fas fa-file-export me-2"></i> Xuất File
+                            <option selected="">Lựa Chọn Niên Khóa </option>
+                            <option value="">2024-2027</option>
+
+                        </select>
+                        <button
+                            type="button"
+                            class="btn btn-primary shadow-sm"
+                            onclick="handleStatistics()"
+                            style="font-size: 14px; margin-left: 15px;"
+                        >
+                            <i class="fas fa-chart-bar me-2"></i> Thống kê
                         </button>
+
+                        <a type="button" class="btn btn-secondary" href="">
+                            <i class="bi bi-download"></i> Xuất File
+                        </a>
                     </div>
 
                     <!-- Bảng thông tin (trống) -->
@@ -76,12 +88,10 @@
                         <thead class="text-center">
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Mã SV</th>
-                            <th scope="col">Eamil</th>
-                            <th scope="col">Họ và Tên</th>
-                            <th scope="col">Ngày tháng năm sinh	</th>
                             <th scope="col">Mã Lớp</th>
-                            <th scope="col">Trạng Thái</th>
+                            <th scope="col">CVHT</th>
+                            <th scope="col">Năm Học</th>
+                            <th scope="col">Xếp Loại</th>
                         </tr>
                         </thead>
                         <tbody class="text-center">

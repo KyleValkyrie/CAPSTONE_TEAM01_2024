@@ -8,19 +8,19 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             ViewData["page"] = "ShowStatistics";
             return View();
         }
-        public IActionResult StatisticsMajor()
+        public IActionResult StatisticsClassByYear()
         {
-            ViewData["page"] = "StatisticsMajor";
+            ViewData["page"] = "StatisticsClassByYear";
             return View();
         }
-        public IActionResult StatisticsRole()
+        public IActionResult StatisticsClassByMajor()
         {
-            ViewData["page"] = "StatisticsRole";
+            ViewData["page"] = "StatisticsClassByMajor";
             return View();
         }
-        public IActionResult StatisticsStatusStudent()
+        public IActionResult StatisticsEvalution()
         {
-            ViewData["page"] = "StatisticsStatusStudent";
+            ViewData["page"] = "StatisticsEvalution";
             return View();
         }
     }

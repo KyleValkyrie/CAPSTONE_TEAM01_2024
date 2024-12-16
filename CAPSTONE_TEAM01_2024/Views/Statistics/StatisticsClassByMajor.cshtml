@@ -1,7 +1,9 @@
 ﻿@{
-    ViewData["Title"] = "Show Statistic Role";
+    ViewData["Title"] = "Statistic Class By Major";
 }
 <style>
+    
+    
     /* Tinh chỉnh ComboBox */
     .form-select-lg {
         font-size: 14px; /* Giảm kích thước chữ */
@@ -17,7 +19,8 @@
         border-color: #495057;
         background-color: #f2f2f2;
     }
-    #RoleFilter {
+    #ToYearFilter,
+    #FromYearFilter {
         font-size: 14px;
         padding: 6px 12px;
         height: auto;
@@ -36,7 +39,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h3 class="m-0">Thống Kê Vai Trò</h3>
+                    <h3 class="m-0">Thống Kê Số Lượng Lớp</h3>
                 </div>
             </div>
         </div>
@@ -50,26 +53,37 @@
                 <div class="card-body">
                     <!-- ComboBox thiết kế -->
                     <div class="form-group">
-                        <label for="RoleFilter" style="font-size: 14px; color: #555;"></label>
+                        <label for="FromYearFilter" style="font-size: 14px; color: #555;">Từ Niên Khóa:</label>
                         <select
-                            id="RoleFilter"
+                            id="FromYearFilter"
                             class=" form-select-lg"
                             onchange="filterTable()"
                         >
-                            <option selected="">Lựa chọn Vai Trò</option>
-                            <option value="">BCN Khoa</option>
-                            <option value="">CVHT</option>
-                            <option value="">Sinh Vien</option>
+                            <option selected="">Lựa Chọn Niên Khóa</option>
+                            <option selected="">2022-2025</option>
+                        </select>
+                        <label for="ToYearFilter" style="font-size: 14px; color: #555;">Đến Niên Khóa:</label>
+                        <select
+                            id="ToYearFilter"
+                            class=" form-select-lg"
+                            onchange="filterTable()"
+                        >
+                            <option selected="">Lựa Chọn Niên Khóa</option>
+                            <option selected="">2023-2026</option>
                         </select>
                         <button
-                            id="exportFileRole"
+                            type="button"
                             class="btn btn-primary shadow-sm"
-                            onclick="exportFile()"
-                            style="font-size: 14px; margin-left: 15px"
+                            onclick="handleStatistics()"
+                            style="font-size: 14px; margin-left: 15px;"
                         >
-                            <i class="fas fa-file-export me-2"></i> Xuất File
+                            <i class="fas fa-chart-bar me-2"></i> Thống kê
                         </button>
-                       
+
+                        <button type="button" class="btn btn-secondary" href="">
+                            <i class="bi bi-download"></i> Xuất File
+                        </button>
+                        
                     </div>
                     
                     <!-- Bảng thông tin (trống) -->
@@ -77,10 +91,9 @@
                         <thead class="text-center">
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Mã</th>
-                            <th scope="col">Tên Đầy Đủ</th>
-                            <th scope="col">Vai Trò</th>
+                            <th scope="col">Mã Ngành</th>
+                            <th scope="col">Tên Ngành</th>
+                            <th scope="col">Số Lượng Lớp</th>
                         </tr>
                         </thead>
                         <tbody class="text-center">

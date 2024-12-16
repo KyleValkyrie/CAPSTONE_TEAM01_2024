@@ -13,15 +13,20 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 100px;
+        height: 70px; 
+        box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.2);
+        position: relative;
     }
+
     .card-header i {
-        font-size: 2.5rem;
+        font-size: 2rem;
     }
+
     .card-body h5 {
         font-size: 1.2rem;
         color: #555;
     }
+
 </style>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -43,55 +48,56 @@
             <!-- Card 1 -->
             <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
                 <div class="card shadow text-center">
-                    <div class="card-header bg-warning text-white d-flex align-items-center justify-content-center">
+                    <div class="card-header text-white d-flex align-items-center justify-content-center" style="background-color: rgba(255, 159, 64, 1)">
                         <i class="material-icons" style="font-size: 2.5rem;">account_circle</i>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Tài Khoản</h5>
-                        <h3>102</h3>
-                        <p class="text-muted"><i class="material-icons" style="font-size: 1.2rem; vertical-align: middle">supervisor_account</i> Đã Đăng Nhập Vào Hệ Thống </p>
+                    <div class="card-body" style="height: 120px">
+                        <h5 class="card-title">BCN Khoa</h5>
+                        <h3>15</h3>
+                        <p class="text-muted"><i class="material-icons" style="font-size: 1.2rem; vertical-align: middle">account_circle</i> Đang Sử Dụng Hệ Thống</p>
                     </div>
                 </div>
             </div>
             <!-- Card 2 -->
             <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
                 <div class="card shadow text-center">
-                    <div class="card-header bg-danger text-white d-flex align-items-center justify-content-center">
-                        <i class="material-icons" style="font-size: 2.5rem;">class</i>
+                    <div class="card-header text-white d-flex align-items-center justify-content-center" style="background-color: #1b6ec2   ">
+                        <i class="material-icons" style="font-size: 2.5rem;">person</i>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Tổng Lớp</h5>
-                        <h3>17</h3>
-                        <p class="text-muted"><i class="material-icons" style="font-size: 1.2rem; vertical-align: middle">school</i> Đã Được Tạo</p>
+                    <div class="card-body" style="height: 120px">
+                        <h5 class="card-title">CVHT</h5>
+                        <h3>20</h3>
+                        <p class="text-muted">
+                            <i class="material-icons" style="font-size: 1.2rem; vertical-align: middle;">person</i>
+                            Đang Sử Dụng Hệ Thống
+                        </p>
                     </div>
                 </div>
             </div>
+            
             <!-- Card 3 -->
             <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
                 <div class="card shadow text-center">
                     <div class="card-header bg-success text-white d-flex align-items-center justify-content-center">
-                        <i class="material-icons" style="font-size: 2.5rem;">date_range</i>
+                        <i class="material-icons" style="font-size: 2.5rem;">group</i>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Năm Học</h5>
+                    <div class="card-body" style="height: 120px">
+                        <h5 class="card-title">Sinh Viên</h5>
                         <h3>4</h3>
-                        <p class="text-muted"><i class="material-icons" style="font-size: 1.2rem; vertical-align: middle" >today</i> Đã Được Tạo</p>
+                        <p class="text-muted"><i class="material-icons" style="font-size: 1.2rem; vertical-align: middle" >group</i> Đang Sử Dụng Hệ Thống</p>
                     </div>
                 </div>
             </div>
             <!-- Card 4 -->
             <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
                 <div class="card shadow text-center">
-                    <div class="card-header bg-info text-white d-flex align-items-center justify-content-center">
-                        <i class="material-icons" style="font-size: 2.5rem;">group</i>
+                    <div class="card-header bg-danger text-white d-flex align-items-center justify-content-center">
+                        <i class="material-icons" style="font-size: 2.5rem;">class</i>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">aaa</h5>
-                        <h3>bbbbb</h3>
-                        <p class="text-muted">
-                            <i class="material-icons" style="font-size: 1.2rem; vertical-align: middle;">update</i>
-                            ccccc
-                        </p>
+                    <div class="card-body" style="height: 120px">
+                        <h5 class="card-title">Tổng Lớp</h5>
+                        <h3>17</h3>
+                        <p class="text-muted"><i class="material-icons" style="font-size: 1.2rem; vertical-align: middle">school</i> Có Trên Hệ Thống</p>
                     </div>
                 </div>
             </div>

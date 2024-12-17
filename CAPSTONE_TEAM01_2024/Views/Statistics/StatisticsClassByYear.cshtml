@@ -1,5 +1,7 @@
-﻿@{
+﻿@model CAPSTONE_TEAM01_2024.ViewModels.ClassListViewModel
+@{
     ViewData["Title"] = "Show Statistic Class By Year";
+    int number = (Model.Classes.PageIndex - 1) * Model.Classes.PageSize;
 }
 <style>
     /* Tinh chỉnh ComboBox */
@@ -55,8 +57,11 @@
                             class=" form-select-lg"
                             onchange="filterTable()"
                         >
-                            <option selected="">Lựa chọn Niên Khoóa</option>
-                            <option value="">2024-2027</option>
+                            <option selected="">Lựa chọn Niên Khóa</option>
+                            @foreach (var term in ViewBag.AllTerms as List<string>)
+                            {
+                                <option value="@term">@term</option>
+                            }
                         </select>
                         <label for="ToClassFilter" style="font-size: 14px; color: #555;">Đến Niên Khóa:</label>
                         <select
@@ -64,8 +69,11 @@
                             class=" form-select-lg"
                             onchange="filterTable()"
                         >
-                            <option selected="">Lựa chọn Niên Khoóa</option>
-                            <option value="">2025-2028</option>
+                            <option selected="">Lựa chọn Niên Khóa</option>
+                            @foreach (var term in ViewBag.AllTerms as List<string>)
+                            {
+                                <option value="@term">@term</option>
+                            }
                         </select>
                         <button
                             type="button"
@@ -91,26 +99,74 @@
                             <th scope="col">Niên Khóa</th>
                         </tr>
                         </thead>
-                        <tbody class="text-center">
+                        <tbody class="classTable">
+                        @foreach (var classItem in Model.Classes)
+                        {
+                            number++;
+                            <tr>
+                                <td class="text-center">@number</td>
+                                <td class="text-center">@classItem.ClassId</td>
+                                <td class="text-center">
+                                    @(classItem.Advisor != null ?
+                                        (string.IsNullOrEmpty(classItem.Advisor.FullName) ? classItem.Advisor.Email : classItem.Advisor.FullName) :
+                                    "Chưa bổ nhiệm")
+                                </td>
+                                <td class="text-center">@classItem.Term</td>
+                            </tr>
+                        }
                         </tbody>
                     </table>
 
                     <!-- Pagination -->
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-end">
-                            <li class="page-item disabled">
-                                <a class="page-link" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item active">
-                                <a class="page-link">1</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
+                    <nav aria-label="Page navigation" style="float:right;">
+                        <ul class="pagination">
+                            @if (Model.Classes.HasPreviousPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="StatisticsClassByYear" asp-route-pageIndex="@(Model.Classes.PageIndex - 1)" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <a class="page-link" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            @for (var i = 1; i <= Model.Classes.TotalPages; i++)
+                            {
+                                if (i == Model.Classes.PageIndex)
+                                {
+                                    <li class="page-item active">
+                                        <a class="page-link">@i</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="StatisticsClassByYear" asp-route-pageIndex="@i">@i</a>
+                                    </li>
+                                }
+                            }
+                            @if (Model.Classes.HasNextPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="StatisticsClassByYear" asp-route-pageIndex="@(Model.Classes.PageIndex + 1)" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <a class="page-link" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
                         </ul>
                     </nav>
                 </div>

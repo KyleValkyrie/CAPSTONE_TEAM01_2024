@@ -331,14 +331,14 @@
 
                                     <button class="btn btn-outline-success btn-sm"
                                             title="Xem chi tiết"
-                                                onclick="openEditSemesterReportModal(@report.ReportId)">
+                                                onclick="openEditDetailModal(@report.ReportId)">
                                         <i class="fa-solid fa-eye custom-icon"></i>
                                     </button>
                                     @if (isNotFaculty)
                                     {
                                         <button class="btn btn-outline-primary btn-sm"
                                                 title="Cập Nhật"
-                                                onclick="openEditSemesterReport(@report.ReportId)">
+                                                    onclick="openEditSemesterReport(@report.ReportId, @report.PeriodId, '@Html.Raw(report.ReportType)', '@report.ClassId')">
                                             <i class="fa-solid fa-pen-to-square custom-icon"></i>
                                         </button>
                                     }
@@ -1207,7 +1207,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
     }
 
 //View Report Detail JS
-    function openEditSemesterReportModal(reportId) {
+    function openEditDetailModal(reportId) {
         var modal = document.getElementById("EditReportDetailModal");
         $(modal).modal('show');
 
@@ -1271,9 +1271,9 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
     // Function to fetch and load the attachments when the button is clicked
     function fetchAttachmentsFromButton(button) {
         // Get the associated 'detail-id' from the button
-        var detailId = $(button).data('detail-id');
+        var detailId = $(button).attr('data-detail-id');
         var filesId = $(button).data('files');
-        console.log(filesId);
+        console.log(detailId);
 
         // Get the display element for the file list
         const display = document.getElementById('fileList');
@@ -1384,7 +1384,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
         }
     }
 
-    // Function to handle file removal from db
+    // Function to handle file removal from upload field
     function removeFileFromList(fileInput, fileIndex, listItem) {
         // Create a new FileList excluding the file at fileIndex
         const fileList = Array.from(fileInput.files);
@@ -1399,5 +1399,9 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
         listItem.remove();
     }
 
+//Helper function to clear file list display
+    document.getElementById('fileListModal').addEventListener('hide.bs.modal', function () {
+        document.getElementById('fileList').innerHTML = ''; // Clear the inner HTML of the file list
+    });
 
 </script>

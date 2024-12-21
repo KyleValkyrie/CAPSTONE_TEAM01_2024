@@ -542,7 +542,219 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return Json(new { success = true });
         }
+    //Export Report
+        [HttpPost]
+        public async Task<IActionResult> ExportReport(int reportId)
+        {
+            var currentUser = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == User.Identity.Name);
+            var targetReport = await _context.SemesterReports.FirstOrDefaultAsync(rp=> rp.ReportId == reportId);
+            var targetAdvisor =
+                await _context.ApplicationUsers.FirstOrDefaultAsync(t => t.Email == targetReport.AdvisorName);
+            var targetClasses = await _context.Classes
+               .Where(c => c.AdvisorId == currentUser.Id) // Filter by current user's AdvisorId
+               .Select(c => new SelectListItem
+               {
+                   Value = c.ClassId,
+                   Text = c.ClassId
+               })
+               .ToListAsync(); 
+            string classesString = string.Join(" - ", targetClasses.Select(c => c.Text));
+            var details = await _context.ReportDetails.Where(dt => dt.ReportId == reportId).ToListAsync();
+            // Create a new document
+            var doc = DocX.Create($"Báo cáo năm học {targetReport.PeriodName}.docx");
+            // Set page orientation to Landscape
+            doc.PageLayout.Orientation = Orientation.Landscape;
+            // Add content to the document
+            doc.InsertParagraph("BẢNG TỰ ĐÁNH GIÁ HOẠT ĐỘNG CỐ VẤN HỌC TẬP ").FontSize(16).Bold().Alignment = Alignment.center;
+            doc.InsertParagraph($"NĂM HỌC: {targetReport.PeriodName}").FontSize(13).Bold().Alignment = Alignment.center;
+            doc.InsertParagraph("Khoa: Công nghệ Thông tin ").FontSize(14).Bold().Alignment = Alignment.left;
+            doc.InsertParagraph("Họ và tên giảng viên: " + targetAdvisor.FullName).FontSize(14).Bold().Alignment = Alignment.left;
+            doc.InsertParagraph("Mã số giảng viên: " + targetAdvisor.SchoolId).FontSize(14).Bold().Alignment = Alignment.left;
+            var classNames = doc.InsertParagraph();
+            classNames.Append("Lớp phụ trách: ")
+                .FontSize(14); 
 
+            classNames.Append(classesString)
+                .FontSize(14)
+                .Color(System.Drawing.Color.Red)
+                .Bold();
+
+            classNames.Alignment = Alignment.left; // Set alignment for the entire paragraph
+
+            // Create a table with 11 rows and 7 columns
+            var table = doc.AddTable(14, 4);
+
+            // Table Headers
+            var headers = new[]
+            {
+                "Mục ", "Tiêu chí đánh giá ", "Mô tả công việc cụ thể ", "Hồ sơ, minh chứng "
+            };
+
+            for (int i = 0; i < headers.Length; i++)
+            {
+                table.Rows[0].Cells[i].Paragraphs[0].Append(headers[i]).FontSize(12).Bold().Alignment =
+                    Alignment.center;
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Top,
+                    new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                        System.Drawing.Color.Black));
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Bottom,
+                    new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                        System.Drawing.Color.Black));
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Left,
+                    new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                        System.Drawing.Color.Black));
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Right,
+                    new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                        System.Drawing.Color.Black));
+            }
+
+            // Merge cells
+            table.MergeCellsInColumn(0, 3, 4);
+            table.MergeCellsInColumn(0, 5, 6);
+            table.MergeCellsInColumn(0, 7, 9);
+            table.MergeCellsInColumn(0, 12, 13);
+            table.MergeCellsInColumn(1, 3, 4);
+            table.MergeCellsInColumn(1, 5, 6);
+            table.MergeCellsInColumn(1, 7, 9);
+            table.MergeCellsInColumn(1, 12, 13);
+
+            // Apply borders and padding to all cells
+            for (int row = 0; row < table.RowCount; row++)
+            {
+                for (int col = 0; col < table.ColumnCount; col++)
+                {
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Top,
+                        new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                            System.Drawing.Color.Black));
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Bottom,
+                        new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                            System.Drawing.Color.Black));
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Left,
+                        new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                            System.Drawing.Color.Black));
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Right,
+                        new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                            System.Drawing.Color.Black));
+                    table.Rows[row].Cells[col].MarginLeft = 10f;
+                    table.Rows[row].Cells[col].MarginRight = 10f;
+                    table.Rows[row].Cells[col].MarginTop = 5f;
+                    table.Rows[row].Cells[col].MarginBottom = 5f;
+                }
+            }
+
+
+            // Table Content
+            //1st column
+            table.Rows[1].Cells[0].Paragraphs[0].Append("1").FontSize(12).Alignment = Alignment.center;
+            table.Rows[2].Cells[0].Paragraphs[0].Append("2").FontSize(12).Alignment = Alignment.center;
+            table.Rows[3].Cells[0].Paragraphs[0].Append("3").FontSize(12).Alignment = Alignment.center;
+            table.Rows[5].Cells[0].Paragraphs[0].Append("4").FontSize(12).Alignment = Alignment.center;
+            table.Rows[7].Cells[0].Paragraphs[0].Append("5").FontSize(12).Alignment = Alignment.center;
+            table.Rows[10].Cells[0].Paragraphs[0].Append("6").FontSize(12).Alignment = Alignment.center;
+            table.Rows[11].Cells[0].Paragraphs[0].Append("7").FontSize(12).Alignment = Alignment.center;
+            table.Rows[12].Cells[0].Paragraphs[0].Append("8").FontSize(12).Alignment = Alignment.center;
+
+            //2nd column
+            table.Rows[1].Cells[1].Paragraphs[0].Append("Có kế hoạch hoạt động về công tác CVHT của năm học ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[2].Cells[1].Paragraphs[0].Append("CVHT khai thác hệ thống quản lý học tập của SV để nắm rõ tình trạng học tập của SV ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[3].Cells[1].Paragraphs[0].Append("Tổ chức các cuộc họp lớp, tư vấn cho sinh viên các nội dung học tập như: quy chế, quy định về tổ chức hoạt động đào tạo theo học chế tín chỉ; cấu trúc, lưu đồ của CTĐT, mục tiêu đào tạo, chuẩn đầu ra của ngành/chuyên ngành…").FontSize(12).Alignment = Alignment.center;
+            table.Rows[5].Cells[1].Paragraphs[0].Append("Hướng dẫn SV lập kế hoạch học tập phù hợp với cá nhân từng học kỳ/năm học/khóa học. Xem xét và phê duyệt kế hoạch học tập của SV đối với những trường hợp có yêu cầu. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[7].Cells[1].Paragraphs[0].Append("Trao đổi kinh nghiệm cá nhân trong học tập và nghề nghiệp, định hướng nghề nghiệp cho SV có nhu cầu. Tư vấn cho SV lựa chọn chuyên ngành (nếu có) ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[10].Cells[1].Paragraphs[0].Append("Tư vấn SV thuộc diện cảnh báo học vụ (Quy trình cảnh báo sớm). ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[11].Cells[1].Paragraphs[0].Append("Các ý kiến, đề xuất, khiếu nại của SV được phản ánh kịp thời đến các cấp có thẩm quyền. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[12].Cells[1].Paragraphs[0].Append("Tham gia đầy đủ các buổi tập huấn/hội nghị/cuộc họp liên quan đến công tác CVHT do Khoa, Trường tổ chức (nếu có). ").FontSize(12).Alignment = Alignment.center;
+
+            //3rd column
+            table.Rows[1].Cells[2].Paragraphs[0].Append("Có kế hoạch hoạt động về công tác CVHT của năm học ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[2].Cells[2].Paragraphs[0].Append("CVHT sử dụng thành thạo tài khoản online đã được phân quyền để khai thác hiệu quả và đánh giá được kết quả học tập của SV đối với lớp do mình làm cố vấn. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[3].Cells[2].Paragraphs[0].Append("3.1 CVHT thu thập và hiểu các văn bản liên quan quy định, quy chế đào tạo, chuẩn đầu ra, cấu trúc, lưu đồ CTĐT…phổ biến nội dung trong các buổi sinh hoạt lớp và tư vấn trực tiếp cho SV khi cần. Tổ chức sinh hoạt lớp SV bằng hình thức trực tiếp hoặc trực tuyến (online) ít nhất 2 lần/học kỳ; có biên bản các cuộc họp đầy đủ, đáp ứng yêu cầu về nội dung họp. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[4].Cells[2].Paragraphs[0].Append("3.2 Tiếp SV trực tiếp theo lịch trực tại văn phòng khoa hoặc thông qua các phương tiện khác ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[5].Cells[2].Paragraphs[0].Append("4.1 Hướng dẫn sinh viên cách xây dựng kế hoạch học tập cho khóa học hoặc năm học, tư vấn cho sinh viên lập kế hoạch học tập của năm học hoặc khóa học, xem xét và phê duyệt kế hoạch học tập của sinh viên đối với những trường hợp có yêu cầu từ Phòng Đào tạo. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[6].Cells[2].Paragraphs[0].Append("4.2 Hướng dẫn sinh viên điều chỉnh kế hoạch học tập và đăng ký môn học phù hợp với năng lực và hoàn cảnh của từng sinh viên. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[7].Cells[2].Paragraphs[0].Append("5.1 Tư vấn sinh viên lựa chọn chuyên ngành").FontSize(12).Alignment = Alignment.center;
+            table.Rows[8].Cells[2].Paragraphs[0].Append("5.2 Trao đổi kinh nghiệm cá nhân trong học tập và nghề nghiệp, định hướng nghề nghiệp cho sinh viên có nhu cầu. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[9].Cells[2].Paragraphs[0].Append("5.3 Giới thiệu nơi thực tập và việc làm cho SV (nếu có). ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[10].Cells[2].Paragraphs[0].Append("Tư vấn sinh viên thuộc diện cảnh báo học vụ hoặc có nguy cơ bị cảnh báo học vụ ở từng học kỳ có phương án học tập tiếp theo").FontSize(12).Alignment = Alignment.center;
+            table.Rows[11].Cells[2].Paragraphs[0].Append("CVHT làm cầu nối giữa SV và Khoa, Trường trong đề đạt nguyện vọng, ý kiến, phản ánh nhằm xây dựng môi trường học tập lành mạnh. Không có trường hợp SV gửi đơn thư khiếu nại vượt cấp. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[12].Cells[2].Paragraphs[0].Append("8.1 Tham dự họp, hội nghị theo triệu tập của của các cấp: Khoa - Phòng chức năng - Trường.").FontSize(12).Alignment = Alignment.center;
+            table.Rows[13].Cells[2].Paragraphs[0].Append("8.2 Tham gia họp tổng kết, đánh giá công tác CVHT do Hội đồng Khoa triệu tập. ").FontSize(12).Alignment = Alignment.center;
+
+            //4rd column
+            for(int i = 1; i <= details.Count; i++)
+            {
+                table.Rows[i].Cells[3].Paragraphs[0].Append(details[i-1].HowToExecuteReport).FontSize(12).Alignment = Alignment.left;
+                table.Rows[i].Cells[3].Paragraphs[0].AppendLine(""); // Insert a line break
+                table.Rows[i].Cells[3].Paragraphs[0].AppendLine(""); // Insert a line break
+                table.Rows[i].Cells[3].Paragraphs[0].Append("Danh sách minh chứng: ").FontSize(12).Alignment = Alignment.left;
+                table.Rows[i].Cells[3].Paragraphs[0].AppendLine(""); // Insert a line break
+                var proofs = await _context.AttachmentReports
+                    .Where(p => p.DetailReportlId == details[i-1].DetailReportlId)
+                    .ToListAsync();
+                foreach(var file in proofs)
+                {
+                    table.Rows[i].Cells[3].Paragraphs[0].Append("-" + file.FileNames).FontSize(12).Alignment = Alignment.left;
+                    table.Rows[i].Cells[3].Paragraphs[0].AppendLine(""); // Insert a line break
+                }
+            }
+
+            // Insert the table into the document
+            doc.InsertParagraph().InsertTableAfterSelf(table);
+
+            // Cá nhân tự đánh giá
+            doc.InsertParagraph("Cá nhân tự đánh giá: " + targetReport.SelfAssessment)
+               .FontSize(14)
+               .Bold()
+               .Alignment = Alignment.left;
+
+            // Xếp loại
+            doc.InsertParagraph("Xếp loại: " + targetReport.SelfRanking)
+               .FontSize(14)
+               .Bold()
+               .Alignment = Alignment.left;
+
+            // TP.Hồ Chí Minh, ngày 10 tháng 08 năm 2024
+            doc.InsertParagraph("TP.Hồ Chí Minh, ngày  tháng  năm ")
+               .FontSize(14)
+               .Alignment = Alignment.right;
+
+            // Add a blank paragraph for spacing
+            doc.InsertParagraph().SpacingBefore(10);
+
+            // Insert the first part of the text
+            var headerParagraph = doc.InsertParagraph()
+                .Append("PHÓ TRƯỞNG KHOA")
+                .FontSize(14)
+                .Bold();
+
+            // Set alignment after appending the text
+            headerParagraph.Alignment = Alignment.left; // Correct way
+
+            // Insert the second part of the text
+            var secondParagraph = doc.InsertParagraph()
+                .Append("\t\t\t\t\t\tCỐ VẤN HỌC TẬP")
+                .FontSize(14)
+                .Bold();
+
+            // Set the alignment for the second paragraph
+            secondParagraph.Alignment = Alignment.right; // Correct wa
+
+            // Add multiple blank lines for spacing
+            for (int i = 0; i < 4; i++)
+            {
+                doc.InsertParagraph().SpacingBefore(10);
+            }
+
+            // Save the document to a MemoryStream
+            using (var memoryStream = new MemoryStream())
+            {
+                doc.SaveAs(memoryStream);
+                memoryStream.Position = 0;
+                // Return the document as a file download
+                return File(memoryStream.ToArray(),
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    $"Tự đánh giá CVHT_{currentUser.FullName}.docx");
+            }
+        }
 
 //ClassList actions
     //Render ClassList

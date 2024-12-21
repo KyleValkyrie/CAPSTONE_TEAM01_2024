@@ -3,8 +3,8 @@
     ViewData["Title"] = "Statistic Class By Major";
 }
 <style>
-    
-    
+
+
     /* Tinh chỉnh ComboBox */
     .form-select-lg {
         font-size: 14px; /* Giảm kích thước chữ */
@@ -66,7 +66,7 @@
                                 var years = term.Split('-');
                                 var startYear = int.Parse(years[0]);
                                 var endYear = int.Parse(years[1]);
-                                var khóa = startYear - 1994;  
+                                var khóa = startYear - 1994;
                                 <option value="@term">@($"K{khóa}")</option>
                             }
                         </select>
@@ -82,7 +82,7 @@
                                 var years = term.Split('-');
                                 var startYear = int.Parse(years[0]);
                                 var endYear = int.Parse(years[1]);
-                                var khóa = startYear - 1994;  
+                                var khóa = startYear - 1994;
                                 <option value="@term">@($"K{khóa}")</option>
                             }
                         </select>
@@ -98,7 +98,7 @@
                         <button type="button" class="btn btn-secondary" href="">
                             <i class="bi bi-download"></i> Xuất File
                         </button>
-                        
+
                     </div>
                     <!-- Thông báo -->
                     @if (TempData["Success"] != null)
@@ -201,9 +201,10 @@
             return;
         }
 
-        // Gửi yêu cầu thống kê đến server (có thể dùng AJAX nếu muốn động)
-        window.location.href = `/Statistics/StatisticsClassByMajor?fromYear=${fromYear}&toYear=${toYear}`;
+        const url = `/Statistics/StatisticsClassByMajor?fromYear=${encodeURIComponent(fromYear)}&toYear=${encodeURIComponent(toYear)}`;
+        window.location.href = url;
     }
+
 
 </script>
 

@@ -94,57 +94,81 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
         return View(viewModel);
     }
+    
+    public async Task<IActionResult> StatisticsClassByMajor(string fromYear = null, string toYear = null)
+{
+    ViewData["page"] = "StatisticsClassByMajor";
 
-    public async Task<IActionResult> StatisticsClassByMajor(int pageIndex = 1, int pageSize = 20)
+    // Danh sách cố định các ngành
+    var fixedDepartments = new List<string>
     {
-        ViewData["page"] = "StatisticsClassByMajor";
-        
-        var fixedDepartments = new List<string>
+        "7480104 - Hệ thống Thông tin (CTTC)",
+        "7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)",
+        "7480201 - Công nghệ Thông Tin (CTTC)",
+        "7480201 - Công nghệ Thông Tin (CTĐB)"
+    };
+
+    // Tách mã ngành và tên ngành và loại bỏ dấu cách thừa
+    var departmentList = fixedDepartments.Select(d =>
+    {
+        var parts = d.Split(" - ");
+        return new
         {
-            "7480104 - Hệ thống Thông tin (CTTC)",
-            "7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)",
-            "7480201 - Công nghệ Thông tin (CTTC)",
-            "7480201 - Công nghệ Thông Tin (CTĐB)"
+            DepartmentCode = parts[0].Trim(),
+            DepartmentName = parts[1].Trim()
         };
+    }).ToList();
 
-        // Tách mã ngành và tên ngành
-        var departmentList = fixedDepartments.Select(d =>
-        {
-            var parts = d.Split(" - ");
-            return new
-            {
-                DepartmentCode = parts[0].Trim(),
-                DepartmentName = parts[1].Trim()
-            };
-        }).ToList();
+    // Lấy tất cả các niên khóa
+    var allTerms = await _context.Classes
+        .Select(c => c.Term)
+        .Distinct()
+        .OrderBy(t => t)
+        .ToListAsync();
+    ViewBag.AllTerms = allTerms;
 
-        // Lấy tất cả các niên khóa
-        var allTerms = await _context.Classes
-            .Select(c => c.Term)
-            .Distinct()
-            .OrderBy(t => t)
+    // Xử lý niên khóa lọc (fromYear và toYear)
+    int? fromYearStart = null, toYearEnd = null;
+    if (!string.IsNullOrEmpty(fromYear))
+    {
+        var years = fromYear.Split('-');
+        fromYearStart = int.Parse(years[0]);
+    }
+    if (!string.IsNullOrEmpty(toYear))
+    {
+        var years = toYear.Split('-');
+        toYearEnd = int.Parse(years[1]);
+    }
+
+    // Lấy dữ liệu từng ngành sử dụng Đoạn 1
+    var statistics = new List<object>();
+
+    foreach (var department in departmentList)
+    {
+        // Lấy danh sách các lớp của từng ngành
+        var classesForDepartment = await _context.Classes
+            .Where(c => c.Department != null &&
+                        c.Department.Trim() == $"{department.DepartmentCode} - {department.DepartmentName}")
             .ToListAsync();
-        ViewBag.AllTerms = allTerms;
 
-        // Thống kê số lượng lớp theo ngành cố định
-        var statistics = departmentList.Select(department => new
+        // Lọc theo niên khóa (nếu có)
+        var filteredClasses = classesForDepartment
+            .Where(c => (!fromYearStart.HasValue || int.Parse(c.Term.Split('-')[0]) >= fromYearStart) &&
+                        (!toYearEnd.HasValue || int.Parse(c.Term.Split('-')[1]) <= toYearEnd));
+
+        // Thêm vào kết quả thống kê
+        statistics.Add(new
         {
             DepartmentCode = department.DepartmentCode,
             DepartmentName = department.DepartmentName,
-            ClassCount = _context.Classes
-                .Where(c => c.Department != null &&
-                            c.Department == $"{department.DepartmentCode} - {department.DepartmentName}")
-                .Count()
-
-
-        }).ToList();
-
-        // Truyền kết quả thống kê đến view
-        ViewBag.Statistics = statistics;
-
-        return View();
+            ClassCount = filteredClasses.Count()
+        });
     }
 
+    // Truyền kết quả thống kê đến view
+    ViewBag.Statistics = statistics;
+    return View();
+}
 
     public async Task<IActionResult> StatisticsEvalution()
     {

@@ -67,9 +67,18 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 AdvisorId = c.AdvisorId,
                 Advisor = c.Advisor ?? new ApplicationUser { Email = "N/A", FullName = "Chưa bổ nhiệm" },
             });
-        
 
-        // Thực hiện phân trang
+        // Lọc dữ liệu theo khoảng niên khóa (nếu có)
+        if (!string.IsNullOrEmpty(fromTerm))
+        {
+            classesQuery = classesQuery.Where(c => string.Compare(c.Term, fromTerm) >= 0);
+        }
+        if (!string.IsNullOrEmpty(toTerm))
+        {
+            classesQuery = classesQuery.Where(c => string.Compare(c.Term, toTerm) <= 0);
+        }
+
+        // Phân trang
         var classes = await classesQuery.ToListAsync();
         var paginatedClasses = PaginatedList<Class>.Create(classes, pageIndex, pageSize);
 
@@ -78,22 +87,47 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             Classes = paginatedClasses
         };
 
+        // Gửi dữ liệu niên khóa đã chọn về view
         ViewBag.AllTerms = allTerms;
+        ViewBag.CurrentFromTerm = fromTerm;
+        ViewBag.CurrentToTerm = toTerm;
 
         return View(viewModel);
     }
 
-
-
-    public IActionResult StatisticsClassByMajor()
+    public async Task<IActionResult> StatisticsClassByMajor(int pageIndex = 1, int pageSize = 20)
     {
         ViewData["page"] = "StatisticsClassByMajor";
+        var allTerms = await _context.Classes
+            .Select(c => c.Term)
+            .Distinct()
+            .OrderBy(t => t)
+            .ToListAsync();
+        
+        ViewBag.AllTerms = allTerms;
+
+        var classesQuery = _context.Classes
+            .Include(c => c.Department)
+            .Select(c => new Class
+            {
+                ClassId = c.ClassId,
+                Term = c.Term,
+                Department = c.Department,
+            });
+
         return View();
     }
 
-    public IActionResult StatisticsEvalution()
+    public async Task<IActionResult> StatisticsEvalution()
     {
         ViewData["page"] = "StatisticsEvalution";
+        var allTerms = await _context.Classes
+            .Select(c => c.Term)
+            .Distinct()
+            .OrderBy(t => t)
+            .ToListAsync();
+        
+        ViewBag.AllTerms = allTerms;
         return View();
     }
 }

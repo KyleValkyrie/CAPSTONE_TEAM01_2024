@@ -791,10 +791,10 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
             </div>
 
             <!-- Modal Form -->
-            <form id="editSemesterReportForm" method="post" action="/Categories/EditReportDetail">
+            <form id="editSemesterReportForm" method="post" action="/Categories/EditReportDetail" enctype="multipart/form-data">
                 <!-- Dropdown Options for Period and Class -->
                 <div class="fields-row" style="display: flex; align-items: center; gap: 10px; width: 100%; font-weight: bold; padding-bottom: 5px;">
-                    <input type = "hidden" id="DetailIds" name="DetailIds"/>
+                    <input type = "hidden" id="DetailIds" name="ReportId"/>
                 </div>
                 <!-- Header Row for Fields -->
                 <div class="fields-row" style="display: flex; align-items: center; height: 50px;">
@@ -846,7 +846,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <textarea id="EditHowToExecute3_1" name="HowToExecute3_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
-                        <input type="file" class="Edit-upload-file" data-target="EditfileList3_1" id="Editfiles3_1[]" name="Editfiles3_1[]" multiple>
+                        <input type="file" class="Edit-upload-file" data-target="EditfileList3_1" id="Editfiles3_1[]" name="files3_1[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
                                 id="buttonForDetail2" data-detail-id="" data-files="Editfiles3_1[]" onclick="fetchAttachmentsFromButton(this)">
                             Xem danh sách file đã upload
@@ -947,7 +947,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="Task7_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>CVHT làm cầu nối giữa SV và Khoa, Trường trong đề đạt nguyện vọng, ý kiến, phản ánh nhằm xây dựng môi trường học tập lành mạnh. Không có trường hợp SV gửi đơn thư khiếu nại vượt cấp. </textarea>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea id="EditHowToExecute7_1" name="EditHowToExecute7_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
+                        <textarea id="EditHowToExecute7_1" name="HowToExecute7_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList7_1" id="Editfiles7_1[]" name="files7_1[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
@@ -1211,6 +1211,8 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
         var modal = document.getElementById("EditReportDetailModal");
         $(modal).modal('show');
 
+        var idField = document.getElementById("DetailIds");
+        idField.value = reportId;
         // Fetch the report details
         fetch(`/Categories/GetReportDetails?reportId=${reportId}`)
             .then(response => {

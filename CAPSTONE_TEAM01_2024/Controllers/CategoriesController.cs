@@ -104,8 +104,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             report.AdvisorName = User.Identity.Name;
             report.CreationTimeReport = vietnamTime;
             report.StatusReport = "Nháp";
-            report.SelfAssessment = report.SelfAssessment;
-            report.SelfRanking = report.SelfRanking;
             _context.SemesterReports.Add(report);
             await _context.SaveChangesAsync();
 
@@ -145,7 +143,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             await _context.SaveChangesAsync();
 
 
-        // Handling ReportDetails table
+            // Handling AttachmentReport table
             // List to hold all attachment reports
             List<AttachmentReport> attToAdd = new List<AttachmentReport>();
 
@@ -392,8 +390,90 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
     //Edit Report Details
         [HttpPost]
-        public async Task<IActionResult> EditReportDetail(SemesterReport report, IFormCollection form)
+        public async Task<IActionResult> EditReportDetail(int ReportId ,IFormCollection form)
         {
+            // edit report
+            var report = await _context.SemesterReports.FirstOrDefaultAsync(rp => rp.ReportId == ReportId);
+            report.SelfAssessment = form["EditselfAssessment"];
+            report.FacultyAssessment = form["EditFaculityAssessment"];
+            report.SelfRanking = form["Editranking"].ToString().FirstOrDefault();
+            report.FacultyRanking = form["EditFaculityranking"].ToString().FirstOrDefault();
+
+            // edit details
+            var details = await _context.ReportDetails.Where(dt=> dt.ReportId == ReportId).ToListAsync();
+            var patterns = new[]
+            {
+                "HowToExecute1_1",
+                "HowToExecute2_1", 
+                "HowToExecute3_1",
+                "HowToExecute3_2",
+                "HowToExecute4_1",
+                "HowToExecute4_2",
+                "HowToExecute5_1",
+                "HowToExecute5_2",
+                "HowToExecute5_3",
+                "HowToExecute6_1",
+                "HowToExecute7_1",
+                "HowToExecute8_1",
+                "HowToExecute8_2"
+            };
+            for(int i = 0; i < details.Count; i++)
+            {
+                details[i].HowToExecuteReport = form[patterns[i]];
+            }
+            _context.ReportDetails.UpdateRange(details);
+
+
+            // Handling attachments
+            // List to hold all attachment reports
+            List<AttachmentReport> attToAdd = new List<AttachmentReport>();
+
+            // List of file name patterns and corresponding indices for DetailReportlId in listToAdd
+            var fileNamePatterns = new[]
+            {
+                new { Pattern = "files1_1[]", Index = 0 },
+                new { Pattern = "files2_1[]", Index = 1 },
+                new { Pattern = "files3_1[]", Index = 2 },
+                new { Pattern = "files3_2[]", Index = 3 },
+                new { Pattern = "files4_1[]", Index = 4 },
+                new { Pattern = "files4_2[]", Index = 5 },
+                new { Pattern = "files5_1[]", Index = 6 },
+                new { Pattern = "files5_2[]", Index = 7 },
+                new { Pattern = "files5_3[]", Index = 8 },
+                new { Pattern = "files6_1[]", Index = 9 },
+                new { Pattern = "files7_1[]", Index = 10 },
+                new { Pattern = "files8_1[]", Index = 11 },
+                new { Pattern = "files8_2[]", Index = 12 }
+            };
+            // Process each file pattern and its corresponding DetailReportlId
+            foreach (var pattern in fileNamePatterns)
+            {
+                // Get files matching the current pattern
+                var files = form.Files.Where(f => f.Name == pattern.Pattern).ToList();
+
+                // Process each file
+                foreach (IFormFile f in files)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await f.CopyToAsync(memoryStream); // Copy file content to memory stream
+
+                        // Create attachment
+                        var attachment = new AttachmentReport()
+                        {
+                            FileNames = f.FileName,
+                            FileDatas = memoryStream.ToArray(), // Convert memory stream to byte array
+                            DetailReportlId = details[pattern.Index].DetailReportlId // Use the corresponding DetailReportlId
+                        };
+
+                        attToAdd.Add(attachment); // Add the attachment to the list
+                    }
+                }
+            }
+            _context.AttachmentReports.AddRange(attToAdd);       
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Sửa đổi chi tiết báo cáo thành công!";
+
             return RedirectToAction("EndSemesterReport");
         }
 
@@ -464,8 +544,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         }
 
 
-        //ClassList actions
-        //Render ClassList
+//ClassList actions
+    //Render ClassList
         public async Task<IActionResult> ClassList(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "ClassList";
@@ -496,7 +576,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return View(viewModel);
         }
 
-        // Add Class
+    // Add Class
         [HttpPost]
         public async Task<IActionResult> CreateClass(Class model, string AdvisorEmail)
         {
@@ -543,7 +623,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("ClassList");
         }
 
-        // Edit Class
+    // Edit Class
         [HttpPost]
         public async Task<IActionResult> EditClass(Class model, string AdvisorEmail)
         {

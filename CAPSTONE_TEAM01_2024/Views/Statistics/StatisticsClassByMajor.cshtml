@@ -143,6 +143,28 @@
                         </tr>
                         </thead>
                         <tbody class="text-center">
+                        @{
+                            var index = 1;
+                            if (ViewBag.Statistics != null)
+                            {
+                                foreach (var stat in ViewBag.Statistics)
+                                {
+                                    <tr>
+                                        <td>@index</td>
+                                        <td>@stat.DepartmentCode</td>
+                                        <td>@stat.DepartmentName</td>
+                                        <td>@stat.ClassCount</td>
+                                    </tr>
+                                    index++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4">Không có dữ liệu để hiển thị.</td>
+                                </tr>
+                            }
+                        }
                         </tbody>
                     </table>
 
@@ -169,5 +191,21 @@
         </div>
     </main>
 </div>
+<script>
+    function handleStatistics() {
+        const fromYear = document.getElementById('FromYearFilter').value;
+        const toYear = document.getElementById('ToYearFilter').value;
+
+        if (!fromYear || !toYear || fromYear === 'Lựa chọn Khóa' || toYear === 'Lựa chọn Khóa') {
+            alert('Vui lòng chọn cả Từ Khóa và Đến Khóa.');
+            return;
+        }
+
+        // Gửi yêu cầu thống kê đến server (có thể dùng AJAX nếu muốn động)
+        window.location.href = `/Statistics/StatisticsClassByMajor?fromYear=${fromYear}&toYear=${toYear}`;
+    }
+
+</script>
+
 
 

@@ -98,25 +98,53 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     public async Task<IActionResult> StatisticsClassByMajor(int pageIndex = 1, int pageSize = 20)
     {
         ViewData["page"] = "StatisticsClassByMajor";
+        
+        var fixedDepartments = new List<string>
+        {
+            "7480104 - Hệ thống Thông tin (CTTC)",
+            "7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)",
+            "7480201 - Công nghệ Thông tin (CTTC)",
+            "7480201 - Công nghệ Thông Tin (CTĐB)"
+        };
+
+        // Tách mã ngành và tên ngành
+        var departmentList = fixedDepartments.Select(d =>
+        {
+            var parts = d.Split(" - ");
+            return new
+            {
+                DepartmentCode = parts[0].Trim(),
+                DepartmentName = parts[1].Trim()
+            };
+        }).ToList();
+
+        // Lấy tất cả các niên khóa
         var allTerms = await _context.Classes
             .Select(c => c.Term)
             .Distinct()
             .OrderBy(t => t)
             .ToListAsync();
-        
         ViewBag.AllTerms = allTerms;
 
-        var classesQuery = _context.Classes
-            .Include(c => c.Department)
-            .Select(c => new Class
-            {
-                ClassId = c.ClassId,
-                Term = c.Term,
-                Department = c.Department,
-            });
+        // Thống kê số lượng lớp theo ngành cố định
+        var statistics = departmentList.Select(department => new
+        {
+            DepartmentCode = department.DepartmentCode,
+            DepartmentName = department.DepartmentName,
+            ClassCount = _context.Classes
+                .Where(c => c.Department != null &&
+                            c.Department == $"{department.DepartmentCode} - {department.DepartmentName}")
+                .Count()
+
+
+        }).ToList();
+
+        // Truyền kết quả thống kê đến view
+        ViewBag.Statistics = statistics;
 
         return View();
     }
+
 
     public async Task<IActionResult> StatisticsEvalution()
     {

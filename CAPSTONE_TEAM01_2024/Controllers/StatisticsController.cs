@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using Newtonsoft.Json;
 using OfficeOpenXml.Style;
 using System.IO;
 using Microsoft.Extensions.Logging;
@@ -27,6 +28,7 @@ using System.Linq;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Net.Mail;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
    public class StatisticsController : Controller
@@ -44,7 +46,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         ViewData["page"] = "ShowStatistics";
         return View();
     }
-
+    //Year
     public async Task<IActionResult> StatisticsClassByYear(int pageIndex = 1, int pageSize = 20, string fromTerm = null, string toTerm = null)
     {
         ViewData["page"] = "StatisticsClassByYear";
@@ -94,7 +96,72 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
         return View(viewModel);
     }
+    //export year
+    [HttpGet] 
+    public async Task<IActionResult> ExportStatisticsToExcel(string fromTerm = null, string toTerm = null)
+{
+    // Lấy dữ liệu theo niên khóa
+    var classesQuery = _context.Classes
+        .Include(c => c.Advisor)
+        .Include(c => c.Students)
+        .Select(c => new
+        {
+            ClassId = c.ClassId,
+            Term = c.Term,
+            AdvisorName = c.Advisor != null ? c.Advisor.FullName : "Chưa bổ nhiệm",
+            AdvisorEmail = c.Advisor != null ? c.Advisor.Email : "N/A",
+        });
+
+    if (!string.IsNullOrEmpty(fromTerm))
+    {
+        classesQuery = classesQuery.Where(c => string.Compare(c.Term, fromTerm) >= 0);
+    }
+    if (!string.IsNullOrEmpty(toTerm))
+    {
+        classesQuery = classesQuery.Where(c => string.Compare(c.Term, toTerm) <= 0);
+    }
+
+    var classList = await classesQuery.ToListAsync();
+
+    // Tạo file Excel
+    using var package = new ExcelPackage();
+    var worksheet = package.Workbook.Worksheets.Add("Statistics");
+
+    // Định nghĩa tiêu đề
+    worksheet.Cells[1, 1].Value = "Mã Lớp";
+    worksheet.Cells[1, 2].Value = "Niên Khóa";
+    worksheet.Cells[1, 3].Value = "Tên CVHT";
+    worksheet.Cells[1, 4].Value = "Email";
+
+    // Thêm dữ liệu
+    for (int i = 0; i < classList.Count; i++)
+    {
+        var row = i + 2;
+        worksheet.Cells[row, 1].Value = classList[i].ClassId;
+        worksheet.Cells[row, 2].Value = classList[i].Term;
+        worksheet.Cells[row, 3].Value = classList[i].AdvisorName;
+        worksheet.Cells[row, 4].Value = classList[i].AdvisorEmail;
+    }
     
+    using (var range = worksheet.Cells[1, 1, 1, 5])
+    {
+        range.Style.Font.Bold = true;
+        range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+        range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+        range.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+    }
+    
+    worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+    
+    var stream = new MemoryStream();
+    package.SaveAs(stream);
+    stream.Position = 0;
+
+    var fileName = $"ThongKeCVHT_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+    return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+}
+    
+    //Major
     public async Task<IActionResult> StatisticsClassByMajor(string fromYear = null, string toYear = null)
 {
     ViewData["page"] = "StatisticsClassByMajor";
@@ -170,6 +237,101 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     return View();
 }
 
+    //export major
+    [HttpGet] 
+    public async Task<IActionResult> ExportStatisticsClassByMajor(string fromYear = null, string toYear = null)
+{
+    // Lặp lại logic từ StatisticsClassByMajor để đảm bảo export đúng dữ liệu đã thống kê
+    var fixedDepartments = new List<string>
+    {
+        "7480104 - Hệ thống Thông tin (CTTC)",
+        "7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)",
+        "7480201 - Công nghệ Thông Tin (CTTC)",
+        "7480201 - Công nghệ Thông Tin (CTĐB)"
+    };
+
+    var departmentList = fixedDepartments.Select(d =>
+    {
+        var parts = d.Split(" - ");
+        return new
+        {
+            DepartmentCode = parts[0].Trim(),
+            DepartmentName = parts[1].Trim()
+        };
+    }).ToList();
+
+    int? fromYearStart = null, toYearEnd = null;
+    if (!string.IsNullOrEmpty(fromYear))
+    {
+        var years = fromYear.Split('-');
+        fromYearStart = int.Parse(years[0]);
+    }
+    if (!string.IsNullOrEmpty(toYear))
+    {
+        var years = toYear.Split('-');
+        toYearEnd = int.Parse(years[1]);
+    }
+
+    var statistics = new List<object>();
+
+    foreach (var department in departmentList)
+    {
+        var classesForDepartment = await _context.Classes
+            .Where(c => c.Department != null &&
+                        c.Department.Trim() == $"{department.DepartmentCode} - {department.DepartmentName}")
+            .ToListAsync();
+
+        var filteredClasses = classesForDepartment
+            .Where(c => (!fromYearStart.HasValue || int.Parse(c.Term.Split('-')[0]) >= fromYearStart) &&
+                        (!toYearEnd.HasValue || int.Parse(c.Term.Split('-')[1]) <= toYearEnd));
+
+        statistics.Add(new
+        {
+            DepartmentCode = department.DepartmentCode,
+            DepartmentName = department.DepartmentName,
+            ClassCount = filteredClasses.Count()
+        });
+    }
+
+    // Tạo file Excel
+    using var package = new ExcelPackage();
+    var worksheet = package.Workbook.Worksheets.Add("Statistics");
+
+    // Tiêu đề cột
+    worksheet.Cells[1, 1].Value = "Mã Ngành";
+    worksheet.Cells[1, 2].Value = "Tên Ngành";
+    worksheet.Cells[1, 3].Value = "Số Lớp";
+
+    // Thêm dữ liệu vào Excel
+    for (int i = 0; i < statistics.Count; i++)
+    {
+        dynamic stat = statistics[i];
+        worksheet.Cells[i + 2, 1].Value = stat.DepartmentCode;
+        worksheet.Cells[i + 2, 2].Value = stat.DepartmentName;
+        worksheet.Cells[i + 2, 3].Value = stat.ClassCount;
+    }
+
+    // Định dạng
+    using (var range = worksheet.Cells[1, 1, 1, 3])
+    {
+        range.Style.Font.Bold = true;
+        range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+        range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+        range.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+    }
+
+    worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+    var stream = new MemoryStream();
+    package.SaveAs(stream);
+    stream.Position = 0;
+
+    var fileName = $"ThongKeLopTheoNganh_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+    return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+}
+
+    
+    //Evalution
     public async Task<IActionResult> StatisticsEvalution()
     {
         ViewData["page"] = "StatisticsEvalution";

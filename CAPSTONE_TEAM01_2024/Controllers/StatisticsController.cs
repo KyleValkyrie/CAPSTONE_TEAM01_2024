@@ -162,11 +162,14 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 }
     
     //Major
-    public async Task<IActionResult> StatisticsClassByMajor(string fromYear = null, string toYear = null)
+    public class StatisticResult
 {
-    ViewData["page"] = "StatisticsClassByMajor";
-
-    // Danh sách cố định các ngành
+    public string DepartmentCode { get; set; }
+    public string DepartmentName { get; set; }
+    public int ClassCount { get; set; }
+}
+    private async Task<List<StatisticResult>> GetStatistics(string fromYear, string toYear)
+{
     var fixedDepartments = new List<string>
     {
         "7480104 - Hệ thống Thông tin (CTTC)",
@@ -175,7 +178,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         "7480201 - Công nghệ Thông Tin (CTĐB)"
     };
 
-    // Tách mã ngành và tên ngành và loại bỏ dấu cách thừa
     var departmentList = fixedDepartments.Select(d =>
     {
         var parts = d.Split(" - ");
@@ -186,7 +188,48 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         };
     }).ToList();
 
-    // Lấy tất cả các niên khóa
+    int? fromYearStart = null, toYearEnd = null;
+    if (!string.IsNullOrEmpty(fromYear))
+    {
+        var years = fromYear.Split('-');
+        fromYearStart = int.Parse(years[0]);
+    }
+    if (!string.IsNullOrEmpty(toYear))
+    {
+        var years = toYear.Split('-');
+        toYearEnd = int.Parse(years[1]);
+    }
+
+    var statistics = new List<StatisticResult>();
+
+    foreach (var department in departmentList)
+    {
+        var classesForDepartment = await _context.Classes
+            .Where(c => c.Department != null &&
+                        c.Department.Trim() == $"{department.DepartmentCode} - {department.DepartmentName}")
+            .ToListAsync();
+
+        var filteredClasses = classesForDepartment
+            .Where(c => (!fromYearStart.HasValue || int.Parse(c.Term.Split('-')[0]) >= fromYearStart) &&
+                        (!toYearEnd.HasValue || int.Parse(c.Term.Split('-')[1]) <= toYearEnd));
+
+
+        statistics.Add(new StatisticResult
+        {
+            DepartmentCode = department.DepartmentCode,
+            DepartmentName = department.DepartmentName,
+            ClassCount = filteredClasses.Count()
+        });
+    }
+
+    return statistics;
+} 
+    // Major
+    public async Task<IActionResult> StatisticsClassByMajor(string fromYear = null, string toYear = null)
+{
+    ViewData["page"] = "StatisticsClassByMajor";
+
+    // Lấy danh sách niên khóa
     var allTerms = await _context.Classes
         .Select(c => c.Term)
         .Distinct()
@@ -194,124 +237,46 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         .ToListAsync();
     ViewBag.AllTerms = allTerms;
 
-    // Xử lý niên khóa lọc (fromYear và toYear)
-    int? fromYearStart = null, toYearEnd = null;
-    if (!string.IsNullOrEmpty(fromYear))
-    {
-        var years = fromYear.Split('-');
-        fromYearStart = int.Parse(years[0]);
-    }
-    if (!string.IsNullOrEmpty(toYear))
-    {
-        var years = toYear.Split('-');
-        toYearEnd = int.Parse(years[1]);
-    }
+    // Tính toán dữ liệu thống kê
+    var statistics = await GetStatistics(fromYear, toYear);
 
-    // Lấy dữ liệu từng ngành sử dụng Đoạn 1
-    var statistics = new List<object>();
+    // Lưu dữ liệu vào Session
+    HttpContext.Session.SetString("Statistics", JsonConvert.SerializeObject(statistics));
 
-    foreach (var department in departmentList)
-    {
-        // Lấy danh sách các lớp của từng ngành
-        var classesForDepartment = await _context.Classes
-            .Where(c => c.Department != null &&
-                        c.Department.Trim() == $"{department.DepartmentCode} - {department.DepartmentName}")
-            .ToListAsync();
-
-        // Lọc theo niên khóa (nếu có)
-        var filteredClasses = classesForDepartment
-            .Where(c => (!fromYearStart.HasValue || int.Parse(c.Term.Split('-')[0]) >= fromYearStart) &&
-                        (!toYearEnd.HasValue || int.Parse(c.Term.Split('-')[1]) <= toYearEnd));
-
-        // Thêm vào kết quả thống kê
-        statistics.Add(new
-        {
-            DepartmentCode = department.DepartmentCode,
-            DepartmentName = department.DepartmentName,
-            ClassCount = filteredClasses.Count()
-        });
-    }
-
-    // Truyền kết quả thống kê đến view
+    // Truyền dữ liệu thống kê vào ViewBag
     ViewBag.Statistics = statistics;
-    return View();
-}
 
-    //export major
+    return View();
+} 
+    // Export Major
     [HttpGet] 
     public async Task<IActionResult> ExportStatisticsClassByMajor(string fromYear = null, string toYear = null)
 {
-    // Lặp lại logic từ StatisticsClassByMajor để đảm bảo export đúng dữ liệu đã thống kê
-    var fixedDepartments = new List<string>
+    // Lấy dữ liệu thống kê từ Session
+    var statisticsJson = HttpContext.Session.GetString("Statistics");
+    if (string.IsNullOrEmpty(statisticsJson))
     {
-        "7480104 - Hệ thống Thông tin (CTTC)",
-        "7480102 - Mạng máy tính và truyền thông dữ liệu (CTTC)",
-        "7480201 - Công nghệ Thông Tin (CTTC)",
-        "7480201 - Công nghệ Thông Tin (CTĐB)"
-    };
-
-    var departmentList = fixedDepartments.Select(d =>
-    {
-        var parts = d.Split(" - ");
-        return new
-        {
-            DepartmentCode = parts[0].Trim(),
-            DepartmentName = parts[1].Trim()
-        };
-    }).ToList();
-
-    int? fromYearStart = null, toYearEnd = null;
-    if (!string.IsNullOrEmpty(fromYear))
-    {
-        var years = fromYear.Split('-');
-        fromYearStart = int.Parse(years[0]);
-    }
-    if (!string.IsNullOrEmpty(toYear))
-    {
-        var years = toYear.Split('-');
-        toYearEnd = int.Parse(years[1]);
+        return BadRequest("Không có dữ liệu để xuất.");
     }
 
-    var statistics = new List<object>();
-
-    foreach (var department in departmentList)
-    {
-        var classesForDepartment = await _context.Classes
-            .Where(c => c.Department != null &&
-                        c.Department.Trim() == $"{department.DepartmentCode} - {department.DepartmentName}")
-            .ToListAsync();
-
-        var filteredClasses = classesForDepartment
-            .Where(c => (!fromYearStart.HasValue || int.Parse(c.Term.Split('-')[0]) >= fromYearStart) &&
-                        (!toYearEnd.HasValue || int.Parse(c.Term.Split('-')[1]) <= toYearEnd));
-
-        statistics.Add(new
-        {
-            DepartmentCode = department.DepartmentCode,
-            DepartmentName = department.DepartmentName,
-            ClassCount = filteredClasses.Count()
-        });
-    }
+    var statistics = JsonConvert.DeserializeObject<List<StatisticResult>>(statisticsJson);
 
     // Tạo file Excel
     using var package = new ExcelPackage();
     var worksheet = package.Workbook.Worksheets.Add("Statistics");
 
-    // Tiêu đề cột
     worksheet.Cells[1, 1].Value = "Mã Ngành";
     worksheet.Cells[1, 2].Value = "Tên Ngành";
     worksheet.Cells[1, 3].Value = "Số Lớp";
 
-    // Thêm dữ liệu vào Excel
     for (int i = 0; i < statistics.Count; i++)
     {
-        dynamic stat = statistics[i];
+        var stat = statistics[i];
         worksheet.Cells[i + 2, 1].Value = stat.DepartmentCode;
         worksheet.Cells[i + 2, 2].Value = stat.DepartmentName;
         worksheet.Cells[i + 2, 3].Value = stat.ClassCount;
     }
 
-    // Định dạng
     using (var range = worksheet.Cells[1, 1, 1, 3])
     {
         range.Style.Font.Bold = true;
@@ -329,6 +294,9 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     var fileName = $"ThongKeLopTheoNganh_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
     return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
 }
+
+   
+    
 
     
     //Evalution

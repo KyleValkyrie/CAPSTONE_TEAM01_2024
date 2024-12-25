@@ -4,6 +4,7 @@ using CAPSTONE_TEAM01_2024;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CAPSTONE_TEAM01_2024.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241210012429_FixAttachmentReportTable")]
+    partial class FixAttachmentReportTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -327,10 +329,24 @@ namespace CAPSTONE_TEAM01_2024.Migrations
                     b.Property<int>("CriterionId")
                         .HasColumnType("int");
 
+                    b.Property<string>("FacultyAssessment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FacultyRanking")
+                        .HasColumnType("int");
+
                     b.Property<string>("HowToExecuteReport")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ReportId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SelfAssessment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SelfRanking")
                         .HasColumnType("int");
 
                     b.Property<string>("TaskReport")
@@ -408,12 +424,6 @@ namespace CAPSTONE_TEAM01_2024.Migrations
                     b.Property<DateTime>("CreationTimeReport")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("FacultyAssessment")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FacultyRanking")
-                        .HasColumnType("nvarchar(1)");
-
                     b.Property<int>("PeriodId")
                         .HasColumnType("int");
 
@@ -424,12 +434,6 @@ namespace CAPSTONE_TEAM01_2024.Migrations
                     b.Property<string>("ReportType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SelfAssessment")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SelfRanking")
-                        .HasColumnType("nvarchar(1)");
 
                     b.Property<string>("StatusReport")
                         .IsRequired()

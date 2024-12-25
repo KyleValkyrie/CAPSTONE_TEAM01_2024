@@ -25,6 +25,7 @@ using NuGet.Protocol.Plugins;
 using static MimeKit.TextPart;
 using System.Linq;
 using Microsoft.AspNetCore.StaticFiles;
+using System.Net.Mail;
 
 
 namespace CAPSTONE_TEAM01_2024.Controllers
@@ -40,7 +41,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         }
 
 //SemesterReport actions
-        //Render SemesterReport
+    //Render SemesterReport
         public async Task<IActionResult> EndSemesterReport(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["Page"] =" EndSemesterReport";
@@ -78,78 +79,126 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             };
             ViewBag.Warning = TempData["Warning"];
             ViewBag.Success = TempData["Success"];
-            ViewBag.Error = TempData["Error"]; return View(viewModel);
-        }   
-        // Add SemesterReport
-        [HttpPost] 
-        public async Task<IActionResult> AddReport(SemesterReport report, IFormCollection form) 
+            ViewBag.Error = TempData["Error"]; 
+            return View(viewModel);
+        }
+    // Add SemesterReport
+        [HttpPost]
+        public async Task<IActionResult> AddReport(SemesterReport report, IFormCollection form)
         {
-    // Setup data for SemesterReport
-    var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
-    report.CreationTimeReport = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
-    report.AdvisorName = User.Identity.Name;
-    var period = await _context.AcademicPeriods.FirstOrDefaultAsync(p => p.PeriodId == report.PeriodId);
-    report.PeriodName = period.PeriodName;
-    report.StatusReport = "Nháp";
+        // Check validity
+            var existedReport = await _context.SemesterReports.FirstOrDefaultAsync(sr => sr.ClassId == report.ClassId && sr.PeriodId == report.PeriodId);
+            if (existedReport != null)
+            {
+                TempData["Warning"] = "Đã tồn tại báo cáo cùng thời gian và lớp, xin hãy chọn lại thông tin phù hợp";
+                return RedirectToAction("EndSemesterReport");
+            }
+        // Get the SE Asia Standard Time timezone
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+        // Convert the time to Vietnam time
+            var vietnamTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
 
-    // Add new SemesterReport
-    var existingReport = await _context.SemesterReports.FirstOrDefaultAsync(rp =>
-        rp.AcademicPeriod == report.AcademicPeriod &&
-        rp.ClassId == report.ClassId &&
-        rp.AdvisorName == report.AdvisorName);
-    
-    if (existingReport == null)
-    {
-        _context.SemesterReports.Add(report);
-        await _context.SaveChangesAsync();
+        // Handling SemesterReports table
+            report.PeriodName = await _context.AcademicPeriods.Where(ap => ap.PeriodId == report.PeriodId)
+                                                              .Select(ap => ap.PeriodName)
+                                                              .FirstOrDefaultAsync();
+            report.AdvisorName = User.Identity.Name;
+            report.CreationTimeReport = vietnamTime;
+            report.StatusReport = "Nháp";
+            _context.SemesterReports.Add(report);
+            await _context.SaveChangesAsync();
 
-        // Setup data for ReportDetails
-        var detailIds = new List<string>
-        {
-            "1_1", "2_1", "3_1", "3_2", "4_1", "4_2", 
-            "5_1", "5_2", "5_3", "6_1", "7_1", "8_1", "8_2"
-        };
+        //Handling ReportDetails table
+            var rpID = report.ReportId;
+            List<ReportDetail> listToAdd = new List<ReportDetail>();
 
-        var details = detailIds.Select(id => new ReportDetail
-        {
-            ReportId = report.ReportId,
-            CriterionId = int.Parse(id.Split('_')[0]),
-            TaskReport = form[$"Task{id}"],
-            HowToExecuteReport = form[$"HowToExecute{id}"],
-            AttachmentReport = form[$"files{id}[]"]
-                .Select(fileName => new AttachmentReport
+            // Define the criterion groups (each group contains the task numbers)
+            var criterionTasks = new[]
+            {
+                new { CriterionId = 1, TaskCount = 1 },
+                new { CriterionId = 2, TaskCount = 1 },
+                new { CriterionId = 3, TaskCount = 2 },
+                new { CriterionId = 4, TaskCount = 2 },
+                new { CriterionId = 5, TaskCount = 3 },
+                new { CriterionId = 6, TaskCount = 1 },
+                new { CriterionId = 7, TaskCount = 1 },
+                new { CriterionId = 8, TaskCount = 2 }
+            };
+
+            foreach (var criterion in criterionTasks)
+            {
+                for (int i = 1; i <= criterion.TaskCount; i++)
                 {
-                    FileNames = fileName,
-                    FilePath = Path.Combine("Uploads", fileName), // Điều chỉnh đường dẫn thực tế
-                    FileDatas = Array.Empty<byte>(), // Nếu cần lưu dữ liệu thực của tệp
-                    DetailReportlId = report.ReportId
-                }).ToList(),
-            // Add SelfAssessment and SelfRanking
-            SelfAssessment = form["selfAssessment"], // Get personal assessment from form
-            SelfRanking = Enum.TryParse<ReportDetail.Ranking>(form["ranking"], out var selfRank) ? selfRank : ReportDetail.Ranking.E, // Default to "E" if invalid
-            // Add FacultyAssessment and FacultyRanking
-            FacultyAssessment = form["FaculityAssessment"], // Get faculty assessment from form
-            FacultyRanking = Enum.TryParse<ReportDetail.Ranking>(form["Faculityranking"], out var facultyRank) ? facultyRank : ReportDetail.Ranking.E // Default to "E" if invalid
-        }).ToList();
+                    listToAdd.Add(new ReportDetail()
+                    {
+                        ReportId = rpID,
+                        CriterionId = criterion.CriterionId,
+                        TaskReport = form[$"Task{criterion.CriterionId}_{i}"],
+                        HowToExecuteReport = form[$"HowToExecute{criterion.CriterionId}_{i}"]
+                    });
+                }
+            }
+
+            // Add filled list to the context and save
+            _context.ReportDetails.AddRange(listToAdd);
+            await _context.SaveChangesAsync();
 
 
-        // Add new ReportDetails
-        await _context.ReportDetails.AddRangeAsync(details);
-        await _context.SaveChangesAsync();
+            // Handling AttachmentReport table
+            // List to hold all attachment reports
+            List<AttachmentReport> attToAdd = new List<AttachmentReport>();
 
-        TempData["Success"] = "Thêm Báo Cáo thành công! Trạng thái hiện tại là nháp, vui lòng nộp Báo Cáo để thay đổi trạng thái!";
-        return RedirectToAction("EndSemesterReport");
-    }
-    else
-    {
-        TempData["Warning"] = "Đã tồn tại Báo Cáo trong thời gian và lớp tương tự!";
-        return RedirectToAction("EndSemesterReport");
-    }
-}
-        
-        
-        
-        //Delete Report
+            // List of file name patterns and corresponding indices for DetailReportlId in listToAdd
+            var fileNamePatterns = new[]
+            {
+                new { Pattern = "files1_1[]", Index = 0 },
+                new { Pattern = "files2_1[]", Index = 1 },
+                new { Pattern = "files3_1[]", Index = 2 },
+                new { Pattern = "files3_2[]", Index = 3 },
+                new { Pattern = "files4_1[]", Index = 4 },
+                new { Pattern = "files4_2[]", Index = 5 },
+                new { Pattern = "files5_1[]", Index = 6 },
+                new { Pattern = "files5_2[]", Index = 7 },
+                new { Pattern = "files5_3[]", Index = 8 },
+                new { Pattern = "files6_1[]", Index = 9 },
+                new { Pattern = "files7_1[]", Index = 10 },
+                new { Pattern = "files8_1[]", Index = 11 },
+                new { Pattern = "files8_2[]", Index = 12 }
+            };
+            // Process each file pattern and its corresponding DetailReportlId
+            foreach (var pattern in fileNamePatterns)
+            {
+                // Get files matching the current pattern
+                var files = form.Files.Where(f => f.Name == pattern.Pattern).ToList();
+
+                // Process each file
+                foreach (IFormFile f in files)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await f.CopyToAsync(memoryStream); // Copy file content to memory stream
+
+                        // Create attachment
+                        var attachment = new AttachmentReport()
+                        {
+                            FileNames = f.FileName,
+                            FileDatas = memoryStream.ToArray(), // Convert memory stream to byte array
+                            DetailReportlId = listToAdd[pattern.Index].DetailReportlId // Use the corresponding DetailReportlId
+                        };
+
+                        attToAdd.Add(attachment); // Add the attachment to the list
+                    }
+                }
+            }
+            // After processing all attachments, save them to the database
+            _context.AttachmentReports.AddRange(attToAdd);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Thêm báo cáo thành công!";
+            return RedirectToAction("EndSemesterReport");
+        }
+
+    //Delete Report
         [HttpPost]
         public async Task<IActionResult> DeleteReport(int reportId)
         {
@@ -180,8 +229,9 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("EndSemesterReport");
             }
         }
-        
-         [HttpPost]
+
+    //Edit Report
+        [HttpPost]
         public async Task<IActionResult> EditReport(int reportId, int periodId, string reportType, string classId)
         {
             var reportToEdit = await _context.SemesterReports.FirstOrDefaultAsync(rp => rp.ReportId == reportId);
@@ -221,7 +271,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("EndSemesterReport");
         }
 
-        //Submit Report
+    //Submit Report
         [HttpPost]
         public async Task<IActionResult> SubmitReport(int reportId)
         {
@@ -246,7 +296,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("EndSemesterReport");
         }
         
-        //Duplicate Plan
+    //Duplicate Plan
         [HttpPost]
         public async Task<IActionResult> DuplicateReport(int reportId)
         {
@@ -277,12 +327,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     TaskReport = detail.TaskReport,
                     CriterionId = detail.CriterionId,
                     HowToExecuteReport = detail.HowToExecuteReport,
-                    AttachmentReport = detail.AttachmentReport,
-                    SelfAssessment = detail.SelfAssessment,
-                    FacultyAssessment = detail.FacultyAssessment,
-                    SelfRanking = detail.SelfRanking,
-                    FacultyRanking = detail.FacultyRanking,
-                    
+                    AttachmentReport = detail.AttachmentReport                
                 };
 
                 _context.ReportDetails.Add(duplicatedDetail);
@@ -293,14 +338,25 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("EndSemesterReport");
         }
         
-        //Edit  Report Detail
-        [HttpPost]
+    //View Report Detail
+        [HttpGet]
         public async Task<IActionResult> GetReportDetails(int reportId) 
         {
             if (reportId <= 0)
             {
                 return BadRequest("Invalid Report ID.");
             }
+
+            var assessmentDatas = await _context.SemesterReports
+                .Where(sr => sr.ReportId == reportId)
+                .Select(sr => new
+                {
+                    sr.SelfAssessment,
+                    sr.SelfRanking,
+                    sr.FacultyAssessment,
+                    sr.FacultyRanking
+                })
+                .FirstOrDefaultAsync();
 
             var reportDetails = await _context.ReportDetails
                 .Include(r => r.AttachmentReport)
@@ -312,32 +368,397 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                     rd.CriterionId,
                     rd.TaskReport,
                     rd.HowToExecuteReport,
-                    rd.FacultyAssessment,
-                    rd.FacultyRanking,
-                    rd.SelfAssessment,
-                    rd.SelfRanking,
-                    Files = rd.AttachmentReport.Select(f => new
-                    {
-                        f.FileNames,
-                        f.FilePath
-                    }).ToList()
                 })
                 .ToListAsync();
 
+            //var attachments =await _context.AttachmentReports
+            //        .Where(a => a.DetailReport.ReportId == reportId)
+            //        .ToListAsync();
             if (!reportDetails.Any())
             {
                 return NotFound("No data found.");
             }
+            // Combine both assessment data and report details into a single object
+            var result = new
+            {
+                AssessmentData = assessmentDatas,
+                ReportDetails = reportDetails,
+                //Attachments = attachments
+            };
 
-            return Json(reportDetails); // Chọn trả về dữ liệu JSON
+            return Json(result); // Return the combined data as JSON
         }
 
+    //Edit Report Details
+        [HttpPost]
+        public async Task<IActionResult> EditReportDetail(int ReportId ,IFormCollection form)
+        {
+            // edit report
+            var report = await _context.SemesterReports.FirstOrDefaultAsync(rp => rp.ReportId == ReportId);
+            report.SelfAssessment = form["EditselfAssessment"];
+            report.FacultyAssessment = form["EditFaculityAssessment"];
+            report.SelfRanking = form["Editranking"].ToString().FirstOrDefault();
+            report.FacultyRanking = form["EditFaculityranking"].ToString().FirstOrDefault();
 
-      
+            // edit details
+            var details = await _context.ReportDetails.Where(dt=> dt.ReportId == ReportId).ToListAsync();
+            var patterns = new[]
+            {
+                "HowToExecute1_1",
+                "HowToExecute2_1", 
+                "HowToExecute3_1",
+                "HowToExecute3_2",
+                "HowToExecute4_1",
+                "HowToExecute4_2",
+                "HowToExecute5_1",
+                "HowToExecute5_2",
+                "HowToExecute5_3",
+                "HowToExecute6_1",
+                "HowToExecute7_1",
+                "HowToExecute8_1",
+                "HowToExecute8_2"
+            };
+            for(int i = 0; i < details.Count; i++)
+            {
+                details[i].HowToExecuteReport = form[patterns[i]];
+            }
+            _context.ReportDetails.UpdateRange(details);
 
+
+            // Handling attachments
+            // List to hold all attachment reports
+            List<AttachmentReport> attToAdd = new List<AttachmentReport>();
+
+            // List of file name patterns and corresponding indices for DetailReportlId in listToAdd
+            var fileNamePatterns = new[]
+            {
+                new { Pattern = "files1_1[]", Index = 0 },
+                new { Pattern = "files2_1[]", Index = 1 },
+                new { Pattern = "files3_1[]", Index = 2 },
+                new { Pattern = "files3_2[]", Index = 3 },
+                new { Pattern = "files4_1[]", Index = 4 },
+                new { Pattern = "files4_2[]", Index = 5 },
+                new { Pattern = "files5_1[]", Index = 6 },
+                new { Pattern = "files5_2[]", Index = 7 },
+                new { Pattern = "files5_3[]", Index = 8 },
+                new { Pattern = "files6_1[]", Index = 9 },
+                new { Pattern = "files7_1[]", Index = 10 },
+                new { Pattern = "files8_1[]", Index = 11 },
+                new { Pattern = "files8_2[]", Index = 12 }
+            };
+            // Process each file pattern and its corresponding DetailReportlId
+            foreach (var pattern in fileNamePatterns)
+            {
+                // Get files matching the current pattern
+                var files = form.Files.Where(f => f.Name == pattern.Pattern).ToList();
+
+                // Process each file
+                foreach (IFormFile f in files)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await f.CopyToAsync(memoryStream); // Copy file content to memory stream
+
+                        // Create attachment
+                        var attachment = new AttachmentReport()
+                        {
+                            FileNames = f.FileName,
+                            FileDatas = memoryStream.ToArray(), // Convert memory stream to byte array
+                            DetailReportlId = details[pattern.Index].DetailReportlId // Use the corresponding DetailReportlId
+                        };
+
+                        attToAdd.Add(attachment); // Add the attachment to the list
+                    }
+                }
+            }
+            _context.AttachmentReports.AddRange(attToAdd);       
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Sửa đổi chi tiết báo cáo thành công!";
+
+            return RedirectToAction("EndSemesterReport");
+        }
+
+    //Get Attachments
+        [HttpGet]
+        public async Task<IActionResult> GetReportAttachments(int detailId)
+        {
+            // Fetch the list of attachments for the specified report and detail
+            var attachments = await _context.AttachmentReports
+                .Where(a => a.DetailReportlId == detailId)
+                .Select(a => new
+                {
+                    a.FileNames,
+                    a.DetailReportlId,
+                    a.AttachmentReportId
+                })
+                .ToListAsync();
+            // Return the attachments as JSON
+            return Json(attachments);
+        }
+
+    //Download Proofs
+        [HttpGet]
+        public async Task<IActionResult> DownloadProof(int proofId)
+        {
+            var attachment = await _context.AttachmentReports
+                .FirstOrDefaultAsync(a => a.AttachmentReportId == proofId);
+
+            if (attachment == null)
+            {
+                return NotFound();
+            }
+
+            // Return the file as a download
+            // Set the file name and the content type (e.g., PDF, Image, etc.)
+            var fileName = attachment.FileNames;
+            var fileBytes = attachment.FileDatas; // Byte array containing the file data
+
+            // Using FileExtensionContentTypeProvider to get MIME type dynamically
+            var provider = new FileExtensionContentTypeProvider();
+            var contentType = "application/octet-stream"; // Default content type
+
+            if (!provider.TryGetContentType(fileName, out contentType))
+            {
+                contentType = "application/octet-stream"; // Use generic binary type if no match
+            }
+
+            // Set the Content-Disposition header to prompt the user to download the file
+            Response.Headers.Add("Content-Disposition", $"attachment; filename*=UTF-8''{Uri.EscapeDataString(fileName)}");
+            return File(fileBytes, contentType, fileName);
+        }
+    //Delete Proofs
+        [HttpPost]
+        public async Task<IActionResult> DeleteProof(int proofId)
+        {
+            var attachment = await _context.AttachmentReports
+                .FirstOrDefaultAsync(a => a.AttachmentReportId == proofId);
+
+            if (attachment == null)
+            {
+                return Json(new { success = false, message = "File not found." });
+            }
+
+            _context.AttachmentReports.Remove(attachment);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
+        }
+    //Export Report
+        [HttpPost]
+        public async Task<IActionResult> ExportReport(int reportId)
+        {
+            var currentUser = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == User.Identity.Name);
+            var targetReport = await _context.SemesterReports.FirstOrDefaultAsync(rp=> rp.ReportId == reportId);
+            var targetAdvisor =
+                await _context.ApplicationUsers.FirstOrDefaultAsync(t => t.Email == targetReport.AdvisorName);
+            var targetClasses = await _context.Classes
+               .Where(c => c.AdvisorId == currentUser.Id) // Filter by current user's AdvisorId
+               .Select(c => new SelectListItem
+               {
+                   Value = c.ClassId,
+                   Text = c.ClassId
+               })
+               .ToListAsync(); 
+            string classesString = string.Join(" - ", targetClasses.Select(c => c.Text));
+            var details = await _context.ReportDetails.Where(dt => dt.ReportId == reportId).ToListAsync();
+            // Create a new document
+            var doc = DocX.Create($"Báo cáo năm học {targetReport.PeriodName}.docx");
+            // Set page orientation to Landscape
+            doc.PageLayout.Orientation = Orientation.Landscape;
+            // Add content to the document
+            doc.InsertParagraph("BẢNG TỰ ĐÁNH GIÁ HOẠT ĐỘNG CỐ VẤN HỌC TẬP ").FontSize(16).Bold().Alignment = Alignment.center;
+            doc.InsertParagraph($"NĂM HỌC: {targetReport.PeriodName}").FontSize(13).Bold().Alignment = Alignment.center;
+            doc.InsertParagraph("Khoa: Công nghệ Thông tin ").FontSize(14).Bold().Alignment = Alignment.left;
+            doc.InsertParagraph("Họ và tên giảng viên: " + targetAdvisor.FullName).FontSize(14).Bold().Alignment = Alignment.left;
+            doc.InsertParagraph("Mã số giảng viên: " + targetAdvisor.SchoolId).FontSize(14).Bold().Alignment = Alignment.left;
+            var classNames = doc.InsertParagraph();
+            classNames.Append("Lớp phụ trách: ")
+                .FontSize(14); 
+
+            classNames.Append(classesString)
+                .FontSize(14)
+                .Color(System.Drawing.Color.Red)
+                .Bold();
+
+            classNames.Alignment = Alignment.left; // Set alignment for the entire paragraph
+
+            // Create a table with 11 rows and 7 columns
+            var table = doc.AddTable(14, 4);
+
+            // Table Headers
+            var headers = new[]
+            {
+                "Mục ", "Tiêu chí đánh giá ", "Mô tả công việc cụ thể ", "Hồ sơ, minh chứng "
+            };
+
+            for (int i = 0; i < headers.Length; i++)
+            {
+                table.Rows[0].Cells[i].Paragraphs[0].Append(headers[i]).FontSize(12).Bold().Alignment =
+                    Alignment.center;
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Top,
+                    new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                        System.Drawing.Color.Black));
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Bottom,
+                    new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                        System.Drawing.Color.Black));
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Left,
+                    new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                        System.Drawing.Color.Black));
+                table.Rows[0].Cells[i].SetBorder(TableCellBorderType.Right,
+                    new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                        System.Drawing.Color.Black));
+            }
+
+            // Merge cells
+            table.MergeCellsInColumn(0, 3, 4);
+            table.MergeCellsInColumn(0, 5, 6);
+            table.MergeCellsInColumn(0, 7, 9);
+            table.MergeCellsInColumn(0, 12, 13);
+            table.MergeCellsInColumn(1, 3, 4);
+            table.MergeCellsInColumn(1, 5, 6);
+            table.MergeCellsInColumn(1, 7, 9);
+            table.MergeCellsInColumn(1, 12, 13);
+
+            // Apply borders and padding to all cells
+            for (int row = 0; row < table.RowCount; row++)
+            {
+                for (int col = 0; col < table.ColumnCount; col++)
+                {
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Top,
+                        new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                            System.Drawing.Color.Black));
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Bottom,
+                        new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                            System.Drawing.Color.Black));
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Left,
+                        new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                            System.Drawing.Color.Black));
+                    table.Rows[row].Cells[col].SetBorder(TableCellBorderType.Right,
+                        new Xceed.Document.NET.Border(BorderStyle.Tcbs_single, BorderSize.one, 0,
+                            System.Drawing.Color.Black));
+                    table.Rows[row].Cells[col].MarginLeft = 10f;
+                    table.Rows[row].Cells[col].MarginRight = 10f;
+                    table.Rows[row].Cells[col].MarginTop = 5f;
+                    table.Rows[row].Cells[col].MarginBottom = 5f;
+                }
+            }
+
+
+            // Table Content
+            //1st column
+            table.Rows[1].Cells[0].Paragraphs[0].Append("1").FontSize(12).Alignment = Alignment.center;
+            table.Rows[2].Cells[0].Paragraphs[0].Append("2").FontSize(12).Alignment = Alignment.center;
+            table.Rows[3].Cells[0].Paragraphs[0].Append("3").FontSize(12).Alignment = Alignment.center;
+            table.Rows[5].Cells[0].Paragraphs[0].Append("4").FontSize(12).Alignment = Alignment.center;
+            table.Rows[7].Cells[0].Paragraphs[0].Append("5").FontSize(12).Alignment = Alignment.center;
+            table.Rows[10].Cells[0].Paragraphs[0].Append("6").FontSize(12).Alignment = Alignment.center;
+            table.Rows[11].Cells[0].Paragraphs[0].Append("7").FontSize(12).Alignment = Alignment.center;
+            table.Rows[12].Cells[0].Paragraphs[0].Append("8").FontSize(12).Alignment = Alignment.center;
+
+            //2nd column
+            table.Rows[1].Cells[1].Paragraphs[0].Append("Có kế hoạch hoạt động về công tác CVHT của năm học ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[2].Cells[1].Paragraphs[0].Append("CVHT khai thác hệ thống quản lý học tập của SV để nắm rõ tình trạng học tập của SV ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[3].Cells[1].Paragraphs[0].Append("Tổ chức các cuộc họp lớp, tư vấn cho sinh viên các nội dung học tập như: quy chế, quy định về tổ chức hoạt động đào tạo theo học chế tín chỉ; cấu trúc, lưu đồ của CTĐT, mục tiêu đào tạo, chuẩn đầu ra của ngành/chuyên ngành…").FontSize(12).Alignment = Alignment.center;
+            table.Rows[5].Cells[1].Paragraphs[0].Append("Hướng dẫn SV lập kế hoạch học tập phù hợp với cá nhân từng học kỳ/năm học/khóa học. Xem xét và phê duyệt kế hoạch học tập của SV đối với những trường hợp có yêu cầu. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[7].Cells[1].Paragraphs[0].Append("Trao đổi kinh nghiệm cá nhân trong học tập và nghề nghiệp, định hướng nghề nghiệp cho SV có nhu cầu. Tư vấn cho SV lựa chọn chuyên ngành (nếu có) ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[10].Cells[1].Paragraphs[0].Append("Tư vấn SV thuộc diện cảnh báo học vụ (Quy trình cảnh báo sớm). ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[11].Cells[1].Paragraphs[0].Append("Các ý kiến, đề xuất, khiếu nại của SV được phản ánh kịp thời đến các cấp có thẩm quyền. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[12].Cells[1].Paragraphs[0].Append("Tham gia đầy đủ các buổi tập huấn/hội nghị/cuộc họp liên quan đến công tác CVHT do Khoa, Trường tổ chức (nếu có). ").FontSize(12).Alignment = Alignment.center;
+
+            //3rd column
+            table.Rows[1].Cells[2].Paragraphs[0].Append("Có kế hoạch hoạt động về công tác CVHT của năm học ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[2].Cells[2].Paragraphs[0].Append("CVHT sử dụng thành thạo tài khoản online đã được phân quyền để khai thác hiệu quả và đánh giá được kết quả học tập của SV đối với lớp do mình làm cố vấn. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[3].Cells[2].Paragraphs[0].Append("3.1 CVHT thu thập và hiểu các văn bản liên quan quy định, quy chế đào tạo, chuẩn đầu ra, cấu trúc, lưu đồ CTĐT…phổ biến nội dung trong các buổi sinh hoạt lớp và tư vấn trực tiếp cho SV khi cần. Tổ chức sinh hoạt lớp SV bằng hình thức trực tiếp hoặc trực tuyến (online) ít nhất 2 lần/học kỳ; có biên bản các cuộc họp đầy đủ, đáp ứng yêu cầu về nội dung họp. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[4].Cells[2].Paragraphs[0].Append("3.2 Tiếp SV trực tiếp theo lịch trực tại văn phòng khoa hoặc thông qua các phương tiện khác ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[5].Cells[2].Paragraphs[0].Append("4.1 Hướng dẫn sinh viên cách xây dựng kế hoạch học tập cho khóa học hoặc năm học, tư vấn cho sinh viên lập kế hoạch học tập của năm học hoặc khóa học, xem xét và phê duyệt kế hoạch học tập của sinh viên đối với những trường hợp có yêu cầu từ Phòng Đào tạo. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[6].Cells[2].Paragraphs[0].Append("4.2 Hướng dẫn sinh viên điều chỉnh kế hoạch học tập và đăng ký môn học phù hợp với năng lực và hoàn cảnh của từng sinh viên. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[7].Cells[2].Paragraphs[0].Append("5.1 Tư vấn sinh viên lựa chọn chuyên ngành").FontSize(12).Alignment = Alignment.center;
+            table.Rows[8].Cells[2].Paragraphs[0].Append("5.2 Trao đổi kinh nghiệm cá nhân trong học tập và nghề nghiệp, định hướng nghề nghiệp cho sinh viên có nhu cầu. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[9].Cells[2].Paragraphs[0].Append("5.3 Giới thiệu nơi thực tập và việc làm cho SV (nếu có). ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[10].Cells[2].Paragraphs[0].Append("Tư vấn sinh viên thuộc diện cảnh báo học vụ hoặc có nguy cơ bị cảnh báo học vụ ở từng học kỳ có phương án học tập tiếp theo").FontSize(12).Alignment = Alignment.center;
+            table.Rows[11].Cells[2].Paragraphs[0].Append("CVHT làm cầu nối giữa SV và Khoa, Trường trong đề đạt nguyện vọng, ý kiến, phản ánh nhằm xây dựng môi trường học tập lành mạnh. Không có trường hợp SV gửi đơn thư khiếu nại vượt cấp. ").FontSize(12).Alignment = Alignment.center;
+            table.Rows[12].Cells[2].Paragraphs[0].Append("8.1 Tham dự họp, hội nghị theo triệu tập của của các cấp: Khoa - Phòng chức năng - Trường.").FontSize(12).Alignment = Alignment.center;
+            table.Rows[13].Cells[2].Paragraphs[0].Append("8.2 Tham gia họp tổng kết, đánh giá công tác CVHT do Hội đồng Khoa triệu tập. ").FontSize(12).Alignment = Alignment.center;
+
+            //4rd column
+            for(int i = 1; i <= details.Count; i++)
+            {
+                table.Rows[i].Cells[3].Paragraphs[0].Append(details[i-1].HowToExecuteReport).FontSize(12).Alignment = Alignment.left;
+                table.Rows[i].Cells[3].Paragraphs[0].AppendLine(""); // Insert a line break
+                table.Rows[i].Cells[3].Paragraphs[0].AppendLine(""); // Insert a line break
+                table.Rows[i].Cells[3].Paragraphs[0].Append("Danh sách minh chứng: ").FontSize(12).Alignment = Alignment.left;
+                table.Rows[i].Cells[3].Paragraphs[0].AppendLine(""); // Insert a line break
+                var proofs = await _context.AttachmentReports
+                    .Where(p => p.DetailReportlId == details[i-1].DetailReportlId)
+                    .ToListAsync();
+                foreach(var file in proofs)
+                {
+                    table.Rows[i].Cells[3].Paragraphs[0].Append("-" + file.FileNames).FontSize(12).Alignment = Alignment.left;
+                    table.Rows[i].Cells[3].Paragraphs[0].AppendLine(""); // Insert a line break
+                }
+            }
+
+            // Insert the table into the document
+            doc.InsertParagraph().InsertTableAfterSelf(table);
+
+            // Cá nhân tự đánh giá
+            doc.InsertParagraph("Cá nhân tự đánh giá: " + targetReport.SelfAssessment)
+               .FontSize(14)
+               .Bold()
+               .Alignment = Alignment.left;
+
+            // Xếp loại
+            doc.InsertParagraph("Xếp loại: " + targetReport.SelfRanking)
+               .FontSize(14)
+               .Bold()
+               .Alignment = Alignment.left;
+
+            // TP.Hồ Chí Minh, ngày 10 tháng 08 năm 2024
+            doc.InsertParagraph("TP.Hồ Chí Minh, ngày  tháng  năm ")
+               .FontSize(14)
+               .Alignment = Alignment.right;
+
+            // Add a blank paragraph for spacing
+            doc.InsertParagraph().SpacingBefore(10);
+
+            // Insert the first part of the text
+            var headerParagraph = doc.InsertParagraph()
+                .Append("PHÓ TRƯỞNG KHOA")
+                .FontSize(14)
+                .Bold();
+
+            // Set alignment after appending the text
+            headerParagraph.Alignment = Alignment.left; // Correct way
+
+            // Insert the second part of the text
+            var secondParagraph = doc.InsertParagraph()
+                .Append("\t\t\t\t\t\tCỐ VẤN HỌC TẬP")
+                .FontSize(14)
+                .Bold();
+
+            // Set the alignment for the second paragraph
+            secondParagraph.Alignment = Alignment.right; // Correct wa
+
+            // Add multiple blank lines for spacing
+            for (int i = 0; i < 4; i++)
+            {
+                doc.InsertParagraph().SpacingBefore(10);
+            }
+
+            // Save the document to a MemoryStream
+            using (var memoryStream = new MemoryStream())
+            {
+                doc.SaveAs(memoryStream);
+                memoryStream.Position = 0;
+                // Return the document as a file download
+                return File(memoryStream.ToArray(),
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    $"Tự đánh giá CVHT_{currentUser.FullName}.docx");
+            }
+        }
 
 //ClassList actions
-        //Render ClassList
+    //Render ClassList
         public async Task<IActionResult> ClassList(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "ClassList";
@@ -368,7 +789,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return View(viewModel);
         }
 
-        // Add Class
+    // Add Class
         [HttpPost]
         public async Task<IActionResult> CreateClass(Class model, string AdvisorEmail)
         {
@@ -415,7 +836,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("ClassList");
         }
 
-        // Edit Class
+    // Edit Class
         [HttpPost]
         public async Task<IActionResult> EditClass(Class model, string AdvisorEmail)
         {
@@ -1936,8 +2357,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             TempData["Success"] = "Gửi Mail thành công!";
             return RedirectToAction("SentEmail");
         }
-
-        // Helper function to add recipients
+    // Helper function to add recipients
         private async Task AddRecipients(string[] emails, int emailId, string recipientType)
         {
             foreach (string userEmail in emails)
@@ -1956,7 +2376,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 }
             }
         }
-
     //Delete Email
         [HttpPost]
         public async Task<IActionResult> DeleteEmail(int emailId)

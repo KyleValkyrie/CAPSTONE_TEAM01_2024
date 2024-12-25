@@ -1,8 +1,309 @@
-﻿@{
+﻿@model CAPSTONE_TEAM01_2024.ViewModels.ShowStatisticViewModel
+@{
     ViewData["Title"] = "Show Statistic";
     ViewData["CategoryVisibility"] = ViewData["CategoryVisibility"];
 }
+<style> 
+    .stat-card {
+        transition: all 0.3s ease-in-out;
+        transform-style: preserve-3d;
+        perspective: 1000px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        border-radius: 12px !important;
+        margin-bottom: 1rem;
+        max-height: 170px;
+    }
 
-<!-- Page content -->
-<!-- Navigation links -->
-Statistics here
+    .stat-card:hover {
+        transform: translateY(-5px) rotateX(5deg);
+        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+        border-color: rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .stat-card h3 {
+        font-size: 2.5rem !important;
+        font-weight: 600 !important;
+    }
+
+    .stat-card .card-title {
+        font-size: 1.25rem !important;
+        font-weight: 500 !important;
+        color: #2c3e50 !important;
+    }
+
+    .stat-card .card-text {
+        font-size: 0.95rem !important;
+        color: #34495e !important;
+    }
+
+    .stat-card.bcn-khoa {
+        background: linear-gradient(145deg, rgba(255, 243, 205, 0.7), rgba(255, 229, 180, 0.7));
+        border-left: 4px solid rgba(255, 193, 7, 0.8) !important;
+    }
+
+    .stat-card.cvht {
+        background: linear-gradient(145deg, rgba(204, 229, 255, 0.7), rgba(184, 218, 255, 0.7));
+        border-left: 4px solid rgba(13, 110, 253, 0.8) !important;
+    }
+
+    .stat-card.sinh-vien {
+        background: linear-gradient(145deg, rgba(212, 237, 218, 0.7), rgba(195, 230, 203, 0.7));
+        border-left: 4px solid rgba(25, 135, 84, 0.8) !important;
+    }
+
+    .stat-card.tong-lop {
+        background: linear-gradient(145deg, rgba(248, 215, 218, 0.7), rgba(245, 198, 203, 0.7));
+        border-left: 4px solid rgba(220, 53, 69, 0.8) !important;
+    }
+
+    .stat-icon {
+        transform: translateZ(20px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 12px;
+    }
+
+    .stat-icon i {
+        font-size: 20px ;
+    }
+
+    /* Chart styles */
+    .card {
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .card:hover {
+        border-color: rgba(0, 0, 0, 0.2) !important;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .card-header {
+        background: linear-gradient(145deg, #ffffff, #f8f9fa) !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .card-header .card-title {
+        font-size: 1.3rem !important;
+        color: #2c3e50 !important;
+        font-weight: 500 !important;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Spacing between chart cards */
+    .row.g-4 > [class*="col-"] {
+        padding: 1rem;
+    }
+</style>
+<body class="bg-light">
+<div class="container-fluid py-4">
+    <header class="mb-4">
+        <h3 class="h3 mb-2">Dashboard</h3>
+        <p class="text-muted">Tổng quan hệ thống</p>
+    </header>
+    <div class="row g-4 mb-4">
+        <!-- BCN Khoa Card -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm stat-card bcn-khoa">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="stat-icon bg-warning bg-opacity-10">
+                            <i class="bi bi-people text-warning"></i>
+                        </div>
+                        <h3 class="text-warning mb-0">@Model.FacultyNumber</h3>
+                    </div>
+                    <h5 class="card-title text-muted mb-2">BCN Khoa</h5>
+                    <p class="card-text text-muted small">
+                        <i class="bi bi-person-fill"></i>
+                        Đang Sử Dụng Hệ Thống
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CVHT Card -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm stat-card cvht">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="stat-icon bg-primary bg-opacity-10">
+                            <i class="bi bi-person-badge text-primary"></i>
+                        </div>
+                            <h3 class="text-primary mb-0">@Model.AdvisorNumber</h3>
+                    </div>
+                    <h5 class="card-title text-muted mb-2">CVHT</h5>
+                    <p class="card-text text-muted small">
+                        <i class="bi bi-person-fill"></i>
+                        Đang Sử Dụng Hệ Thống
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sinh Viên Card -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm stat-card sinh-vien">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="stat-icon bg-success bg-opacity-10">
+                            <i class="bi bi-mortarboard text-success"></i>
+                        </div>
+                            <h3 class="text-success mb-0">@Model.StudentNumber</h3>
+                    </div>
+                    <h5 class="card-title text-muted mb-2">Sinh Viên</h5>
+                    <p class="card-text text-muted small">
+                        <i class="bi bi-person-fill"></i>
+                        Đang Sử Dụng Hệ Thống
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tổng Lớp Card -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm stat-card tong-lop">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="stat-icon bg-danger bg-opacity-10">
+                            <i class="bi bi-building text-danger"></i>
+                        </div>
+                            <h3 class="text-danger mb-0">@Model.ClassNumber</h3>
+                    </div>
+                        <h5 class="card-title text-muted mb-2">Tổng Lớp</h5>
+                    <p class="card-text text-muted small">
+                        <i class="bi bi-mortarboard-fill"></i>
+                        Có Trên Hệ Thống
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-4">
+        <!-- Chart 1 -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-bar-chart text-success me-2"></i>
+                        Số Lượng Kế Hoạch
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="barChart1"
+                            @for (int i = 0; i < Model.Years.Count; i++)
+                            {
+                                <text>data-year-@i="@Model.Years[i].PeriodStart.Year" </text>
+                            }
+
+
+                            @for (int i = 0; i < Model.PlanChart.Count; i++)
+                            {
+                                <text>data-plan-@i="@Model.PlanChart[i]" </text>
+                            }
+                            height="300">
+                    </canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 2 -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-file-text text-primary me-2"></i>
+                        Số Lượng Báo Cáo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="barChart2" 
+                        @for (int i = 0; i < Model.Years.Count;i++)
+                        {
+                            <text>data-year-@i="@Model.Years[i].PeriodStart.Year" </text>
+                        }
+
+                        @for (int i = 0; i < Model.ReportChart.Count; i++)
+                        {
+                            <text>data-report-@i="@Model.ReportChart[i]" </text>
+                        }
+
+                        height="300" >
+                    </canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ <script>
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        };
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bar Chart 1
+            const ctx1 = document.getElementById('barChart1').getContext('2d');
+            const canvas1 = document.getElementById('barChart1');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                labels: [canvas1.dataset['year-0'], canvas1.dataset['year-1'], canvas1.dataset['year-2'], canvas1.dataset['year-3'], canvas1.dataset['year-4']],
+                    datasets: [{
+                    data: [canvas1.dataset['plan-0'], canvas1.dataset['plan-1'], canvas1.dataset['plan-2'], canvas1.dataset['plan-3'], canvas1.dataset['plan-4']],
+                        backgroundColor: 'rgba(25, 135, 84, 0.2)',
+                        borderColor: 'rgb(25, 135, 84)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        barThickness: 20
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // Bar Chart 2
+            const ctx2 = document.getElementById('barChart2').getContext('2d');
+            const canvas2 = document.getElementById('barChart2');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                labels: [canvas2.dataset['year-0'], canvas2.dataset['year-1'], canvas2.dataset['year-2'], canvas2.dataset['year-3'], canvas2.dataset['year-4']],
+                    datasets: [{
+                    data: [canvas2.dataset['report-0'], canvas2.dataset['report-1'], canvas2.dataset['report-2'], canvas2.dataset['report-3'], canvas2.dataset['report-4']],
+                        backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                        borderColor: 'rgb(13, 110, 253)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        barThickness: 20
+                    }]
+                },
+                options: chartOptions
+            });
+        });
+    </script>

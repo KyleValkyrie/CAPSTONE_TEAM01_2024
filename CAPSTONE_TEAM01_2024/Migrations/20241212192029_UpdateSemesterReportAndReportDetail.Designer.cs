@@ -4,6 +4,7 @@ using CAPSTONE_TEAM01_2024;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CAPSTONE_TEAM01_2024.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241212192029_UpdateSemesterReportAndReportDetail")]
+    partial class UpdateSemesterReportAndReportDetail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -409,9 +411,11 @@ namespace CAPSTONE_TEAM01_2024.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FacultyAssessment")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FacultyRanking")
+                        .IsRequired()
                         .HasColumnType("nvarchar(1)");
 
                     b.Property<int>("PeriodId")
@@ -426,9 +430,11 @@ namespace CAPSTONE_TEAM01_2024.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SelfAssessment")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SelfRanking")
+                        .IsRequired()
                         .HasColumnType("nvarchar(1)");
 
                     b.Property<string>("StatusReport")

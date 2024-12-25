@@ -41,13 +41,91 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         _context = context;
     }
 
-    public IActionResult ShowStatistics()
+    public async Task<IActionResult> ShowStatistics()
     {
         ViewData["page"] = "ShowStatistics";
-        return View();
+        var noOfStudent = (from user in _context.ApplicationUsers
+                           join userRole in _context.UserRoles on user.Id equals userRole.UserId into userRoles
+                           from userRole in userRoles.DefaultIfEmpty()
+                           join role in _context.Roles on userRole.RoleId equals role.Id into roles
+                           from role in roles.DefaultIfEmpty()
+                           where user.Email.EndsWith("@vanlanguni.vn") && (role == null ||
+                                                                           (role.NormalizedName != "ADVISOR" &&
+                                                                            role.NormalizedName != "FACULTY"))
+                           select user).Count();
+        
+        var noOfAdvisor = (from user in _context.ApplicationUsers
+                          join userRole in _context.UserRoles on user.Id equals userRole.UserId into userRoles
+                          from userRole in userRoles.DefaultIfEmpty()
+                          join role in _context.Roles on userRole.RoleId equals role.Id into roles
+                          from role in roles.DefaultIfEmpty()
+                          where (role != null &&
+                                 (role.NormalizedName == "ADVISOR"))
+                          select user).Count();
+
+        var noOfFaculty = (from user in _context.ApplicationUsers
+                           join userRole in _context.UserRoles on user.Id equals userRole.UserId into userRoles
+                           from userRole in userRoles.DefaultIfEmpty()
+                           join role in _context.Roles on userRole.RoleId equals role.Id into roles
+                           from role in roles.DefaultIfEmpty()
+                           where (role != null &&
+                                 (role.NormalizedName == "FACULTY"))
+                           select user).Count();
+
+        var noOfClasses = await _context.Classes.CountAsync();
+
+        var latest5Years = await _context.AcademicPeriods.OrderBy(ap => ap.PeriodStart).Take(5).ToListAsync();
+
+        List<int> plansEachYear = new List<int>();
+        List<int> reportsEachYear = new List<int>();
+
+        foreach (var year in latest5Years)
+        {
+            var thisYearPlanCount = await GetPlanNumberForYear(year.PeriodName);
+            plansEachYear.Add(thisYearPlanCount);
+        }
+
+        foreach (var year in latest5Years)
+        {
+            var thisYearReportCount = await GetReportNumberForYear(year.PeriodName);
+            reportsEachYear.Add(thisYearReportCount);
+        }
+
+            var viewmodel = new ShowStatisticViewModel
+        {
+            FacultyNumber = noOfFaculty,
+            AdvisorNumber = noOfAdvisor,
+            StudentNumber = noOfStudent,
+            ClassNumber = noOfClasses,
+            Years = latest5Years,
+            PlanChart = plansEachYear,
+            ReportChart = reportsEachYear
+        };
+        return View(viewmodel);
     }
-    //Year
-    public async Task<IActionResult> StatisticsClassByYear(int pageIndex = 1, int pageSize = 20, string fromTerm = null, string toTerm = null)
+
+   public async Task<int> GetPlanNumberForYear(string yearName)
+   {
+       // Perform your query, for example, counting the number of SemesterPlans for the specified year
+       var planCount = await _context.SemesterPlans
+           .Where(sp => sp.PeriodName == yearName) // Filter by the provided year (adjust this based on your condition)
+           .CountAsync();
+
+       return planCount;
+   }
+
+   public async Task<int> GetReportNumberForYear(string yearName)
+   {
+       // Perform your query, for example, counting the number of SemesterPlans for the specified year
+       var reportCount = await _context.SemesterReports
+           .Where(sp => sp.PeriodName == yearName) // Filter by the provided year (adjust this based on your condition)
+           .CountAsync();
+
+       return reportCount;
+   }
+
+   //Year
+   public async Task<IActionResult> StatisticsClassByYear(int pageIndex = 1, int pageSize = 20, string fromTerm = null, string toTerm = null)
     {
         ViewData["page"] = "StatisticsClassByYear";
 
@@ -312,6 +390,6 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         ViewBag.AllTerms = allTerms;
         return View();
     }
-}
-
-}
+    }
+    
+    }

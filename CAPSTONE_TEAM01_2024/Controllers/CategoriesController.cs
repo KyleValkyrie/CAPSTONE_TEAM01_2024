@@ -79,7 +79,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             };
             ViewBag.Warning = TempData["Warning"];
             ViewBag.Success = TempData["Success"];
-            ViewBag.Error = TempData["Error"]; return View(viewModel);
+            ViewBag.Error = TempData["Error"]; 
+            return View(viewModel);
         }
     // Add SemesterReport
         [HttpPost]

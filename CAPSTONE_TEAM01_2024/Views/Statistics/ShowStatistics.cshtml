@@ -1,4 +1,5 @@
-﻿@{
+﻿@model CAPSTONE_TEAM01_2024.ViewModels.ShowStatisticViewModel
+@{
     ViewData["Title"] = "Show Statistic";
     ViewData["CategoryVisibility"] = ViewData["CategoryVisibility"];
 }
@@ -113,7 +114,7 @@
                         <div class="stat-icon bg-warning bg-opacity-10">
                             <i class="bi bi-people text-warning"></i>
                         </div>
-                        <h3 class="text-warning mb-0">15</h3>
+                        <h3 class="text-warning mb-0">@Model.FacultyNumber</h3>
                     </div>
                     <h5 class="card-title text-muted mb-2">BCN Khoa</h5>
                     <p class="card-text text-muted small">
@@ -132,7 +133,7 @@
                         <div class="stat-icon bg-primary bg-opacity-10">
                             <i class="bi bi-person-badge text-primary"></i>
                         </div>
-                        <h3 class="text-primary mb-0">20</h3>
+                            <h3 class="text-primary mb-0">@Model.AdvisorNumber</h3>
                     </div>
                     <h5 class="card-title text-muted mb-2">CVHT</h5>
                     <p class="card-text text-muted small">
@@ -151,7 +152,7 @@
                         <div class="stat-icon bg-success bg-opacity-10">
                             <i class="bi bi-mortarboard text-success"></i>
                         </div>
-                        <h3 class="text-success mb-0">4</h3>
+                            <h3 class="text-success mb-0">@Model.StudentNumber</h3>
                     </div>
                     <h5 class="card-title text-muted mb-2">Sinh Viên</h5>
                     <p class="card-text text-muted small">
@@ -170,9 +171,9 @@
                         <div class="stat-icon bg-danger bg-opacity-10">
                             <i class="bi bi-building text-danger"></i>
                         </div>
-                        <h3 class="text-danger mb-0">17</h3>
+                            <h3 class="text-danger mb-0">@Model.ClassNumber</h3>
                     </div>
-                    <h5 class="card-title text-muted mb-2">Tổng Lớp</h5>
+                        <h5 class="card-title text-muted mb-2">Tổng Lớp</h5>
                     <p class="card-text text-muted small">
                         <i class="bi bi-mortarboard-fill"></i>
                         Có Trên Hệ Thống
@@ -194,7 +195,19 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="barChart1" height="300"></canvas>
+                    <canvas id="barChart1"
+                            @for (int i = 0; i < Model.Years.Count; i++)
+                            {
+                                <text>data-year-@i="@Model.Years[i].PeriodStart.Year" </text>
+                            }
+
+
+                            @for (int i = 0; i < Model.PlanChart.Count; i++)
+                            {
+                                <text>data-plan-@i="@Model.PlanChart[i]" </text>
+                            }
+                            height="300">
+                    </canvas>
                 </div>
             </div>
         </div>
@@ -209,7 +222,19 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="barChart2" height="300"></canvas>
+                    <canvas id="barChart2" 
+                        @for (int i = 0; i < Model.Years.Count;i++)
+                        {
+                            <text>data-year-@i="@Model.Years[i].PeriodStart.Year" </text>
+                        }
+
+                        @for (int i = 0; i < Model.ReportChart.Count; i++)
+                        {
+                            <text>data-report-@i="@Model.ReportChart[i]" </text>
+                        }
+
+                        height="300" >
+                    </canvas>
                 </div>
             </div>
         </div>
@@ -245,12 +270,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Bar Chart 1
             const ctx1 = document.getElementById('barChart1').getContext('2d');
+            const canvas1 = document.getElementById('barChart1');
             new Chart(ctx1, {
                 type: 'bar',
                 data: {
-                    labels: ['2022', '2023', '2024', '2025', '2026'],
+                labels: [canvas1.dataset['year-0'], canvas1.dataset['year-1'], canvas1.dataset['year-2'], canvas1.dataset['year-3'], canvas1.dataset['year-4']],
                     datasets: [{
-                        data: [35, 22, 10, 27, 19],
+                    data: [canvas1.dataset['plan-0'], canvas1.dataset['plan-1'], canvas1.dataset['plan-2'], canvas1.dataset['plan-3'], canvas1.dataset['plan-4']],
                         backgroundColor: 'rgba(25, 135, 84, 0.2)',
                         borderColor: 'rgb(25, 135, 84)',
                         borderWidth: 2,
@@ -263,12 +289,13 @@
 
             // Bar Chart 2
             const ctx2 = document.getElementById('barChart2').getContext('2d');
+            const canvas2 = document.getElementById('barChart2');
             new Chart(ctx2, {
                 type: 'bar',
                 data: {
-                    labels: ['2022', '2023', '2024', '2025', '2026'],
+                labels: [canvas2.dataset['year-0'], canvas2.dataset['year-1'], canvas2.dataset['year-2'], canvas2.dataset['year-3'], canvas2.dataset['year-4']],
                     datasets: [{
-                        data: [12, 19, 3, 5, 2],
+                    data: [canvas2.dataset['report-0'], canvas2.dataset['report-1'], canvas2.dataset['report-2'], canvas2.dataset['report-3'], canvas2.dataset['report-4']],
                         backgroundColor: 'rgba(13, 110, 253, 0.2)',
                         borderColor: 'rgb(13, 110, 253)',
                         borderWidth: 2,

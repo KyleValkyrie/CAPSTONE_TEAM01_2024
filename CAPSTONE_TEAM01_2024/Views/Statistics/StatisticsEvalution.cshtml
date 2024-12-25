@@ -1,6 +1,7 @@
-﻿@model CAPSTONE_TEAM01_2024.ViewModels.ClassListViewModel
+﻿@model CAPSTONE_TEAM01_2024.ViewModels.StatisticsEvalutionViewModel
 @{
     ViewData["Title"] = "Statistic Evalution";
+    int number = (Model.SemesterReports.PageIndex - 1) * Model.SemesterReports.PageSize;
 }
 <style>
     /* Tinh chỉnh ComboBox */
@@ -93,9 +94,14 @@
                             <i class="fas fa-chart-bar me-2"></i> Thống kê
                         </button>
 
-                        <a type="button" class="btn btn-secondary" href="">
+                        <a type="button" class="btn btn-secondary"
+                           href="@Url.Action("ExportStatisticsEvalution", "Statistics",
+                                     new { fromTerm = ViewBag.CurrentFromTerm, toTerm = ViewBag.CurrentToTerm})">
                             <i class="bi bi-download"></i> Xuất File
                         </a>
+
+
+
                     </div>
                     <!-- Thông báo -->
                     @if (TempData["Success"] != null)
@@ -141,25 +147,82 @@
                         </tr>
                         </thead>
                         <tbody class="text-center">
+                        @foreach (var report in Model.SemesterReports)
+                        {
+                            number++;
+                            <tr>
+                                <td class="text-center">@number</td>
+                                <td class="text-center">@report.ClassId</td>
+                                <td class="text-center">
+                                    @if (report.Class.Advisor != null)
+                                    {
+                                        @if (string.IsNullOrEmpty(report.Class.Advisor.FullName))
+                                        {
+                                            @report.Class.Advisor.Email
+                                        }
+                                        else
+                                        { @report.Class.Advisor.FullName
+                                        }
+                                    }
+                                </td>
+                                <td class="text-center">@report.PeriodName</td>
+                                <td class="text-center">@report.FacultyRanking</td>
+                               
+                            </tr>
+                        }
                         </tbody>
                     </table>
 
                     <!-- Pagination -->
                     <nav aria-label="Page navigation">
                         <ul class="pagination justify-content-end">
-                            <li class="page-item disabled">
-                                <a class="page-link" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item active">
-                                <a class="page-link">1</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
+                            @if (Model.SemesterReports.HasPreviousPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="StatisticsEvalution" asp-route-pageIndex="@(Model.SemesterReports.PageIndex - 1)" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <a class="page-link" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            @for (var i = 1; i <= Model.SemesterReports.TotalPages; i++)
+                            {
+                                if (i == Model.SemesterReports.PageIndex)
+                                {
+                                    <li class="page-item active">
+                                        <a class="page-link">@i</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="StatisticsEvalution" asp-route-pageIndex="@i">@i</a>
+                                    </li>
+                                }
+                            }
+                            @if (Model.SemesterReports.HasNextPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="StatisticsEvalution" asp-route-pageIndex="@(Model.SemesterReports.PageIndex + 1)" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <a class="page-link" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
                         </ul>
                     </nav>
                 </div>
@@ -167,3 +230,19 @@
         </div>
     </main>
 </div>
+<script>
+    function handleStatistics() {
+        const fromTerm = document.getElementById("FromEvalutionFilter").value;
+        const toTerm = document.getElementById("ToEvalutionFilter").value;
+
+        if (fromTerm === "Lựa chọn Khóa" || toTerm === "Lựa chọn Khóa") {
+            alert("Vui lòng chọn đầy đủ Từ Khóa và Đến Khóa.");
+            return;
+        }
+
+        const url = `@Url.Action("StatisticsEvalution", "Statistics")?fromTerm=${fromTerm}&toTerm=${toTerm}`;
+        window.location.href = url;
+    }
+
+</script>
+

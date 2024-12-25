@@ -378,18 +378,113 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
     
     //Evalution
-    public async Task<IActionResult> StatisticsEvalution()
+    public async Task<IActionResult> StatisticsEvalution(string fromTerm = null, string toTerm = null, int pageIndex = 1)
     {
         ViewData["page"] = "StatisticsEvalution";
+
+        // Lấy tất cả các Term (Khóa học)
         var allTerms = await _context.Classes
             .Select(c => c.Term)
             .Distinct()
             .OrderBy(t => t)
             .ToListAsync();
-        
         ViewBag.AllTerms = allTerms;
-        return View();
+        ViewBag.CurrentFromTerm = fromTerm;
+        ViewBag.CurrentToTerm = toTerm;
+
+        // Lấy dữ liệu các báo cáo học kỳ
+        var query = _context.SemesterReports
+            .Include(sr => sr.Class)
+            .ThenInclude(c => c.Advisor)
+            .AsQueryable();
+
+        // Áp dụng bộ lọc nếu có
+        if (!string.IsNullOrEmpty(fromTerm) && !string.IsNullOrEmpty(toTerm))
+        {
+            query = query.Where(sr => string.Compare(sr.Class.Term, fromTerm) >= 0 &&
+                                      string.Compare(sr.Class.Term, toTerm) <= 0);
+        }
+
+        // Phân trang
+        int pageSize = 10; // Số lượng bản ghi mỗi trang
+        var semesterReports = await PaginatedList<SemesterReport>.CreateAsync(query, pageIndex, pageSize);
+
+        // Tạo ViewModel
+        var viewModel = new StatisticsEvalutionViewModel
+        {
+            SemesterReports = semesterReports
+        };
+
+        return View(viewModel);
     }
+    //export evalution
+    [HttpGet]
+     public async Task<IActionResult> ExportStatisticsEvalution(string fromTerm, string toTerm)
+    {
+        // Lấy dữ liệu các báo cáo học kỳ theo bộ lọc
+        var query = _context.SemesterReports
+            .Include(sr => sr.Class)
+            .ThenInclude(c => c.Advisor)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(fromTerm) && !string.IsNullOrEmpty(toTerm))
+        {
+            query = query.Where(sr => string.Compare(sr.Class.Term, fromTerm) >= 0 &&
+                                      string.Compare(sr.Class.Term, toTerm) <= 0);
+        }
+
+        var semesterReports = await query.ToListAsync();
+
+        // Tạo file Excel
+        using (var package = new ExcelPackage())
+        {
+            var worksheet = package.Workbook.Worksheets.Add("Statistics");
+            
+            worksheet.Cells[1, 1].Value = "Khóa: " + $"Từ Khóa {fromTerm} - Đến Khóa {toTerm}";
+            worksheet.Cells[1, 1, 1, 4].Merge = true;  // Merge các ô từ cột 1 đến 4
+            worksheet.Cells[1, 1].Style.Font.Bold = true;
+            worksheet.Cells[1, 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+            worksheet.Cells[1, 1].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+
+            
+            worksheet.Cells[2, 1].Value = "Mã Lớp";
+            worksheet.Cells[2, 2].Value = "CVHT";
+            worksheet.Cells[2, 3].Value = "Năm Học";
+            worksheet.Cells[2, 4].Value = "Xếp Loại";
+
+            // Điền dữ liệu vào các hàng
+            int row = 3;  // Dữ liệu bắt đầu từ hàng thứ 3
+            foreach (var report in semesterReports)
+            {
+                worksheet.Cells[row, 1].Value = report.ClassId;
+                worksheet.Cells[row, 2].Value = report.Class.Advisor?.FullName ?? report.Class.Advisor?.Email;
+                worksheet.Cells[row, 3].Value = report.PeriodName;
+                worksheet.Cells[row, 4].Value = report.FacultyRanking;
+                row++;
+            }
+            using (var range = worksheet.Cells[2, 1, 2, 4])
+            {
+                range.Style.Font.Bold = true;
+                range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+                range.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+            }
+            
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+            
+            var stream = new MemoryStream();
+            await package.SaveAsAsync(stream);
+            stream.Position = 0;
+
+            
+            var fileName = $"ThongKeDanhGia_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+    }
+}
+
+
     }
     
-    }
+    

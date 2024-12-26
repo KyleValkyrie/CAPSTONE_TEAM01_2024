@@ -10,6 +10,7 @@
 }
 
 <style>
+   
     .list-group-item {
         display: flex;
         justify-content: space-between;
@@ -330,9 +331,9 @@
                                 <td class="text-center">
 
                                     <button class="btn btn-outline-success btn-sm"
-                                            title="Xem chi tiết"
+                                            title="Xem và Cập Nhật chi tiết"
                                                 onclick="openEditDetailModal(@report.ReportId)">
-                                        <i class="fa-solid fa-eye custom-icon"></i>
+                                        <i class="fa-solid fa-pencil"></i>
                                     </button>
                                     @if (isNotFaculty)
                                     {
@@ -1190,7 +1191,10 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="fileModalLabel">Danh sách file đã upload</h5>
+                <div>
+                    <h5 class="modal-title" id="fileModalLabel">Danh sách file đã upload</h5>
+                    <p class="modal-title" style="margin-top: 10px; font-weight: bold; color: red;">Thầy/Cô nhớ lưu Báo Cáo, nếu không sẽ mất các minh chứng đã upload.</p>
+                    </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -1198,9 +1202,9 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     <!-- Uploaded files will be displayed here -->
                 </ul>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
         </div>
     </div>
 </div>

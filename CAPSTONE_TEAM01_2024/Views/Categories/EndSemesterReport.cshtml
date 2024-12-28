@@ -451,7 +451,7 @@
                     <div style="flex: 1; text-align: center;">Báo Cáo CVHT </div>
                     <input type="hidden" id="ReportType" name="ReportType" value="Báo Cáo CVHT" />
                     <div style="flex: 1; text-align: center;">
-                        <select id="PeriodId" name="PeriodId" style="width: 100%;" required oninvalid="setCustomValidity('Vui lòng chọn dữ liệu ')">
+                        <select id="PeriodId" name="PeriodId" style="width: 100%;" required>
                             <option value="" disabled selected>Vui lòng chọn năm học</option>
                             @foreach (var item in Model.SchoolYears)
                             {
@@ -461,7 +461,7 @@
                     </div>
                     <div style="flex: 1; text-align: center;">Lớp: </div>
                     <div style="flex: 1; text-align: center;">
-                        <select id="ClassId" name="ClassId" style="width: 100%;" required oninvalid="setCustomValidity('Vui lòng chọn dữ liệu ')">
+                        <select id="ClassId" name="ClassId" style="width: 100%;" required>
                             <option value="" disabled selected>Vui lòng chọn lớp</option>
                             @foreach (var item in Model.Class)
                             {
@@ -483,7 +483,7 @@
                         <textarea name="Task1_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>Kế hoạch cụ thể, rõ ràng, nộp đúng hạn. Hoạt động diễn ra trong học kỳ, năm học đáp ứng bao nhiêu % kế hoạch thiết kế.</textarea>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea name="HowToExecute1_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea name="HowToExecute1_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="upload-file" data-target="fileList1_1" name="files1_1[]" multiple id="uploadField1_1">
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal"
@@ -499,10 +499,11 @@
                         <textarea name="Task2_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>CVHT sử dụng thành thạo tài khoản online đã được phân quyền để khai thác hiệu quả và đánh giá được kết quả học tập của SV đối với lớp do mình làm cố vấn. </textarea>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea name="HowToExecute2_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto; " required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea name="HowToExecute2_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
-                        <input type="file" class="upload-file" data-target="fileList2_1" name="files2_1[]"  multiple>
-                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileModal2_1">
+                        <input type="file" class="upload-file" data-target="fileList2_1" name="files2_1[]" multiple id=" uploadField2_1">
+                        <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal"
+                                data-bs-target="#fileListModal" onclick="showFileList('uploadField2_1')">
                             Xem danh sách file đã upload
                         </button>
                     </div>
@@ -515,7 +516,7 @@
                         <textarea name="Task3_2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>3.2.Tiếp SV trực tiếp theo lịch trực tại văn phòng khoa hoặc thông qua các phương tiện khác. </textarea>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea name="HowToExecute3_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea name="HowToExecute3_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="upload-file" data-target="fileList3_1" name="files3_1[]" multiple id="uploadField3_1">
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal"
@@ -523,56 +524,13 @@
                             Xem danh sách file đã upload
                         </button>
 
-                        <!-- Modal -->
-                        <div class="modal fade" id="fileModal3_1" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="fileModalLabel3_1">Danh sách file đã upload</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <ul id="fileList3_1" class="list-group">
-                                            <!-- Danh sách file sẽ hiển thị tại đây -->
-                                        </ul>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <textarea name="HowToExecute3_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea name="HowToExecute3_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="upload-file" data-target="fileList3_2" name="files3_2[]" multiple id="uploadField3_2">
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal"
                                 data-bs-target="#fileListModal" onclick="showFileList('uploadField3_2')">
                             Xem danh sách file đã upload
                         </button>
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="fileModal3_2" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="fileModalLabel3_2">Danh sách file đã upload</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <ul id="fileList3_2" class="list-group">
-                                            <!-- Danh sách file sẽ hiển thị tại đây -->
-                                        </ul>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-       
-
                     </div>
                 </div>
                 <!-- Rows for Tiêu Chí 4 -->
@@ -584,7 +542,7 @@
 
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea name="HowToExecute4_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea name="HowToExecute4_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="upload-file" data-target="fileList4_1" name="files4_1[]" multiple id="uploadField4_1">
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal"
@@ -612,7 +570,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="Task5_3" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>5.3.Giới thiệu nơi thực tập và việc làm cho SV (nếu có).</textarea>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea name="HowToExecute5_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea name="HowToExecute5_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="upload-file" data-target="fileList5_1" name="files5_1[]" multiple id="uploadField5_1">
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal"
@@ -620,27 +578,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                             Xem danh sách file đã upload
                         </button>
 
-                        <!-- Modal -->
-                        <div class="modal fade" id="fileModal5_1" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="fileModalLabel5_1">Danh sách file đã upload</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <ul id="fileList5_1" class="list-group">
-                                            <!-- Danh sách file sẽ hiển thị tại đây -->
-                                        </ul>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <textarea name="HowToExecute5_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea name="HowToExecute5_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="upload-file" data-target="fileList5_2" name="files5_2[]" multiple id="uploadField5_2">
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" 
@@ -649,7 +587,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         </button>
 
                         <!-- 5_3 -->
-                        <textarea name="HowToExecute5_3" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea name="HowToExecute5_3" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="upload-file" data-target="fileList5_3" name="files5_3[]" multiple id="uploadField5_3">
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal"
@@ -665,7 +603,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="Task6_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>Tư vấn sinh viên thuộc diện cảnh báo học vụ hoặc có nguy cơ bị cảnh báo học vụ ở từng học kỳ có phương án học tập tiếp theo. </textarea>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea name="HowToExecute6_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea name="HowToExecute6_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="upload-file" data-target="fileList6_1" name="files6_1[]" multiple id="uploadField6_1">
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal"
@@ -681,7 +619,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="Task7_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>CVHT làm cầu nối giữa SV và Khoa, Trường trong đề đạt nguyện vọng, ý kiến, phản ánh nhằm xây dựng môi trường học tập lành mạnh. Không có trường hợp SV gửi đơn thư khiếu nại vượt cấp. </textarea>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea name="HowToExecute7_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea name="HowToExecute7_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="upload-file" data-target="fileList7_1" name="files7_1[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" onclick="showFileList(7, 1)">
@@ -699,7 +637,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <!-- 8_1 -->
-                        <textarea name="HowToExecute8_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea name="HowToExecute8_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="upload-file" data-target="fileList8_1" name="files8_1[]" multiple id="uploadField8_1">
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal"
@@ -707,7 +645,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                             Xem danh sách file đã upload
                         </button>
                         <!-- 8_2 -->
-                        <textarea name="HowToExecute8_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea name="HowToExecute8_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="upload-file" data-target="fileList8_2" name="files8_2[]" multiple id="uploadField8_2">
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal"
@@ -722,7 +660,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <label for="selfAssessment" style="white-space: nowrap; font-weight: bold;">Cá Nhân Tự Đánh Giá:</label>
                         <textarea id="selfAssessment" name="selfAssessment"
                                       placeholder="Nhập đánh giá"
-                                  style="flex: 1; width: 850px; height: 50px;overflow-y: auto; " required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                                      style="flex: 1; width: 850px; height: 50px;overflow-y: auto; "></textarea>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <label for="ranking" style="white-space: nowrap; font-weight: bold;">Cá Nhân Tự Xếp Loại:</label>
@@ -871,7 +809,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="Task1_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>Kế hoạch cụ thể, rõ ràng, nộp đúng hạn. Hoạt động diễn ra trong học kỳ, năm học đáp ứng bao nhiêu % kế hoạch thiết kế.</textarea>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea name="EditHowToExecute1_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea id="EditHowToExecute1_1" name="HowToExecute1_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList1_1" id="Editfiles1_1[]" name="files1_1[]" multiple>
                         <!-- Button with dynamic detailId -->
@@ -888,7 +826,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="Task2_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>CVHT sử dụng thành thạo tài khoản online đã được phân quyền để khai thác hiệu quả và đánh giá được kết quả học tập của SV đối với lớp do mình làm cố vấn. </textarea>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea name="EditHowToExecute2_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea id="EditHowToExecute2_1" name="HowToExecute2_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList2_1" id="Editfiles2_1[]" name="files2_1[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
@@ -906,7 +844,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
 
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea name="EditHowToExecute3_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea id="EditHowToExecute3_1" name="HowToExecute3_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList3_1" id="Editfiles3_1[]" name="files3_1[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
@@ -914,28 +852,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                             Xem danh sách file đã upload
                         </button>
 
-                        <!-- Modal -->
-                        <div class="modal fade" id="EditfileModal3_1" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="fileModalLabel">Danh sách file đã upload</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <ul id="EditfileList3_1" class="list-group">
-                                            <!-- Danh sách file sẽ hiển thị tại đây -->
-                                        </ul>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <textarea name="EditHowToExecute3_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea id="EditHowToExecute3_2" name="HowToExecute3_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList3_2" id="Editfiles3_2[]" name="files3_2[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
@@ -952,7 +869,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="Task4_2" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>4.2.Hướng dẫn sinh viên điều chỉnh kế hoạch học tập và đăng ký môn học phù hợp với năng lực và hoàn cảnh của từng sinh viên.  </textarea>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea name="EditHowToExecute4_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea id="EditHowToExecute4_1" name="HowToExecute4_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList4_1" id="Editfiles4_1[]" name="files4_1[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
@@ -960,27 +877,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                             Xem danh sách file đã upload
                         </button>
 
-                        <!-- Modal -->
-                        <div class="modal fade" id="EditfileModal4_1" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="fileModalLabel">Danh sách file đã upload</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <ul id="EditfileList4_1" class="list-group">
-                                            <!-- Danh sách file sẽ hiển thị tại đây -->
-                                        </ul>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <textarea name="EditHowToExecute4_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea id="EditHowToExecute4_2" name="HowToExecute4_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList4_2" id="Editfiles4_2[]" name="files4_2[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
@@ -1000,7 +897,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="Task5_3" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>5.3.Giới thiệu nơi thực tập và việc làm cho SV (nếu có).</textarea>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea name="EditHowToExecute5_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea id="EditHowToExecute5_1" name="HowToExecute5_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList5_1" id="Editfiles5_1[]" name="files5_1[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
@@ -1008,27 +905,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                             Xem danh sách file đã upload
                         </button>
 
-                        <!-- Modal -->
-                        <div class="modal fade" id="EditfileModal5_1" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="fileModalLabel">Danh sách file đã upload</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <ul id="EditfileList5_1" class="list-group">
-                                            <!-- Danh sách file sẽ hiển thị tại đây -->
-                                        </ul>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <textarea name="EditHowToExecute5_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea id="EditHowToExecute5_2" name="HowToExecute5_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList5_2" id="Editfiles5_2[]" name="files5_2[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
@@ -1037,7 +914,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         </button>
 
                         <!-- 5_3 -->
-                        <textarea name="EditHowToExecute5_3" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea id="EditHowToExecute5_3" name="HowToExecute5_3" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList5_3" id="Editfiles5_3[]" name="files5_3[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
@@ -1054,7 +931,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="Task6_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>Tư vấn sinh viên thuộc diện cảnh báo học vụ hoặc có nguy cơ bị cảnh báo học vụ ở từng học kỳ có phương án học tập tiếp theo. </textarea>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea name="EditHowToExecute6_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea id="EditHowToExecute6_1"  name="HowToExecute6_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList6_1" id="Editfiles6_1[]" name="files6_1[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
@@ -1070,7 +947,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <textarea name="Task7_1" style="flex: 1; min-width: 100px; height: 50px; font-weight: bold;" readonly>CVHT làm cầu nối giữa SV và Khoa, Trường trong đề đạt nguyện vọng, ý kiến, phản ánh nhằm xây dựng môi trường học tập lành mạnh. Không có trường hợp SV gửi đơn thư khiếu nại vượt cấp. </textarea>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                        <textarea name="EditHowToExecute7_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea id="EditHowToExecute7_1" name="HowToExecute7_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList7_1" id="Editfiles7_1[]" name="files7_1[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
@@ -1089,7 +966,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
                         <!-- 8_1 -->
-                        <textarea name="EditHowToExecute8_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea id="EditHowToExecute8_1" name="HowToExecute8_1" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList8_1" id="Editfiles8_1[]" name="files8_1[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"
@@ -1098,7 +975,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         </button>
 
                         <!-- 8_2 -->
-                        <textarea name="EditHowToExecute8_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;" required oninvalid="setCustomValidity('Vui lòng nhập đầy đủ trường dữ liệu ')"></textarea>
+                        <textarea id="EditHowToExecute8_2" name="HowToExecute8_2" style="flex: 1; min-width: 100px; height: 50px;overflow-y: auto;"></textarea>
                         <!-- Input file -->
                         <input type="file" class="Edit-upload-file" data-target="EditfileList8_2" id="Editfiles8_2[]" name="files8_2[]" multiple>
                         <button type="button" class="btn btn-secondary mt-1" data-bs-toggle="modal" data-bs-target="#fileListModal"

@@ -753,7 +753,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 // Return the document as a file download
                 return File(memoryStream.ToArray(),
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    $"Tự đánh giá CVHT_{currentUser.FullName}.docx");
+                    $"Tự đánh giá CVHT_{targetAdvisor.FullName}.docx");
             }
         }
 

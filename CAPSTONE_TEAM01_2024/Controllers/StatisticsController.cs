@@ -29,6 +29,8 @@ using Microsoft.AspNetCore.StaticFiles;
 using System.Net.Mail;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
+using Color = System.Drawing.Color;
+
 namespace CAPSTONE_TEAM01_2024.Controllers
 {
    public class StatisticsController : Controller
@@ -200,37 +202,90 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     }
 
     var classList = await classesQuery.ToListAsync();
+    
+    string fromKhoa = !string.IsNullOrEmpty(fromTerm)
+        ? $"K{int.Parse(fromTerm.Split('-')[0]) - 1994}"
+        : "Không xác định";
+    string toKhoa = !string.IsNullOrEmpty(toTerm)
+        ? $"K{int.Parse(toTerm.Split('-')[0]) - 1994}"
+        : "Không xác định";
 
     // Tạo file Excel
     using var package = new ExcelPackage();
     var worksheet = package.Workbook.Worksheets.Add("Statistics");
 
-    // Định nghĩa tiêu đề
-    worksheet.Cells[1, 1].Value = "Mã Lớp";
-    worksheet.Cells[1, 2].Value = "Niên Khóa";
-    worksheet.Cells[1, 3].Value = "Tên CVHT";
-    worksheet.Cells[1, 4].Value = "Email";
-
-    // Thêm dữ liệu
-    for (int i = 0; i < classList.Count; i++)
-    {
-        var row = i + 2;
-        worksheet.Cells[row, 1].Value = classList[i].ClassId;
-        worksheet.Cells[row, 2].Value = classList[i].Term;
-        worksheet.Cells[row, 3].Value = classList[i].AdvisorName;
-        worksheet.Cells[row, 4].Value = classList[i].AdvisorEmail;
-    }
+    // Add university headers
+    worksheet.Cells["A1"].Value = "TRƯỜNG ĐẠI HỌC VĂN LANG";
+    worksheet.Cells["A2"].Value = "KHOA CÔNG NGHỆ THÔNG TIN";
+    worksheet.Cells["A3"].Value = "THỐNG KÊ DANH SÁCH CVHT THEO NIÊN KHÓA";
     
-    using (var range = worksheet.Cells[1, 1, 1, 5])
+    // Add term range
+    worksheet.Cells["A4"].Value = "TỪ KHÓA:";
+    worksheet.Cells["B4"].Value = fromKhoa; 
+    worksheet.Cells["C4"].Value = "ĐẾN KHÓA:";
+    worksheet.Cells["D4"].Value = toKhoa; 
+    
+    // Style the headers
+    using (var range = worksheet.Cells["A1:A3"])
     {
         range.Style.Font.Bold = true;
-        range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-        range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
-        range.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+        range.Style.Font.Size = 12;
     }
-    
+
+    // Add table headers
+    worksheet.Cells["A5"].Value = "Mã Lớp";
+    worksheet.Cells["B5"].Value = "Niên Khóa";
+    worksheet.Cells["C5"].Value = "Tên CVHT";
+    worksheet.Cells["D5"].Value = "Email";
+
+    // Style the table headers
+    using (var range = worksheet.Cells["A5:D5"])
+    {
+        range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+        range.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(192, 0, 0)); // Dark red
+        range.Style.Font.Color.SetColor(Color.White);
+        range.Style.Font.Bold = true;
+        range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+    }
+    using (var range = worksheet.Cells["A4,C4"])
+    {
+        range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+        range.Style.Font.Bold = true;
+    }
+
+    // Add data
+    int row = 6;
+    foreach (var item in classList)
+    {
+        worksheet.Cells[row, 1].Value = item.ClassId;
+        worksheet.Cells[row, 2].Value = item.Term;
+        worksheet.Cells[row, 3].Value = item.AdvisorName;
+        worksheet.Cells[row, 4].Value = item.AdvisorEmail;
+        
+        // Style data rows
+        using (var range = worksheet.Cells[row, 1, row, 4])
+        {
+            range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+        }
+        
+        row++;
+    }
+
+    // Auto-fit columns
     worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
-    
+
+    // Add borders to the table
+    using (var range = worksheet.Cells[5, 1, row - 1, 4])
+    {
+        range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+        range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+        range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+        range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+    }
+
     var stream = new MemoryStream();
     package.SaveAs(stream);
     stream.Position = 0;
@@ -267,16 +322,17 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     }).ToList();
 
     int? fromYearStart = null, toYearEnd = null;
-    if (!string.IsNullOrEmpty(fromYear))
+    if (!string.IsNullOrEmpty(fromYear) && fromYear.Contains('-'))
     {
         var years = fromYear.Split('-');
         fromYearStart = int.Parse(years[0]);
     }
-    if (!string.IsNullOrEmpty(toYear))
+    if (!string.IsNullOrEmpty(toYear) && toYear.Contains('-'))
     {
         var years = toYear.Split('-');
         toYearEnd = int.Parse(years[1]);
     }
+
 
     var statistics = new List<StatisticResult>();
 
@@ -290,6 +346,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         var filteredClasses = classesForDepartment
             .Where(c => (!fromYearStart.HasValue || int.Parse(c.Term.Split('-')[0]) >= fromYearStart) &&
                         (!toYearEnd.HasValue || int.Parse(c.Term.Split('-')[1]) <= toYearEnd));
+
 
 
         statistics.Add(new StatisticResult
@@ -314,12 +371,15 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         .OrderBy(t => t)
         .ToListAsync();
     ViewBag.AllTerms = allTerms;
-
+    
     // Tính toán dữ liệu thống kê
     var statistics = await GetStatistics(fromYear, toYear);
 
     // Lưu dữ liệu vào Session
     HttpContext.Session.SetString("Statistics", JsonConvert.SerializeObject(statistics));
+    HttpContext.Session.SetString("FromYear", fromYear ?? string.Empty);
+    HttpContext.Session.SetString("ToYear", toYear ?? string.Empty);
+
 
     // Truyền dữ liệu thống kê vào ViewBag
     ViewBag.Statistics = statistics;
@@ -328,42 +388,106 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 } 
     // Export Major
     [HttpGet] 
-    public async Task<IActionResult> ExportStatisticsClassByMajor(string fromYear = null, string toYear = null)
+    public async Task<IActionResult> ExportStatisticsClassByMajor()
 {
+    string fromYear = HttpContext.Session.GetString("FromYear");
+    string toYear = HttpContext.Session.GetString("ToYear");
+    var statisticss = await GetStatistics(fromYear, toYear);
+
+    // Kiểm tra nếu dữ liệu không tồn tại
+    if (string.IsNullOrEmpty(fromYear) || string.IsNullOrEmpty(toYear))
+    {
+        return BadRequest("Không có thông tin niên khóa để xuất.");
+    }
     // Lấy dữ liệu thống kê từ Session
     var statisticsJson = HttpContext.Session.GetString("Statistics");
     if (string.IsNullOrEmpty(statisticsJson))
     {
         return BadRequest("Không có dữ liệu để xuất.");
     }
-
     var statistics = JsonConvert.DeserializeObject<List<StatisticResult>>(statisticsJson);
+    
+    
+    string fromKhoa = !string.IsNullOrEmpty(fromYear)
+        ? $"K{int.Parse(fromYear.Split('-')[0]) - 1994}"
+        : "Không xác định";
+    string toKhoa = !string.IsNullOrEmpty(toYear)
+        ? $"K{int.Parse(toYear.Split('-')[0]) - 1994}"
+        : "Không xác định";
+
 
     // Tạo file Excel
     using var package = new ExcelPackage();
     var worksheet = package.Workbook.Worksheets.Add("Statistics");
+    
+    // Add university headers
+    worksheet.Cells["A1"].Value = "TRƯỜNG ĐẠI HỌC VĂN LANG";
+    worksheet.Cells["A2"].Value = "KHOA CÔNG NGHỆ THÔNG TIN";
+    worksheet.Cells["A3"].Value = "THỐNG KÊ DANH SÁCH LỚP THEO NGÀNH";
+    
+    // Add term range
+    worksheet.Cells["A4"].Value = "TỪ KHÓA:";
+    worksheet.Cells["B4"].Value = fromKhoa; 
+    worksheet.Cells["C4"].Value = "ĐẾN KHÓA:";
+    worksheet.Cells["D4"].Value = toKhoa; 
+    
+    // Style the headers
+    using (var range = worksheet.Cells["A1:A3"])
+    {
+        range.Style.Font.Bold = true;
+        range.Style.Font.Size = 12;
+    }
 
-    worksheet.Cells[1, 1].Value = "Mã Ngành";
-    worksheet.Cells[1, 2].Value = "Tên Ngành";
-    worksheet.Cells[1, 3].Value = "Số Lớp";
-
+    worksheet.Cells["A5"].Value = "Mã Ngành";
+    worksheet.Cells["B5"].Value = "Tên Ngành";
+    worksheet.Cells["C5"].Value = "Số Lớp";
+    
+    using (var range = worksheet.Cells["A5:C5"])
+    {
+        range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+        range.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(192, 0, 0)); // Dark red
+        range.Style.Font.Color.SetColor(Color.White);
+        range.Style.Font.Bold = true;
+        range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+    }
+    using (var range = worksheet.Cells["A4,C4"])
+    {
+        range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+        range.Style.Font.Bold = true;
+    }
+    
+    int row = 6; 
     for (int i = 0; i < statistics.Count; i++)
     {
         var stat = statistics[i];
-        worksheet.Cells[i + 2, 1].Value = stat.DepartmentCode;
-        worksheet.Cells[i + 2, 2].Value = stat.DepartmentName;
-        worksheet.Cells[i + 2, 3].Value = stat.ClassCount;
+        worksheet.Cells[row, 1].Value = stat.DepartmentCode;
+        worksheet.Cells[row, 2].Value = stat.DepartmentName;
+        worksheet.Cells[row, 3].Value = stat.ClassCount;
+
+        // Style cho các hàng dữ liệu
+        using (var range = worksheet.Cells[row, 1, row, 3])
+        {
+            range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+        }
+
+        row++;
     }
 
-    using (var range = worksheet.Cells[1, 1, 1, 3])
+// Thêm viền bao quanh toàn bộ bảng dữ liệu (từ hàng 6 đến cuối bảng)
+    using (var range = worksheet.Cells[6, 1, row - 1, 3])
     {
-        range.Style.Font.Bold = true;
-        range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-        range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
-        range.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+        range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+        range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+        range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+        range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
     }
 
+// Auto-fit columns
     worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
 
     var stream = new MemoryStream();
     package.SaveAs(stream);
@@ -434,41 +558,76 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         }
 
         var semesterReports = await query.ToListAsync();
+        
+        string fromKhoa = !string.IsNullOrEmpty(fromTerm)
+            ? $"K{int.Parse(fromTerm.Split('-')[0]) - 1994}"
+            : "Không xác định";
+        string toKhoa = !string.IsNullOrEmpty(toTerm)
+            ? $"K{int.Parse(toTerm.Split('-')[0]) - 1994}"
+            : "Không xác định";
 
         // Tạo file Excel
         using (var package = new ExcelPackage())
         {
             var worksheet = package.Workbook.Worksheets.Add("Statistics");
             
-            worksheet.Cells[1, 1].Value = "Khóa: " + $"Từ Khóa {fromTerm} - Đến Khóa {toTerm}";
-            worksheet.Cells[1, 1, 1, 4].Merge = true;  // Merge các ô từ cột 1 đến 4
-            worksheet.Cells[1, 1].Style.Font.Bold = true;
-            worksheet.Cells[1, 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-            worksheet.Cells[1, 1].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-
+            // Add university headers
+            worksheet.Cells["A1"].Value = "TRƯỜNG ĐẠI HỌC VĂN LANG";
+            worksheet.Cells["A2"].Value = "KHOA CÔNG NGHỆ THÔNG TIN";
+            worksheet.Cells["A3"].Value = "THỐNG KÊ BÁO CÁO CỦA CVHT THEO ĐÁNH GIÁ";
             
-            worksheet.Cells[2, 1].Value = "Mã Lớp";
-            worksheet.Cells[2, 2].Value = "CVHT";
-            worksheet.Cells[2, 3].Value = "Năm Học";
-            worksheet.Cells[2, 4].Value = "Xếp Loại";
+            // Add term range
+            worksheet.Cells["A4"].Value = "TỪ KHÓA:";
+            worksheet.Cells["B4"].Value = fromKhoa; 
+            worksheet.Cells["C4"].Value = "ĐẾN KHÓA:";
+            worksheet.Cells["D4"].Value = toKhoa; 
+            
+            // Style the headers
+            using (var range = worksheet.Cells["A1:A3"])
+            {
+                range.Style.Font.Bold = true;
+                range.Style.Font.Size = 12;
+            }
+            
+            // Add table headers
+            worksheet.Cells["A5"].Value = "Mã Lớp";
+            worksheet.Cells["B5"].Value = "CVHT";
+            worksheet.Cells["C5"].Value = "Năm Học";
+            worksheet.Cells["D5"].Value = "Xếp Loại";
+            
+            // Style the table headers
+            using (var range = worksheet.Cells["A5:D5"])
+            {
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(192, 0, 0)); // Dark red
+                range.Style.Font.Color.SetColor(Color.White);
+                range.Style.Font.Bold = true;
+                range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            }
+            using (var range = worksheet.Cells["A4,C4"])
+            {
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Font.Bold = true;
+            }
 
             // Điền dữ liệu vào các hàng
-            int row = 3;  // Dữ liệu bắt đầu từ hàng thứ 3
+            int row = 6;  // Dữ liệu bắt đầu từ hàng thứ 3
             foreach (var report in semesterReports)
             {
                 worksheet.Cells[row, 1].Value = report.ClassId;
                 worksheet.Cells[row, 2].Value = report.Class.Advisor?.FullName ?? report.Class.Advisor?.Email;
                 worksheet.Cells[row, 3].Value = report.PeriodName;
                 worksheet.Cells[row, 4].Value = report.FacultyRanking;
+                using (var range = worksheet.Cells[row, 1, row, 4])
+                {
+                    range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                    range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                    range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                }
                 row++;
             }
-            using (var range = worksheet.Cells[2, 1, 2, 4])
-            {
-                range.Style.Font.Bold = true;
-                range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
-                range.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-            }
+           
             
             worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 

@@ -35,11 +35,11 @@
    
     }
 
-        .dropdown-menu .dropdown-item.active,
-        .dropdown-menu .dropdown-item:hover {
-            background-color: rgba(220, 53, 69, 0.8);
-            color: #fff;
-        }
+.dropdown-menu .dropdown-item.selected,
+.dropdown-menu .dropdown-item:hover {
+    background-color: rgba(220, 53, 69, 0.8);
+    color: #fff;
+}
 
 .sidebar {
     background-image: url('https://www.vietjack.com/thong-tin-tuyen-sinh/images/truong-dai-hoc-van-lang-181749.PNG');

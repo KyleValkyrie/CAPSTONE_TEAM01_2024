@@ -276,9 +276,9 @@
                 '/ProfileManager/StudentProfiles': 'linkStudentProfiles',
                 '/ProfileManager/AdvisorProfiles': 'linkAdvisorProfiles',
                 '/Statistics/ShowStatistics': 'linkStatistics',
-                '/Statistics/StatisticsRole': 'linkStatisticsRole',
-                '/Statistics/StatisticsMajor': 'linkStatisticsMajor',
-                '/Statistics/StatisticsStatusStudent': 'linkStatisticsStatusStudent',
+                '/Statistics/StatisticsClassByYear': 'linkStatisticsMajor',
+                '/Statistics/StatisticsClassByMajor': 'linkStatisticsRole',
+                '/Statistics/StatisticsEvalution': 'linkStatisticsStatusStudent',
                 '/Categories/SchoolYear': 'linkSchoolYear',
                 '/Categories/ClassList': 'linkClassList',
                 '/Categories/SemesterPlan': 'linkSemesterPlan',
@@ -286,11 +286,29 @@
                 '/Categories/StudentList': 'linkStudentList',
                 '/Announcement/AnnouncementList': 'linkAnnouncement',
                 '/Announcement/MyAnnouncements': 'linkMyAnnouncement',
+                '/Categories/SentEmail': 'linkSend',
+                '/Categories/ReceiveEmail': 'linkReceive    ',
             };
 
             // Set the selected state
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.classList.remove('selected');
+            });
             if (linkMap[currentUrl]) {
-                document.getElementById(linkMap[currentUrl]).classList.add('selected');
+                const selectedLink = document.getElementById(linkMap[currentUrl]);
+                if (selectedLink) {
+                    selectedLink.classList.add('selected');
+                    // Mở dropdown menu chứa link được chọn
+                    const parentMenu = selectedLink.closest('.collapse');
+                    if (parentMenu) {
+                        parentMenu.style.display = 'block';
+                        const toggle = document.querySelector(`[aria-controls="${parentMenu.id}"]`);
+                        if (toggle) {
+                            toggle.setAttribute('aria-expanded', 'true');
+                            sessionStorage.setItem(parentMenu.id, 'open');
+                        }
+                    }
+                }
             }
 
             // Load dropdown state from session storage

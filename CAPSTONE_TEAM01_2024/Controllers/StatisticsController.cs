@@ -36,11 +36,13 @@ namespace CAPSTONE_TEAM01_2024.Controllers
    public class StatisticsController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly IWebHostEnvironment _webHostEnvironment;
 
     // Constructor để inject DbContext
-    public StatisticsController(ApplicationDbContext context)
+    public StatisticsController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
     {
         _context = context;
+        _webHostEnvironment = webHostEnvironment;
     }
 
     public async Task<IActionResult> ShowStatistics()
@@ -130,6 +132,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
    public async Task<IActionResult> StatisticsClassByYear(int pageIndex = 1, int pageSize = 20, string fromTerm = null, string toTerm = null)
     {
         ViewData["page"] = "StatisticsClassByYear";
+        ViewBag.SelectedFromYear = fromTerm;
+        ViewBag.SelectedToYear = toTerm;
 
         // Lấy danh sách niên khóa từ database
         var allTerms = await _context.Classes
@@ -215,31 +219,50 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     var worksheet = package.Workbook.Worksheets.Add("Statistics");
 
     // Add university headers
-    worksheet.Cells["A1"].Value = "TRƯỜNG ĐẠI HỌC VĂN LANG";
-    worksheet.Cells["A2"].Value = "KHOA CÔNG NGHỆ THÔNG TIN";
-    worksheet.Cells["A3"].Value = "THỐNG KÊ DANH SÁCH CVHT THEO NIÊN KHÓA";
+    worksheet.Cells["B1:D1"].Merge = true;
+    worksheet.Cells["B2:D2"].Merge = true;
+    worksheet.Cells["B1"].Value = "TRƯỜNG ĐẠI HỌC VĂN LANG";
+    worksheet.Cells["B2"].Value = "KHOA CÔNG NGHỆ THÔNG TIN";
+    worksheet.Cells["B4:E4"].Merge = true;
+    worksheet.Cells["B4"].Value = "THỐNG KÊ DANH SÁCH CVHT THEO NIÊN KHÓA";
+    worksheet.Cells["B4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+    
+    // Add logo image
+    string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "logo.png");
+
+    if (System.IO.File.Exists(imagePath))
+    {
+        var picture = worksheet.Drawings.AddPicture("Logo", new FileInfo(imagePath));
+        picture.SetPosition(0, 5, 4, 90); 
+        picture.SetSize(16);
+
+    }
+
+
     
     // Add term range
-    worksheet.Cells["A4"].Value = "TỪ KHÓA:";
-    worksheet.Cells["B4"].Value = fromKhoa; 
-    worksheet.Cells["C4"].Value = "ĐẾN KHÓA:";
-    worksheet.Cells["D4"].Value = toKhoa; 
+    worksheet.Cells["B5"].Value = "TỪ KHÓA:";
+    worksheet.Cells["C5"].Value = fromKhoa; 
+    worksheet.Cells["D5"].Value = "ĐẾN KHÓA:";
+    worksheet.Cells["E5"].Value = toKhoa; 
     
     // Style the headers
-    using (var range = worksheet.Cells["A1:A3"])
+    using (var range = worksheet.Cells["B1,B2,B4"])
     {
         range.Style.Font.Bold = true;
         range.Style.Font.Size = 12;
     }
 
+
+
     // Add table headers
-    worksheet.Cells["A5"].Value = "Mã Lớp";
-    worksheet.Cells["B5"].Value = "Niên Khóa";
-    worksheet.Cells["C5"].Value = "Tên CVHT";
-    worksheet.Cells["D5"].Value = "Email";
+    worksheet.Cells["B6"].Value = "Mã Lớp";
+    worksheet.Cells["C6"].Value = "Niên Khóa";
+    worksheet.Cells["D6"].Value = "Tên CVHT";
+    worksheet.Cells["E6"].Value = "Email";
 
     // Style the table headers
-    using (var range = worksheet.Cells["A5:D5"])
+    using (var range = worksheet.Cells["B6:E6"])
     {
         range.Style.Fill.PatternType = ExcelFillStyle.Solid;
         range.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(192, 0, 0)); // Dark red
@@ -247,23 +270,23 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         range.Style.Font.Bold = true;
         range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
     }
-    using (var range = worksheet.Cells["A4,C4"])
+    using (var range = worksheet.Cells["B5,D5"])
     {
         range.Style.Fill.PatternType = ExcelFillStyle.Solid;
         range.Style.Font.Bold = true;
     }
 
     // Add data
-    int row = 6;
+    int row = 7;
     foreach (var item in classList)
     {
-        worksheet.Cells[row, 1].Value = item.ClassId;
-        worksheet.Cells[row, 2].Value = item.Term;
-        worksheet.Cells[row, 3].Value = item.AdvisorName;
-        worksheet.Cells[row, 4].Value = item.AdvisorEmail;
+        worksheet.Cells[row, 2].Value = item.ClassId;
+        worksheet.Cells[row, 3].Value = item.Term;
+        worksheet.Cells[row, 4].Value = item.AdvisorName;
+        worksheet.Cells[row, 5].Value = item.AdvisorEmail;
         
         // Style data rows
-        using (var range = worksheet.Cells[row, 1, row, 4])
+        using (var range = worksheet.Cells[row, 2, row, 5])
         {
             range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
             range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
@@ -273,12 +296,31 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         
         row++;
     }
+    
+    // Thêm 3 dòng sau dữ liệu
+    worksheet.Cells[row, 3].Value = "TP. Hồ Chí Minh";
+    worksheet.Cells[row, 3, row, 5].Merge = true;  
+    worksheet.Cells[row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+    worksheet.Cells[row, 3].Style.Font.Italic = true;
+
+    row++;  // Tăng lên dòng tiếp theo
+    worksheet.Cells[row, 3].Value = DateTime.Now.ToString("dd/MM/yyyy");  
+    worksheet.Cells[row, 3, row, 5].Merge = true;  
+    worksheet.Cells[row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+    worksheet.Cells[row, 3].Style.Font.Italic = true;
+
+    row++;  // Tăng lên dòng tiếp theo
+    worksheet.Cells[row, 3].Value = "Người lập danh sách (ký, ghi rõ họ tên)";
+    worksheet.Cells[row, 3, row, 5].Merge = true;  
+    worksheet.Cells[row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+    worksheet.Cells[row, 3].Style.Font.Italic = true;
+
 
     // Auto-fit columns
     worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
     // Add borders to the table
-    using (var range = worksheet.Cells[5, 1, row - 1, 4])
+    using (var range = worksheet.Cells[6, 2, row - 3, 5])
     {
         range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
         range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
@@ -363,7 +405,8 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     public async Task<IActionResult> StatisticsClassByMajor(string fromYear = null, string toYear = null)
 {
     ViewData["page"] = "StatisticsClassByMajor";
-
+    ViewBag.SelectedFromYear = fromYear;
+    ViewBag.SelectedToYear = toYear;
     // Lấy danh sách niên khóa
     var allTerms = await _context.Classes
         .Select(c => c.Term)
@@ -421,28 +464,44 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     var worksheet = package.Workbook.Worksheets.Add("Statistics");
     
     // Add university headers
-    worksheet.Cells["A1"].Value = "TRƯỜNG ĐẠI HỌC VĂN LANG";
-    worksheet.Cells["A2"].Value = "KHOA CÔNG NGHỆ THÔNG TIN";
-    worksheet.Cells["A3"].Value = "THỐNG KÊ DANH SÁCH LỚP THEO NGÀNH";
+    worksheet.Cells["B1:D1"].Merge = true;
+    worksheet.Cells["B2:D2"].Merge = true;
+    worksheet.Cells["B1"].Value = "TRƯỜNG ĐẠI HỌC VĂN LANG";
+    worksheet.Cells["B2"].Value = "KHOA CÔNG NGHỆ THÔNG TIN";
+    worksheet.Cells["B4:E4"].Merge = true;
+    worksheet.Cells["B4"].Value = "THỐNG KÊ DANH SÁCH CVHT THEO NIÊN KHÓA";
+    worksheet.Cells["B4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+    
+    // Add logo image
+    string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "logo.png");
+
+    if (System.IO.File.Exists(imagePath))
+    {
+        var picture = worksheet.Drawings.AddPicture("Logo", new FileInfo(imagePath));
+        picture.SetPosition(0, 5, 3, 300); 
+        picture.SetSize(16);
+
+    }
     
     // Add term range
-    worksheet.Cells["A4"].Value = "TỪ KHÓA:";
-    worksheet.Cells["B4"].Value = fromKhoa; 
-    worksheet.Cells["C4"].Value = "ĐẾN KHÓA:";
-    worksheet.Cells["D4"].Value = toKhoa; 
+    worksheet.Cells["B5"].Value = "TỪ KHÓA:";
+    worksheet.Cells["C5"].Value = fromKhoa; 
+    worksheet.Cells["D5"].Value = "ĐẾN KHÓA:";
+    worksheet.Cells["E5"].Value = toKhoa; 
     
     // Style the headers
-    using (var range = worksheet.Cells["A1:A3"])
+    using (var range = worksheet.Cells["B1,B2,B4"])
     {
         range.Style.Font.Bold = true;
         range.Style.Font.Size = 12;
     }
-
-    worksheet.Cells["A5"].Value = "Mã Ngành";
-    worksheet.Cells["B5"].Value = "Tên Ngành";
-    worksheet.Cells["C5"].Value = "Số Lớp";
     
-    using (var range = worksheet.Cells["A5:C5"])
+    worksheet.Cells["B6"].Value = "#";
+    worksheet.Cells["C6"].Value = "Mã Ngành";
+    worksheet.Cells["D6"].Value = "Tên Ngành";
+    worksheet.Cells["E6"].Value = "Số Lớp";
+    
+    using (var range = worksheet.Cells["B6:E6"])
     {
         range.Style.Fill.PatternType = ExcelFillStyle.Solid;
         range.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(192, 0, 0)); // Dark red
@@ -450,22 +509,25 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         range.Style.Font.Bold = true;
         range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
     }
-    using (var range = worksheet.Cells["A4,C4"])
+    using (var range = worksheet.Cells["B5,D5"])
     {
         range.Style.Fill.PatternType = ExcelFillStyle.Solid;
         range.Style.Font.Bold = true;
     }
     
-    int row = 6; 
+    int row = 7; 
     for (int i = 0; i < statistics.Count; i++)
     {
         var stat = statistics[i];
-        worksheet.Cells[row, 1].Value = stat.DepartmentCode;
-        worksheet.Cells[row, 2].Value = stat.DepartmentName;
-        worksheet.Cells[row, 3].Value = stat.ClassCount;
+        worksheet.Cells[row, 2].Value = i + 1;
+        worksheet.Cells[row, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        worksheet.Cells[row, 3].Value = stat.DepartmentCode;
+        worksheet.Cells[row, 4].Value = stat.DepartmentName;
+        worksheet.Cells[row, 5].Value = stat.ClassCount;
+        worksheet.Cells[row, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
         // Style cho các hàng dữ liệu
-        using (var range = worksheet.Cells[row, 1, row, 3])
+        using (var range = worksheet.Cells[row, 2, row, 5])
         {
             range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
             range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
@@ -475,9 +537,25 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
         row++;
     }
+    // Thêm 3 dòng sau dữ liệu
+    worksheet.Cells[row, 4].Value = "TP. Hồ Chí Minh";
+    worksheet.Cells[row, 4, row, 5].Merge = true;  
+    worksheet.Cells[row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+    worksheet.Cells[row, 4].Style.Font.Italic = true;
 
+    row++;  // Tăng lên dòng tiếp theo
+    worksheet.Cells[row, 4].Value = DateTime.Now.ToString("dd/MM/yyyy");  
+    worksheet.Cells[row, 4, row, 5].Merge = true;  
+    worksheet.Cells[row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+    worksheet.Cells[row, 4].Style.Font.Italic = true;
+
+    row++;  // Tăng lên dòng tiếp theo
+    worksheet.Cells[row, 4].Value = "Người lập danh sách (ký, ghi rõ họ tên)";
+    worksheet.Cells[row, 4, row, 5].Merge = true;  
+    worksheet.Cells[row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+    worksheet.Cells[row, 4].Style.Font.Italic = true;
 // Thêm viền bao quanh toàn bộ bảng dữ liệu (từ hàng 6 đến cuối bảng)
-    using (var range = worksheet.Cells[6, 1, row - 1, 3])
+    using (var range = worksheet.Cells[6, 2, row - 3, 5])
     {
         range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
         range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
@@ -505,6 +583,9 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     public async Task<IActionResult> StatisticsEvalution(string fromTerm = null, string toTerm = null, int pageIndex = 1)
     {
         ViewData["page"] = "StatisticsEvalution";
+        
+        ViewBag.SelectedFromYear = fromTerm;
+        ViewBag.SelectedToYear = toTerm;
 
         // Lấy tất cả các Term (Khóa học)
         var allTerms = await _context.Classes
@@ -572,31 +653,46 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             var worksheet = package.Workbook.Worksheets.Add("Statistics");
             
             // Add university headers
-            worksheet.Cells["A1"].Value = "TRƯỜNG ĐẠI HỌC VĂN LANG";
-            worksheet.Cells["A2"].Value = "KHOA CÔNG NGHỆ THÔNG TIN";
-            worksheet.Cells["A3"].Value = "THỐNG KÊ BÁO CÁO CỦA CVHT THEO ĐÁNH GIÁ";
-            
+            worksheet.Cells["B1:D1"].Merge = true;
+            worksheet.Cells["B2:D2"].Merge = true;
+            worksheet.Cells["B1"].Value = "TRƯỜNG ĐẠI HỌC VĂN LANG";
+            worksheet.Cells["B2"].Value = "KHOA CÔNG NGHỆ THÔNG TIN";
+            worksheet.Cells["B4:E4"].Merge = true;
+            worksheet.Cells["B4"].Value = "THỐNG KÊ DANH SÁCH CVHT THEO NIÊN KHÓA";
+            worksheet.Cells["B4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+    
+            // Add logo image
+            string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "logo.png");
+
+            if (System.IO.File.Exists(imagePath))
+            {
+                var picture = worksheet.Drawings.AddPicture("Logo", new FileInfo(imagePath));
+                picture.SetPosition(0, 5, 3, 300); 
+                picture.SetSize(16);
+
+            }
+    
             // Add term range
-            worksheet.Cells["A4"].Value = "TỪ KHÓA:";
-            worksheet.Cells["B4"].Value = fromKhoa; 
-            worksheet.Cells["C4"].Value = "ĐẾN KHÓA:";
-            worksheet.Cells["D4"].Value = toKhoa; 
-            
+            worksheet.Cells["B5"].Value = "TỪ KHÓA:";
+            worksheet.Cells["C5"].Value = fromKhoa; 
+            worksheet.Cells["D5"].Value = "ĐẾN KHÓA:";
+            worksheet.Cells["E5"].Value = toKhoa; 
+    
             // Style the headers
-            using (var range = worksheet.Cells["A1:A3"])
+            using (var range = worksheet.Cells["B1,B2,B4"])
             {
                 range.Style.Font.Bold = true;
                 range.Style.Font.Size = 12;
             }
             
             // Add table headers
-            worksheet.Cells["A5"].Value = "Mã Lớp";
-            worksheet.Cells["B5"].Value = "CVHT";
-            worksheet.Cells["C5"].Value = "Năm Học";
-            worksheet.Cells["D5"].Value = "Xếp Loại";
+            worksheet.Cells["B6"].Value = "Mã Lớp";
+            worksheet.Cells["C6"].Value = "CVHT";
+            worksheet.Cells["D6"].Value = "Năm Học";
+            worksheet.Cells["E6"].Value = "Xếp Loại";
             
             // Style the table headers
-            using (var range = worksheet.Cells["A5:D5"])
+            using (var range = worksheet.Cells["B6:E6"])
             {
                 range.Style.Fill.PatternType = ExcelFillStyle.Solid;
                 range.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(192, 0, 0)); // Dark red
@@ -604,21 +700,21 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 range.Style.Font.Bold = true;
                 range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             }
-            using (var range = worksheet.Cells["A4,C4"])
+            using (var range = worksheet.Cells["B5,D5"])
             {
                 range.Style.Fill.PatternType = ExcelFillStyle.Solid;
                 range.Style.Font.Bold = true;
             }
 
             // Điền dữ liệu vào các hàng
-            int row = 6;  // Dữ liệu bắt đầu từ hàng thứ 3
+            int row = 7;  // Dữ liệu bắt đầu từ hàng thứ 3
             foreach (var report in semesterReports)
             {
-                worksheet.Cells[row, 1].Value = report.ClassId;
-                worksheet.Cells[row, 2].Value = report.Class.Advisor?.FullName ?? report.Class.Advisor?.Email;
-                worksheet.Cells[row, 3].Value = report.PeriodName;
-                worksheet.Cells[row, 4].Value = report.FacultyRanking;
-                using (var range = worksheet.Cells[row, 1, row, 4])
+                worksheet.Cells[row, 2].Value = report.ClassId;
+                worksheet.Cells[row, 3].Value = report.Class.Advisor?.FullName ?? report.Class.Advisor?.Email;
+                worksheet.Cells[row, 4].Value = report.PeriodName;
+                worksheet.Cells[row, 5].Value = report.FacultyRanking;
+                using (var range = worksheet.Cells[row, 2, row, 5])
                 {
                     range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
                     range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
@@ -627,7 +723,23 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 }
                 row++;
             }
-           
+            // Thêm 3 dòng sau dữ liệu
+            worksheet.Cells[row, 3].Value = "TP. Hồ Chí Minh";
+            worksheet.Cells[row, 3, row, 5].Merge = true;  
+            worksheet.Cells[row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Cells[row, 3].Style.Font.Italic = true;
+
+            row++;  // Tăng lên dòng tiếp theo
+            worksheet.Cells[row, 3].Value = DateTime.Now.ToString("dd/MM/yyyy");  
+            worksheet.Cells[row, 3, row, 5].Merge = true;  
+            worksheet.Cells[row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Cells[row, 3].Style.Font.Italic = true;
+
+            row++;  // Tăng lên dòng tiếp theo
+            worksheet.Cells[row, 3].Value = "Người lập danh sách (ký, ghi rõ họ tên)";
+            worksheet.Cells[row, 3, row, 5].Merge = true;  
+            worksheet.Cells[row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Cells[row, 3].Style.Font.Italic = true;
             
             worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 

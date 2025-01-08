@@ -56,15 +56,22 @@
                             id="FromEvalutionFilter"
                             class=" form-select-lg"
                             onchange="filterTable()"
-                        >
-                            <option selected="">Lựa chọn Khóa</option>
+                            required>
+                            <option value="">Lựa chọn Khóa</option>
                             @foreach (var term in ViewBag.AllTerms as List<string>)
                             {
                                 var years = term.Split('-');
                                 var startYear = int.Parse(years[0]);
                                 var endYear = int.Parse(years[1]);
                                 var khóa = startYear - 1994; 
-                                <option value="@term">@($"K{khóa}")</option>
+                                if (ViewBag.SelectedFromYear == term)
+                                {
+                                    <option value="@term" selected>@($"K{khóa}")</option>
+                                }
+                                else
+                                {
+                                    <option value="@term">@($"K{khóa}")</option>
+                                }
                             }
                            
                         </select>
@@ -73,15 +80,22 @@
                             id="ToEvalutionFilter"
                             class=" form-select-lg"
                             onchange="filterTable()"
-                        >
-                            <option selected="">Lựa chọn Khóa</option>
+                            required>
+                            <option value="">Lựa chọn Khóa</option>
                             @foreach (var term in ViewBag.AllTerms as List<string>)
                             {
                                 var years = term.Split('-');
                                 var startYear = int.Parse(years[0]);
                                 var endYear = int.Parse(years[1]);
                                 var khóa = startYear - 1994;  
-                                <option value="@term">@($"K{khóa}")</option>
+                                if (ViewBag.SelectedToYear == term)
+                                {
+                                    <option value="@term" selected>@($"K{khóa}")</option>
+                                }
+                                else
+                                {
+                                    <option value="@term">@($"K{khóa}")</option>
+                                }
                             }
 
                         </select>

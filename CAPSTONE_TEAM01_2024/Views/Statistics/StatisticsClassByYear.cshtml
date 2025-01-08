@@ -52,27 +52,41 @@
                     <!-- ComboBox thiết kế -->
                     <div class="form-group">
                         <label for="FromClassFilter" style="font-size: 14px; color: #555;">Từ Khóa:</label>
-                        <select id="FromClassFilter" class="form-select-lg" onchange="filterTable()">
-                            <option selected="">Lựa chọn Khóa</option>
+                        <select id="FromClassFilter" class="form-select-lg" onchange="filterTable()" required>
+                            <option value="">Lựa chọn Khóa</option>
                             @foreach (var term in ViewBag.AllTerms as List<string>)
                             {
                                 var years = term.Split('-');
                                 var startYear = int.Parse(years[0]);
                                 var endYear = int.Parse(years[1]);
                                 var khóa = startYear - 1994; 
-                                <option value="@term">@($"K{khóa}")</option>
+                                if (ViewBag.SelectedFromYear == term)
+                                {
+                                    <option value="@term" selected>@($"K{khóa}")</option>
+                                }
+                                else
+                                {
+                                    <option value="@term">@($"K{khóa}")</option>
+                                }
                             }
                         </select>
                         <label for="ToClassFilter" style="font-size: 14px; color: #555;">Đến Khóa:</label>
-                        <select id="ToClassFilter" class="form-select-lg" onchange="filterTable()">
-                            <option selected="">Lựa chọn Khóa</option>
+                        <select id="ToClassFilter" class="form-select-lg" onchange="filterTable()" required>
+                            <option value="">Lựa chọn Khóa</option>
                             @foreach (var term in ViewBag.AllTerms as List<string>)
                             {
                                 var years = term.Split('-');
                                 var startYear = int.Parse(years[0]);
                                 var endYear = int.Parse(years[1]);
                                 var khóa = startYear - 1994; 
-                                <option value="@term">@($"K{khóa}")</option>
+                                if (ViewBag.SelectedToYear == term)
+                                {
+                                    <option value="@term" selected>@($"K{khóa}")</option>
+                                }
+                                else
+                                {
+                                    <option value="@term">@($"K{khóa}")</option>
+                                }
                             }
                         </select>
                         <button type="button" class="btn btn-primary shadow-sm" onclick="handleStatistics()" style="font-size: 14px; margin-left: 15px;">

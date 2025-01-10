@@ -32,7 +32,7 @@
                 </button>
                 <div class="dropdown" style="position: relative;">
                     <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton">
-                        <i class="bi bi-person-circle"></i> @User.Identity!.Name
+                        <i class="bi bi-person-circle"></i> 
                     </button>
                     <ul class="dropdown-menu" id="dropdownMenu" style="background-color: #fff; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); text-align: center; right: 0; padding: 0px; display: none; position:absolute;">
                         <li class="btn-logout">
@@ -256,6 +256,38 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
+// Display Info JS
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/Central/GetUserInfo')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Log the full response for debugging
+                    console.log('User Data:', data);
+
+                    const userInfoElement = document.getElementById('dropdownMenuButton');
+                    if (!userInfoElement) {
+                        console.error('Element with ID "dropdownMenuButton" not found.');
+                        return;
+                    }
+
+                    // Use the fullName from the backend response or fallback to email
+                    const displayName = data.fullName && data.fullName.trim() !== '' ? data.fullName : data.email;
+                    userInfoElement.textContent = `${displayName} - ${data.role}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching user info:', error);
+                    const userInfoElement = document.getElementById('dropdownMenuButton');
+                    if (userInfoElement) {
+                        userInfoElement.textContent = 'Failed to load user info';
+                    }
+                });
+        });
+
 // Logout menu JS
         document.getElementById("dropdownMenuButton").addEventListener("click", function () {
             var dropdownMenu = document.getElementById("dropdownMenu");
@@ -373,7 +405,7 @@
             });
         });
         //Update read count
-            document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
             fetch('@Url.Action("GetNewAnnouncementsCount", "Announcement")')
                 .then(response => response.json())
                 .then(data => {
@@ -394,15 +426,15 @@
                 });
             });
 
-            document.getElementById('linkAnnouncement').addEventListener('click', function() {
+        document.getElementById('linkAnnouncement').addEventListener('click', function() {
                 markAllAsRead();
             });
 
-            document.getElementById('linkMyAnnouncement').addEventListener('click', function() {
+        document.getElementById('linkMyAnnouncement').addEventListener('click', function() {
                 markAllAsRead();
             });
 
-            function markAllAsRead() {
+        function markAllAsRead() {
                 $.ajax({
                     type: "POST",
                     url: '@Url.Action("MarkAllAnnouncementsAsRead", "Announcement")',

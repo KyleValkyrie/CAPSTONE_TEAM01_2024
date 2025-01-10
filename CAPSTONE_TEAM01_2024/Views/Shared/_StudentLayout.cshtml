@@ -141,6 +141,39 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
+        // Display Info JS
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/Central/GetUserInfo')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Log the full response for debugging
+                    console.log('User Data:', data);
+
+                    const userInfoElement = document.getElementById('dropdownMenuButton');
+                    if (!userInfoElement) {
+                        console.error('Element with ID "dropdownMenuButton" not found.');
+                        return;
+                    }
+
+                    // Use the fullName from the backend response or fallback to email
+                    const displayName = data.fullName && data.fullName.trim() !== '' ? data.fullName : data.email;
+                    userInfoElement.textContent = `${displayName} - ${data.role}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching user info:', error);
+                    const userInfoElement = document.getElementById('dropdownMenuButton');
+                    if (userInfoElement) {
+                        userInfoElement.textContent = 'Failed to load user info';
+                    }
+                });
+        });
+
+
         // Logout menu JS
         document.getElementById("dropdownMenuButton").addEventListener("click", function () {
             var dropdownMenu = document.getElementById("dropdownMenu");

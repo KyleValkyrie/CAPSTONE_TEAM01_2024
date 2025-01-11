@@ -14,6 +14,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&amp;display=swap" rel="stylesheet">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
 </head>
 <body>
     <!--Page's Head-->
@@ -255,7 +256,28 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src ="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
     <script>
+        // Establish a connection to the SignalR hub
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/notificationHub")  // URL of your SignalR hub
+            .build();
+
+        // Set up the method to handle messages from the server
+        connection.on("ReceiveNotification", function (message) {
+            // Display the received notification (you can update the UI here)
+            alert("New Notification: " + message);  // Example action
+        });
+
+        // Start the connection
+        connection.start()
+            .then(function () {
+                console.log("Connected to SignalR hub.");
+            })
+            .catch(function (err) {
+                console.error("Error connecting to SignalR hub: ", err);
+            });
+
 // Display Info JS
         document.addEventListener('DOMContentLoaded', function () {
             fetch('/Central/GetUserInfo')

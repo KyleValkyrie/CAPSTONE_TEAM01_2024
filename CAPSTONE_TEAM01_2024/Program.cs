@@ -1,5 +1,6 @@
 using CAPSTONE_TEAM01_2024;
 using CAPSTONE_TEAM01_2024.Models; // Make sure to include your model namespace
+using CAPSTONE_TEAM01_2024.Utilities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Enable Controllers in project
 builder.Services.AddControllersWithViews();
 builder.Services.AddSession(); // Session configuration
+builder.Services.AddSignalR(); // Register services for SignalR
+
 
 // Enable Microsoft Authentication
 builder.Services.AddAuthentication().AddMicrosoftAccount(options =>
@@ -60,6 +63,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.MapHub<NotificationHub>("/notificationHub"); // Map the hub endpoint
 app.UseSession(); // Ensure it's before UseRouting and only called once
 app.UseRouting();
 // Authentication/Authorization

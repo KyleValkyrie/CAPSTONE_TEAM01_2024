@@ -22,6 +22,7 @@ bool isNotAdvisor = !roles.Contains("CVHT");
     /* CSS cụ thể cho các modal nhỏ */
     #EditSemesterPlanModal .modal-dialog,
     #SubmitPlanModal .modal-dialog,
+    #BrowsePlanModal .modal-dialog,
     #DeletePlanModal .modal-dialog {
         max-width: 600px; /* Điều chỉnh kích thước nhỏ lại */
     }
@@ -29,6 +30,7 @@ bool isNotAdvisor = !roles.Contains("CVHT");
     /* Định dạng cho các modal để phân biệt */
     #EditSemesterPlanModal .modal-header,
     #SubmitPlanModal .modal-header,
+    #BrowsePlanModal .modal-header,
     #DeletePlanModal .modal-header {
         background-color: #f8f9fa; /* Màu nền nhạt */
         border-bottom: 1px solid #ddd;
@@ -172,17 +174,7 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                             </nav>
                         </div>
                     </div>
-                    <!-- Filter Combo Box -->
-                    <div class="row mt-2">
-                        <div class="col-4 text-left">
-                            <label for="statusFilter" class="form-label">Trạng Thái</label>
-                            <select id="statusFilter" class="form-select custom-select" style="width: 150px;" onchange="filterTable()">
-                                <option value="">Tất cả</option>
-                                <option value="Đã nộp">Đã Nộp</option>
-                                <option value="Nháp">Nháp</option>
-                            </select>
-                        </div>
-                    </div>
+                    
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
@@ -242,6 +234,10 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                                         {
                                             <span class="badge bg-success">@plan.Status</span>
                                         }
+                                        else if(plan.Status == "Đã Duyệt")
+                                        {
+                                            <span class="badge bg-primary">@plan.Status</span>
+                                        }
                                         else
                                         {
                                             <span class="badge bg-primary">@plan.Status</span>
@@ -261,12 +257,12 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                                                     onclick="openEditSemesterPlan(@plan.PlanId, @plan.PeriodId, '@plan.PlanType', '@plan.ClassId')">
                                                 <i class="fa-solid fa-pen-to-square custom-icon"></i>
                                             </button>
+                                            <button class="btn btn-outline-danger btn-sm delete"
+                                                    title="Xóa"
+                                                    onclick="openDeleteModal(@plan.PlanId)">
+                                                <i class="fa-solid fa-trash custom-icon"></i>
+                                            </button>
                                         }
-                                        <button class="btn btn-outline-danger btn-sm delete"
-                                                title="Xóa"
-                                                onclick="openDeleteModal(@plan.PlanId)">
-                                            <i class="fa-solid fa-trash custom-icon"></i>
-                                        </button>
                                         @if (isNotFaculty)
                                         {
                                             <button class="btn btn-outline-secondary btn-sm"
@@ -283,6 +279,14 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                                                     <i class="bi bi-files"></i>
                                                 </button>
                                             </form>
+                                        }
+                                        @if (isNotAdvisor)
+                                        {
+                                            <button class="btn btn-outline-secondary btn-sm"
+                                                    title="Duyệt"
+                                                    onclick="openBrowseSemesterPlan(@plan.PlanId)">
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
                                         }
                                         <form action="/Categories/ExportPlan" method="post" style="display: inline;">
                                             <input type="hidden" name="planId" value="@plan.PlanId" />
@@ -769,6 +773,28 @@ bool isNotAdvisor = !roles.Contains("CVHT");
     </div>
 </div>
 
+<!-- Browse Plan Modal -->
+<div class="modal fade" id="BrowsePlanModal" tabindex="-1" aria-labelledby="BrowseSemesterPlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="BrowsePlanModalLabel">Duyệt Kế Hoạch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn Duyệt kế hoạch này không?</p>
+                <form id="BrowsePlanForm" asp-action="BrowsePlan" method="post">
+                    <input type="hidden" id="BrowsePlanId" name="PlanId" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="browse" class="btn btn-danger">Duyệt</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Delete Plan Modal -->
 <div class="modal fade" id="DeletePlanModal" tabindex="-1" aria-labelledby="DeleteSemesterPlanModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -843,6 +869,14 @@ function openEditSemesterPlan(planId, periodId, planType, classId) {
             var modal = new bootstrap.Modal(document.getElementById('SubmitPlanModal'));
         modal.show();
         }
+
+//Browse Plan JS
+function openBrowseSemesterPlan(planId) {
+    document.getElementById('BrowsePlanId').value = planId;
+    // Show the modal
+    var modal = new bootstrap.Modal(document.getElementById('BrowsePlanModal'));
+    modal.show();
+}
 // Delete Modal JS
     function openDeleteModal(planId) {
         document.getElementById('DeletePlanId').value = planId;

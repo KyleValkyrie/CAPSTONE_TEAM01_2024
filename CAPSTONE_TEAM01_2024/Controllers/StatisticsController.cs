@@ -469,7 +469,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
     worksheet.Cells["B1"].Value = "TRƯỜNG ĐẠI HỌC VĂN LANG";
     worksheet.Cells["B2"].Value = "KHOA CÔNG NGHỆ THÔNG TIN";
     worksheet.Cells["B4:E4"].Merge = true;
-    worksheet.Cells["B4"].Value = "THỐNG KÊ DANH SÁCH CVHT THEO NIÊN KHÓA";
+    worksheet.Cells["B4"].Value = "THỐNG KÊ SỐ LỚP THEO NGÀNH";
     worksheet.Cells["B4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
     
     // Add logo image
@@ -658,7 +658,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             worksheet.Cells["B1"].Value = "TRƯỜNG ĐẠI HỌC VĂN LANG";
             worksheet.Cells["B2"].Value = "KHOA CÔNG NGHỆ THÔNG TIN";
             worksheet.Cells["B4:E4"].Merge = true;
-            worksheet.Cells["B4"].Value = "THỐNG KÊ DANH SÁCH CVHT THEO NIÊN KHÓA";
+            worksheet.Cells["B4"].Value = "THỐNG KÊ ĐÁNH GIÁ BÁO CÁO";
             worksheet.Cells["B4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
     
             // Add logo image

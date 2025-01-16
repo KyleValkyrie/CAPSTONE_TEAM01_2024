@@ -26,6 +26,7 @@ using static MimeKit.TextPart;
 using System.Linq;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Net.Mail;
+using System.Security.Claims;
 
 
 namespace CAPSTONE_TEAM01_2024.Controllers
@@ -102,7 +103,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             report.PeriodName = await _context.AcademicPeriods.Where(ap => ap.PeriodId == report.PeriodId)
                                                               .Select(ap => ap.PeriodName)
                                                               .FirstOrDefaultAsync();
-            report.AdvisorName = User.Identity.Name;
+            report.AdvisorName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             report.CreationTimeReport = vietnamTime;
             report.StatusReport = "Nháp";
             _context.SemesterReports.Add(report);
@@ -197,6 +198,18 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             TempData["Success"] = "Thêm báo cáo thành công!";
             return RedirectToAction("EndSemesterReport");
         }
+        
+        public async Task<IActionResult> GetReports()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.IsInRole("Faculty");
+
+            var reports = await _context.SemesterReports
+                .Where(sr => userRole || sr.AdvisorName == userId) // Kiểm tra quyền
+                .ToListAsync();
+
+            return View(reports);
+        }
 
     //Delete Report
     [HttpPost]
@@ -218,6 +231,11 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             if (report.StatusReport == "Đã Nộp" || report.StatusReport == "Đã Duyệt")
             {
                 TempData["Error"] = "Báo cáo đã được nộp, không thể xóa!";
+                return RedirectToAction("EndSemesterReport");
+            }
+            if (report.AdvisorName != User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                TempData["Error"] = "Bạn không có quyền xóa báo cáo này.";
                 return RedirectToAction("EndSemesterReport");
             }
 
@@ -248,6 +266,11 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 TempData["Error"] = "Không tìm thấy báo cáo.";
                 return RedirectToAction("EndSemesterReport");
             }
+            if (reportToEdit.AdvisorName != User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                TempData["Error"] = "Bạn không có quyền Chỉnh sửa báo cáo này.";
+                return RedirectToAction("EndSemesterReport");
+            }
 
             var period = await _context.AcademicPeriods.FirstOrDefaultAsync(p => p.PeriodId == periodId);
             if (period == null)
@@ -267,6 +290,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 TempData["Error"] = "Mã lớp không được để trống.";
                 return RedirectToAction("EndSemesterReport");
             }
+            
 
             reportToEdit.PeriodName = period.PeriodName;
             reportToEdit.ReportType = reportType;
@@ -309,6 +333,11 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             TempData["Error"] = "Báo Cáo đã được duyệt và không thể nộp lại!";
             return RedirectToAction("EndSemesterReport");
         }
+        if (reportToSubmit.AdvisorName != User.FindFirstValue(ClaimTypes.NameIdentifier))
+        {
+            TempData["Error"] = "Bạn không có quyền nộp báo cáo này.";
+            return RedirectToAction("EndSemesterReport");
+        }
 
         reportToSubmit.StatusReport = "Đã Nộp";
         _context.SemesterReports.Update(reportToSubmit);
@@ -336,7 +365,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("EndSemesterReport");
         }
         
-    //Duplicate Plan
+    //Duplicate Report
         [HttpPost]
         public async Task<IActionResult> DuplicateReport(int reportId)
         {
@@ -345,20 +374,20 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 .Include(rp => rp.ReportDetails) // Load associated PlanDetails
                 .FirstOrDefault(sp => sp.ReportId == reportId);
             var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
-            //Duplicated Plan data
+            //Duplicated report data
             var dupReport = new SemesterReport{ 
                 ClassId = originalReport.ClassId,
                 ReportType = originalReport.ReportType,
                 PeriodId = originalReport.PeriodId,
                 CreationTimeReport = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone),
-                AdvisorName = User.Identity.Name,
+                AdvisorName = User.FindFirstValue(ClaimTypes.NameIdentifier),
                 PeriodName = originalReport.PeriodName,
                 StatusReport = "Nháp"
             };
             _context.SemesterReports.Add(dupReport);
             await _context.SaveChangesAsync();
 
-            //Duplicate Plan details
+            //Duplicate report details
             foreach (var detail in originalReport.ReportDetails)
             {
                 var duplicatedDetail = new ReportDetail
@@ -1703,7 +1732,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             //Setup data for SemesterPlan
             var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             plan.CreationTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
-            plan.AdvisorName = User.Identity.Name;
+            plan.AdvisorName = User.FindFirstValue(ClaimTypes.NameIdentifier);;
             var period = await _context.AcademicPeriods.FirstOrDefaultAsync(p => p.PeriodId == plan.PeriodId);
             plan.PeriodName = period.PeriodName;
             plan.Status = "Nháp";
@@ -1853,6 +1882,18 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 return RedirectToAction("SemesterPlan");
             }
         }
+        
+        public async Task<IActionResult> GetPlan()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.IsInRole("Faculty");
+
+            var plans = await _context.SemesterPlans
+                .Where(sr => userRole || sr.AdvisorName == userId) 
+                .ToListAsync();
+
+            return View(plans);
+        }
 
     //Edit Plan Detail
         [HttpPost]
@@ -1967,6 +2008,12 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             planToEdit.PeriodName = period.PeriodName;
             planToEdit.PlanType = planType;
             planToEdit.ClassId = classId;
+            
+            if (planToEdit.AdvisorName != User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                TempData["Error"] = "Bạn không có quyền chỉnh sửa kế hoạch này.";
+                return RedirectToAction("SemesterPlan");
+            }
 
             _context.SemesterPlans.Update(planToEdit);
             await _context.SaveChangesAsync();
@@ -2013,6 +2060,11 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 TempData["Error"] = "Báo Cáo đã được duyệt và không thể nộp lại!";
                 return RedirectToAction("SemesterPlan");
             }
+            if (planToSubmit.AdvisorName != User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                TempData["Error"] = "Bạn không có quyền nộp kế hoạch này.";
+                return RedirectToAction("SemesterPlan");
+            }
 
             planToSubmit.Status = "Đã Nộp";
             _context.SemesterPlans.Update(planToSubmit);
@@ -2021,7 +2073,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return RedirectToAction("SemesterPlan");
         }
         
-        //Submit Plan
+        //Browse Plan
         [HttpPost]
         public async Task<IActionResult> BrowsePlan(int planId)
         {
@@ -2055,6 +2107,12 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 TempData["Error"] = "Kế Hoạch đã được nộp, không thể xóa!";
                 return RedirectToAction("SemesterPlan");
             }
+            if (targetPlan.AdvisorName != User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                TempData["Error"] = "Bạn không có quyền xóa kế hoạch này.";
+                return RedirectToAction("SemesterPlan");
+            }
+            
 
             _context.SemesterPlans.Remove(targetPlan);
             await _context.SaveChangesAsync();
@@ -2227,7 +2285,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
                 PlanType = originalPlan.PlanType,
                 PeriodId = originalPlan.PeriodId,
                 CreationTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone),
-                AdvisorName = User.Identity.Name,
+                AdvisorName = User.FindFirstValue(ClaimTypes.NameIdentifier),
                 PeriodName = originalPlan.PeriodName,
                 Status = "Nháp"
             };

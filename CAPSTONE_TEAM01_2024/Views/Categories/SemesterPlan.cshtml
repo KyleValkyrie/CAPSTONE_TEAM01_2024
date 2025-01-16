@@ -1,4 +1,6 @@
 ﻿@inject IHttpContextAccessor HttpContextAccessor
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model CAPSTONE_TEAM01_2024.ViewModels.SemesterPlanViewModel
 @{
 ViewData["Title"] = "Semester Plan";
@@ -263,14 +265,16 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                                                 <i class="fa-solid fa-trash custom-icon"></i>
                                             </button>
                                         }
-                                        @if (isNotFaculty)
+                                        @if (plan.Status == "Nháp" && plan.AdvisorName == User.FindFirstValue(ClaimTypes.NameIdentifier))
                                         {
                                             <button class="btn btn-outline-secondary btn-sm"
                                                     title="Nộp"
                                                     onclick="openSubmitSemesterPlan(@plan.PlanId)">
                                                 <i class="fa-solid fa-upload custom-icon"></i>
                                             </button>
-
+                                        }
+                                        @if (isNotFaculty)
+                                        {
                                             <form method="post" action="/Categories/DuplicatePlan" style="display:inline;">
                                                 <input type="hidden" name="planId" value="@plan.PlanId"/>
                                                 <button class="btn btn-outline-warning btn-sm duplicate-btn"

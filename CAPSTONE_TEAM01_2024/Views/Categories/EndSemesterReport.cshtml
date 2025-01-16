@@ -1,4 +1,6 @@
 ﻿@inject IHttpContextAccessor HttpContextAccessor
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model CAPSTONE_TEAM01_2024.ViewModels.SemesterReportViewModel
 @{
     ViewData["Title"] = " End Semester Report";
@@ -356,23 +358,27 @@
                                             <i class="fa-solid fa-trash custom-icon"></i>
                                         </button>
                                     }
-                                    @if (isNotFaculty)
+                                    @if (report.StatusReport == "Nháp" && report.AdvisorName == User.FindFirstValue(ClaimTypes.NameIdentifier))
                                     {
-                                        <button class="btn btn-outline-secondary btn-sm"
-                                                title="Nộp"
-                                                onclick="openSubmitSemesterReport(@report.ReportId)">
-                                            <i class="fa-solid fa-upload custom-icon"></i>
-                                        </button>
-
-                                        <form method="post" action="/Categories/DuplicateReport" style="display:inline;">
-                                            <input type="hidden" name="reportId" value="@report.ReportId"/>
-                                            <button class="btn btn-outline-warning btn-sm duplicate-btn"
-                                                    type="submit"
-                                                    title="Nhân Bản">
-                                                <i class="bi bi-files"></i>
+                                            <button class="btn btn-outline-secondary btn-sm"
+                                                    title="Nộp"
+                                                    onclick="openSubmitSemesterReport(@report.ReportId)">
+                                                <i class="fa-solid fa-upload custom-icon"></i>
                                             </button>
-                                        </form>
+                                        
                                     }
+                                    @if (isNotFaculty)
+                                        {
+                                        <form method="post" action="/Categories/DuplicateReport" style="display:inline;">
+                                                <input type="hidden" name="reportId" value="@report.ReportId"/>
+                                                <button class="btn btn-outline-warning btn-sm duplicate-btn"
+                                                        type="submit"
+                                                        title="Nhân Bản">
+                                                    <i class="bi bi-files"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                    
                                     @if (isNotAdvisor)
                                     {
                                         <button class="btn btn-outline-secondary btn-sm"

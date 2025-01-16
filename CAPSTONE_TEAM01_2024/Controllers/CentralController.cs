@@ -11,6 +11,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         {
             _context = context;
         }
+
         [HttpGet]
         public async Task<IActionResult> GetUserInfo()
         {

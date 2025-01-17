@@ -338,12 +338,12 @@
                                 </td> 
                                 
                                 <td class="text-center">
-
-                                    <button class="btn btn-outline-success btn-sm"
-                                            title="Xem và Cập Nhật chi tiết"
+                                    
+                                        <button class="btn btn-outline-success btn-sm"
+                                                title="Xem và Cập Nhật chi tiết"
                                                 onclick="openEditDetailModal(@report.ReportId)">
-                                        <i class="fa-solid fa-pencil"></i>
-                                    </button>
+                                            <i class="fa-solid fa-pencil"></i>
+                                        </button>
                                     @if (isNotFaculty)
                                     {
                                         <button class="btn btn-outline-primary btn-sm"
@@ -358,37 +358,39 @@
                                             <i class="fa-solid fa-trash custom-icon"></i>
                                         </button>
                                     }
-                                    @if (report.StatusReport == "Nháp" && report.AdvisorName == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                                    @if (isNotFaculty)
                                     {
+                                        @if (report.StatusReport == "Nháp" && report.AdvisorName == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                                        {
                                             <button class="btn btn-outline-secondary btn-sm"
                                                     title="Nộp"
                                                     onclick="openSubmitSemesterReport(@report.ReportId)">
                                                 <i class="fa-solid fa-upload custom-icon"></i>
                                             </button>
-                                        
+                                        }
                                     }
                                     @if (isNotFaculty)
-                                        {
+                                    {
                                         <form method="post" action="/Categories/DuplicateReport" style="display:inline;">
-                                                <input type="hidden" name="reportId" value="@report.ReportId"/>
-                                                <button class="btn btn-outline-warning btn-sm duplicate-btn"
-                                                        type="submit"
-                                                        title="Nhân Bản">
-                                                    <i class="bi bi-files"></i>
-                                                </button>
-                                            </form>
-                                        }
-                                    
+                                            <input type="hidden" name="reportId" value="@report.ReportId"/>
+                                            <button class="btn btn-outline-warning btn-sm duplicate-btn"
+                                                    type="submit"
+                                                    title="Nhân Bản">
+                                                <i class="bi bi-files"></i>
+                                            </button>
+                                        </form>
+                                    }
+
                                     @if (isNotAdvisor)
                                     {
                                         <button class="btn btn-outline-secondary btn-sm"
                                                 title="Duyệt"
                                                 onclick="openBrowseSemesterReport(@report.ReportId)">
                                             <i class="bi bi-check-circle"></i>
-                                        </button>   
+                                        </button>
                                     }
                                     <form action="/Categories/ExportReport" method="post" style="display: inline;">
-                                        <input type="hidden" name="reportId" value="@report.ReportId" />
+                                        <input type="hidden" name="reportId" value="@report.ReportId"/>
                                         <button type="submit" class="btn btn-outline-info btn-sm" title="Xuất">
                                             <i class="fa-solid fa-file-export custom-icon"></i>
                                         </button>

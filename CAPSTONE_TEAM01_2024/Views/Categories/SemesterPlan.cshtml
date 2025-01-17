@@ -265,13 +265,16 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                                                 <i class="fa-solid fa-trash custom-icon"></i>
                                             </button>
                                         }
-                                        @if (plan.Status == "Nháp" && plan.AdvisorName == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                                        @if (isNotFaculty)
                                         {
-                                            <button class="btn btn-outline-secondary btn-sm"
-                                                    title="Nộp"
-                                                    onclick="openSubmitSemesterPlan(@plan.PlanId)">
-                                                <i class="fa-solid fa-upload custom-icon"></i>
-                                            </button>
+                                            @if (plan.Status == "Nháp" && plan.AdvisorName == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                                            {
+                                                <button class="btn btn-outline-secondary btn-sm"
+                                                        title="Nộp"
+                                                        onclick="openSubmitSemesterPlan(@plan.PlanId)">
+                                                    <i class="fa-solid fa-upload custom-icon"></i>
+                                                </button>
+                                            }
                                         }
                                         @if (isNotFaculty)
                                         {
@@ -699,14 +702,13 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                         <textarea name="EditNotes5_1" style="flex: 1; min-width: 100px; height: 50px;"></textarea>
                     </div>
                 </div>
-                @if (isNotFaculty)
-                {
+               
                     <!-- Modal Footer -->
                     <div class="modal-footer" style="display: flex; justify-content: flex-end; width: 100%; align-items: center;">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                         <button type="submit" class="btn btn-primary">Lưu</button> <!-- Submit button to send the form -->
                     </div>
-                }
+                
             </form>
         </div>
     </div>

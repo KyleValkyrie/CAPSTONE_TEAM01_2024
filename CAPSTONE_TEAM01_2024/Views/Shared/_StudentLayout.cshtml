@@ -31,7 +31,7 @@
             <div class="d-flex">
                 <div class="dropdown" style="position: relative;">
                     <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton">
-                        <i class="bi bi-person-circle"></i> @User.Identity!.Name
+                        <i class="bi bi-person-circle"></i>
                     </button>
                     <ul class="dropdown-menu" id="dropdownMenu" style="background-color: #fff; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); text-align: center; right: 0; padding: 0px; display: none; position:absolute;">
                         <li class="btn-logout">
@@ -93,7 +93,9 @@
                             <a class="nav-link" role="button" aria-expanded="false" aria-controls="dropdownMenu5" id="toggleMenu5"
                                onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
                                onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                <i class="bi bi-chat-dots"></i> TRAO ĐỔI <i class="bi bi-caret-down-fill" style="float:right;"></i>
+                                <i class="bi bi-chat-dots"></i> TRAO ĐỔI 
+                                <span id="totalEmailCount" class="badge rounded-pill bg-danger " style="display:none;"></span>
+                                <i class="bi bi-caret-down-fill" style="float:right;"></i>
                             </a>
                             <ul class="collapse" id="dropdownMenu5" style="list-style-type: none; padding-left: 35px;">
                                 <li>
@@ -101,6 +103,7 @@
                                        onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
                                        onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
                                         <i class="bi bi-envelope-open"></i> Nhận
+                                        <span id="receivedEmailCount" class="badge rounded-pill bg-danger " style="display:none;"></span>
                                     </a>
                                 </li>
                                 <li>
@@ -167,7 +170,6 @@
                 });
         });
 
-
         // Logout menu JS
         document.getElementById("dropdownMenuButton").addEventListener("click", function () {
             var dropdownMenu = document.getElementById("dropdownMenu");
@@ -187,11 +189,19 @@
                 '/Home/HomePage': 'linkHome',
                 '/ProfileManager/StudentProfiles': 'linkStudentProfiles',
                 '/ProfileManager/AdvisorProfiles': 'linkAdvisorProfiles',
-               
+                '/Statistics/ShowStatistics': 'linkStatistics',
+                '/Statistics/StatisticsClassByYear': 'linkStatisticsMajor',
+                '/Statistics/StatisticsClassByMajor': 'linkStatisticsRole',
+                '/Statistics/StatisticsEvalution': 'linkStatisticsStatusStudent',
                 '/Categories/SchoolYear': 'linkSchoolYear',
                 '/Categories/ClassList': 'linkClassList',
                 '/Categories/SemesterPlan': 'linkSemesterPlan',
-                '/Categories/EndSemesterReport': 'linkEndSemesterReport'
+                '/Categories/EndSemesterReport': 'linkEndSemesterReport',
+                '/Categories/StudentList': 'linkStudentList',
+                '/Announcement/AnnouncementList': 'linkAnnouncement',
+                '/Announcement/MyAnnouncements': 'linkMyAnnouncement',
+                '/Categories/SentEmail': 'linkSend',
+                '/Categories/ReceiveEmail': 'linkReceive    ',
             };
 
             // Set the selected state
@@ -216,7 +226,7 @@
             }
 
             // Load dropdown state from session storage
-            const dropdownMenus = ['dropdownMenu1','dropdownMenu2','dropdownMenu5'];
+            const dropdownMenus = ['dropdownMenu1', 'dropdownMenu2', 'dropdownMenu3', 'dropdownMenu4', 'dropdownMenu5', 'dropdownMenu6'];
             dropdownMenus.forEach(menuId => {
                 const menuState = sessionStorage.getItem(menuId);
                 const menu = document.getElementById(menuId);
@@ -254,5 +264,89 @@
         function clearSessionStorage() {
             sessionStorage.clear();
         }
+
+        //Notification JS
+        //Pill badge display
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('@Url.Action("GetNewAnnouncementsCount", "Announcement")')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.count > 0) {
+                        document.getElementById('announcementCount').innerText = data.count;
+                        document.getElementById('announcementCount').style.display = 'inline-block';
+
+                        document.getElementById('totalAnnouncementCount').innerText = data.count;
+                        document.getElementById('totalAnnouncementCount').style.display = 'inline-block';
+
+                        document.getElementById('myAnnouncementCount').innerText = data.count;
+                        document.getElementById('myAnnouncementCount').style.display = 'inline-block';
+                    } else {
+                        document.getElementById('announcementCount').style.display = 'none';
+                        document.getElementById('totalAnnouncementCount').style.display = 'none';
+                        document.getElementById('myAnnouncementCount').style.display = 'none';
+                    }
+                });
+        });
+        //Update read count
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('@Url.Action("GetNewAnnouncementsCount", "Announcement")')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.count > 0) {
+                        document.getElementById('announcementCount').innerText = data.count;
+                        document.getElementById('announcementCount').style.display = 'inline-block';
+
+                        document.getElementById('totalAnnouncementCount').innerText = data.count;
+                        document.getElementById('totalAnnouncementCount').style.display = 'inline-block';
+
+                        document.getElementById('myAnnouncementCount').innerText = data.count;
+                        document.getElementById('myAnnouncementCount').style.display = 'inline-block';
+                    } else {
+                        document.getElementById('announcementCount').style.display = 'none';
+                        document.getElementById('totalAnnouncementCount').style.display = 'none';
+                        document.getElementById('myAnnouncementCount').style.display = 'none';
+                    }
+                });
+        });
+
+        document.getElementById('linkAnnouncement').addEventListener('click', function () {
+            markAllAsRead();
+        });
+
+        document.getElementById('linkMyAnnouncement').addEventListener('click', function () {
+            markAllAsRead();
+        });
+
+        function markAllAsRead() {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("MarkAllAnnouncementsAsRead", "Announcement")',
+                success: function (response) {
+                    if (response.success) {
+                        document.getElementById('announcementCount').style.display = 'none';
+                        document.getElementById('totalAnnouncementCount').style.display = 'none';
+                        document.getElementById('myAnnouncementCount').style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Email JS
+        //Pill badge display
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/Categories/GetUnreadEmailsCount') // Call the backend endpoint
+                .then(response => response.json()) // Parse the JSON response
+                .then(data => {
+                    if (data.count > 0) {
+                        document.getElementById('totalEmailCount').innerText = data.count; // Update badge text
+                        document.getElementById('totalEmailCount').style.display = 'inline-block'; // Show badge
+                        document.getElementById('receivedEmailCount').innerText = data.count; // Update badge text
+                        document.getElementById('receivedEmailCount').style.display = 'inline-block'; // Show badge
+                    } else {
+                        document.getElementById('totalEmailCount').style.display = 'none'; // Hide badge if count is 0
+                        document.getElementById('receivedEmailCount').style.display = 'none'; // Hide badge if count is 0
+                    }
+                });
+        });
     </script>
 </body>

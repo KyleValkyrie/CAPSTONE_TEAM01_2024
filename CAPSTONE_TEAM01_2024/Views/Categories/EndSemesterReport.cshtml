@@ -1,4 +1,6 @@
 ﻿@inject IHttpContextAccessor HttpContextAccessor
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model CAPSTONE_TEAM01_2024.ViewModels.SemesterReportViewModel
 @{
     ViewData["Title"] = " End Semester Report";
@@ -56,6 +58,7 @@
     #fileModal8_2 .modal-dialog,
     #EditSemesterReportModal .modal-dialog,
     #SubmitReportModal .modal-dialog,
+    #BrowseReportModal .modal-dialog,
     #DeleteReportModal .modal-dialog {
         max-width: 600px; /* Điều chỉnh kích thước nhỏ lại */
     }
@@ -64,6 +67,7 @@
     
     #EditSemesterReportModal .modal-header,
     #SubmitReportModal .modal-header,
+    #BrowseReportModal .modal-header,
     #DeleteReportModal .modal-header {
         background-color: #f8f9fa; /* Màu nền nhạt */
         border-bottom: 1px solid #ddd;
@@ -319,7 +323,11 @@
                                     {
                                         <span class="badge bg-secondary text-white">@report.StatusReport</span>
                                     }
-                                    else if(report.StatusReport == "Đã Nộp")
+                                    else if (report.StatusReport == "Đã Nộp")
+                                    {
+                                        <span class="badge bg-success">@report.StatusReport</span>
+                                    }
+                                    else if (report.StatusReport == "Duyệt")
                                     {
                                         <span class="badge bg-success">@report.StatusReport</span>
                                     }
@@ -327,14 +335,15 @@
                                     {
                                         <span class="badge bg-primary">@report.StatusReport</span>
                                     }
-                                </td>
+                                </td> 
+                                
                                 <td class="text-center">
-
-                                    <button class="btn btn-outline-success btn-sm"
-                                            title="Xem và Cập Nhật chi tiết"
+                                    
+                                        <button class="btn btn-outline-success btn-sm"
+                                                title="Xem và Cập Nhật chi tiết"
                                                 onclick="openEditDetailModal(@report.ReportId)">
-                                        <i class="fa-solid fa-pencil"></i>
-                                    </button>
+                                            <i class="fa-solid fa-pencil"></i>
+                                        </button>
                                     @if (isNotFaculty)
                                     {
                                         <button class="btn btn-outline-primary btn-sm"
@@ -351,12 +360,17 @@
                                     }
                                     @if (isNotFaculty)
                                     {
-                                        <button class="btn btn-outline-secondary btn-sm"
-                                                title="Nộp"
-                                                onclick="openSubmitSemesterReport(@report.ReportId)">
-                                            <i class="fa-solid fa-upload custom-icon"></i>
-                                        </button>
-
+                                        @if (report.StatusReport == "Nháp" && report.AdvisorName == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                                        {
+                                            <button class="btn btn-outline-secondary btn-sm"
+                                                    title="Nộp"
+                                                    onclick="openSubmitSemesterReport(@report.ReportId)">
+                                                <i class="fa-solid fa-upload custom-icon"></i>
+                                            </button>
+                                        }
+                                    }
+                                    @if (isNotFaculty)
+                                    {
                                         <form method="post" action="/Categories/DuplicateReport" style="display:inline;">
                                             <input type="hidden" name="reportId" value="@report.ReportId"/>
                                             <button class="btn btn-outline-warning btn-sm duplicate-btn"
@@ -366,8 +380,17 @@
                                             </button>
                                         </form>
                                     }
+
+                                    @if (isNotAdvisor)
+                                    {
+                                        <button class="btn btn-outline-secondary btn-sm"
+                                                title="Duyệt"
+                                                onclick="openBrowseSemesterReport(@report.ReportId)">
+                                            <i class="bi bi-check-circle"></i>
+                                        </button>
+                                    }
                                     <form action="/Categories/ExportReport" method="post" style="display: inline;">
-                                        <input type="hidden" name="reportId" value="@report.ReportId" />
+                                        <input type="hidden" name="reportId" value="@report.ReportId"/>
                                         <button type="submit" class="btn btn-outline-info btn-sm" title="Xuất">
                                             <i class="fa-solid fa-file-export custom-icon"></i>
                                         </button>
@@ -732,6 +755,28 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                         <button type="submit" class="btn btn-danger">Nộp</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Browse Report Modal -->
+<div class="modal fade" id="BrowseReportModal" tabindex="-1" aria-labelledby="BrowseSemesterReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="BrowseReportModalLabel">Duyệt Báo Cáo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn Duyệt Báo Cáo này không?</p>
+                <form id="BrowseReportForm" asp-action="BrowseReport" method="post">
+                    <input type="hidden" id="BrowseReportId" name="ReportId" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="browse" class="btn btn-danger">Duyệt</button>
                     </div>
                 </form>
             </div>
@@ -1409,7 +1454,13 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
         var modal = new bootstrap.Modal(document.getElementById('SubmitReportModal'));
         modal.show();
     }
-
+// Open modal Browse Report
+function openBrowseSemesterReport(reportId) {
+    document.getElementById('BrowseReportId').value = reportId;
+    // Show the modal
+    var modal = new bootstrap.Modal(document.getElementById('BrowseReportModal'));
+    modal.show();
+}
 // Edit Report Modal JS
     function openEditSemesterReport(reportId, periodId, reportType, classId) {
         document.getElementById('EditReportId').value = reportId;

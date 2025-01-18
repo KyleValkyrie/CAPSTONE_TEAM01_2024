@@ -2252,7 +2252,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             return Json(new { count = unreadEmailsCount });
         }
 
-    //Mark Email as read
+    // Mark Email as read
         [HttpPost]
         public async Task<IActionResult> MarkEmailAsRead(int emailId)
         {
@@ -2270,13 +2270,15 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
                 // Save the changes to the database
                 await _context.SaveChangesAsync();
-                TempData["Success"] = $"Email đã chuyển trạng thái thành đã xem!";
-                return RedirectToAction("ReceiveEmail");
+
+                // Set TempData messages for success or failure
+                TempData["Success"] = "Email đã chuyển trạng thái thành đã xem!";
+                return Json(new { success = true, redirectUrl = Url.Action("ReceiveEmail") }); // Return a JSON response with the redirect URL
             }
 
             // Return a failure response if the email recipient was not found
             TempData["Error"] = "Không tìm thấy email!";
-            return RedirectToAction("ReceiveEmail");
+            return Json(new { success = false, redirectUrl = Url.Action("ReceiveEmail") }); // Return the redirect URL even on failure
         }
 
 //Send Mail actions

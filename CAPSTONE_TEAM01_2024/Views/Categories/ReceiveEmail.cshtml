@@ -52,7 +52,8 @@
                                     <th>Người Gửi</th>
                                     <th>Người Nhận</th>
                                     <th>Tiêu Đề</th>
-                                    <th>Ngày Nhận</th>                        
+                                    <th>Ngày Nhận</th>  
+                                    <th>Trạng thái</th>
                                     <th>Thao Tác</th>
                                 </tr>
                             </thead>    
@@ -61,7 +62,10 @@
                                 {
                                     var ccRecipients = email.Recipients.Where(r => r.RecipientType == "Cc").Select(r => r.User.Email).ToList();
                                     var toRecipients = email.Recipients.Where(r => r.RecipientType == "To").Select(r => r.User.Email).ToList();
-                                var bccRecipients = email.Recipients.Where(r => r.RecipientType == "Bcc").Select(r => r.User.Email).ToList();
+                                    var bccRecipients = email.Recipients.Where(r => r.RecipientType == "Bcc").Select(r => r.User.Email).ToList();
+
+                                    // Get the recipient for the current user (if exists)
+                                    var recipient = email.Recipients.FirstOrDefault(r => r.User.UserName == User.Identity.Name);
                                     <tr class="text-center">
                                         <td>@email.Sender</td>
                                         <td>@if (toRecipients.Any())
@@ -83,7 +87,20 @@
                                             }
                                         </td>
                                         <td>@email.Subject</td>
-                                        <td>@email.SentDate</td>                              
+                                        <td>@email.SentDate</td>  
+                                        <td>
+                                            @if (recipient != null)  // Check if the recipient exists in the current email for the logged-in user
+                                            {
+                                                @if (recipient.IsRead)
+                                                {
+                                                    <span class="badge bg-success">Đã đọc</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning text-dark">Chưa đọc</span>
+                                                }
+                                            }
+                                        </td>
                                         <td class="text-center">
                                         <button type="button" class="btn btn-outline-info btn-sm btn-view-email" data-bs-toggle="modal" data-bs-target="#DetailMailModal" data-email-id="@email.EmailId">
                                                 <i class="fa-solid fa-eye custom-icon"></i>
@@ -194,6 +211,7 @@
                 <ul id="viewEmailAttachments"></ul>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="markAsReadBtn" data-email-id=""> Đánh dấu đã xem </button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
@@ -285,8 +303,8 @@
 
 <script>
     
-        // Search JS
-        document.getElementById('searchInput').addEventListener('input', function () {
+    // Search JS
+    document.getElementById('searchInput').addEventListener('input', function () {
             var input, filter, table, tr, td, i, txtValue, found;
             input = document.getElementById('searchInput');
             filter = input.value.toUpperCase();
@@ -313,6 +331,7 @@
             var noResultsRow = document.getElementById('noresults');
             noResultsRow.style.display = found ? "none" : "table-row";
         });
+
     // Detail Modal JS
     $(document).on('click', '.btn-view-email', function () {
         var emailId = $(this).data('email-id'); // Get the emailId from the button's data attribute
@@ -324,6 +343,7 @@
             data: { emailId: emailId },
             success: function (data) {
                 if (data) {
+                    console.log(data.emailId); // Check the id
                     console.log(data.subject); // Check the subject
                     console.log(data.content); // Check the content
                     // Populate the modal fields with data
@@ -361,6 +381,9 @@
                     }
                     $('#viewEmailAttachments').html(attachmentList);
 
+                    // Update the Mark as Read button with the emailId
+                    $('#markAsReadBtn').attr('data-email-id', data.emailId);
+
                     // Show the modal
                     $('#viewEmailModal').modal('show');
                 } else {
@@ -374,7 +397,7 @@
         });
     });
 
-// Download attachment function
+    // Download attachment function
     function downloadAttachment(attachmentId) {
         console.log("Attempting to download attachment with ID:", attachmentId);
 
@@ -419,8 +442,7 @@
         }
     }
 
-
-// Handle input event for 'To' field
+    // Handle input event for 'To' field
     $('#recipientTo').on('input', function () {
         const query = $(this).val();
 
@@ -657,6 +679,27 @@
 
         // Open the modal (optional, if not already being triggered)
         $('#ReplyMailModal').modal('show');
+    });
+
+    // Mark Email as Read
+    $(document).on('click', '#markAsReadBtn', function () {
+        var emailId = $(this).data('email-id'); // Get the email ID from the button's data attribute
+        console.log("Email id being marked as read: " + emailId);
+
+        // Send the request to the backend to mark the email as read
+        $.ajax({
+            url: '/Categories/MarkEmailAsRead',
+            type: 'POST',
+            data: { emailId: emailId },
+            success: function (response) {
+                // Redirect to the action to show success or failure messages
+                window.location.href = response.redirectUrl; // The backend should return this URL
+            },
+            error: function (xhr, status, error) {
+                console.error('Error marking email as read:', xhr.responseText);
+                alert('Có lỗi xảy ra khi đánh dấu email.');
+            }
+        });
     });
 
 </script>

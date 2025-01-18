@@ -27,7 +27,6 @@ namespace CAPSTONE_TEAM01_2024
         public DbSet<CriterionReport> CriterionReports { get; set; }     
         public DbSet<ReportDetail> ReportDetails { get; set; }       
         public DbSet<AttachmentReport> AttachmentReports { get; set; }
-        public DbSet<Notification> Notifications { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);

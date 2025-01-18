@@ -26,6 +26,7 @@ using static MimeKit.TextPart;
 using System.Linq;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Net.Mail;
+using System.Security.Claims;
 
 
 namespace CAPSTONE_TEAM01_2024.Controllers
@@ -2196,33 +2197,33 @@ namespace CAPSTONE_TEAM01_2024.Controllers
         }
 
 //Receive Mail actions
-    //Render View 
+    //Render view
         public async Task<IActionResult> ReceiveEmail(int pageIndex = 1, int pageSize = 20)
         {
             ViewData["page"] = "ReceiveEmail";
             var currentUser = await _context.ApplicationUsers.FirstOrDefaultAsync(us => us.UserName == User.Identity.Name);
-            var emails = _context.Emails
-                    .Include(e => e.Recipients)
-                    .ThenInclude(r => r.User)
-                    .Where(e => e.Recipients.Any(r => r.User.UserName == User.Identity.Name))
-                    .OrderByDescending(e => e.SentDate)
-                    .Select(e => new Email
-                    {
-                        EmailId = e.EmailId,
-                        Sender = e.Sender,
-                        Recipients = e.Recipients,
-                        Subject = e.Subject,
-                        SentDate = e.SentDate,
-                        Status = e.Status,
-                        SenderId = e.SenderId,
-                        Content = e.Content,
-                        Thread = e.Thread,
-                        ThreadId = e.ThreadId,
-                        Attachments = e.Attachments
-                    }).AsQueryable();
 
-            var paginatedEmails =
-                await PaginatedList<Email>.CreateAsync(emails, pageIndex, pageSize);
+            var emails = _context.Emails
+                .Include(e => e.Recipients)
+                    .ThenInclude(r => r.User)
+                .Where(e => e.Recipients.Any(r => r.User.UserName == User.Identity.Name))
+                .OrderByDescending(e => e.SentDate)
+                .Select(e => new Email
+                {
+                    EmailId = e.EmailId,
+                    Sender = e.Sender,
+                    Recipients = e.Recipients,
+                    Subject = e.Subject,
+                    SentDate = e.SentDate,
+                    Status = e.Status,
+                    SenderId = e.SenderId,
+                    Content = e.Content,
+                    Thread = e.Thread,
+                    ThreadId = e.ThreadId,
+                    Attachments = e.Attachments
+                }).AsQueryable();
+
+            var paginatedEmails = await PaginatedList<Email>.CreateAsync(emails, pageIndex, pageSize);
 
             var viewmodel = new EmailViewModel
             {
@@ -2234,6 +2235,50 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return View(viewmodel);
         }
+
+    //Get unread email
+        public async Task<IActionResult> GetUnreadEmailsCount()
+        {
+            // Find the current user's ID or username
+            var currentUserName = User.Identity.Name;
+
+            // Query emails where the current user is a recipient and the email is unread
+            var unreadEmailsCount = await _context.Emails
+                .Include(e => e.Recipients) // Include the Recipients collection
+                .Where(e => e.Recipients.Any(r => r.User.UserName == currentUserName && !r.IsRead)) // Filter for unread emails
+                .CountAsync(); // Count the unread emails
+
+            // Return the count as JSON
+            return Json(new { count = unreadEmailsCount });
+        }
+
+    //Mark Email as read
+        [HttpPost]
+        public async Task<IActionResult> MarkEmailAsRead(int emailId)
+        {
+            // Get the current user's ID
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Find the recipient's entry for the specific email and user
+            var emailRecipient = await _context.EmailRecipients
+                .FirstOrDefaultAsync(er => er.EmailId == emailId && er.UserId == userId);
+
+            if (emailRecipient != null)
+            {
+                // Set the email recipient's IsRead property to true
+                emailRecipient.IsRead = true;
+
+                // Save the changes to the database
+                await _context.SaveChangesAsync();
+                TempData["Success"] = $"Email đã chuyển trạng thái thành đã xem!";
+                return RedirectToAction("ReceiveEmail");
+            }
+
+            // Return a failure response if the email recipient was not found
+            TempData["Error"] = "Không tìm thấy email!";
+            return RedirectToAction("ReceiveEmail");
+        }
+
 //Send Mail actions
     //Render View
         public async Task<IActionResult> SentEmail(int pageIndex = 1, int pageSize = 20)
@@ -2422,6 +2467,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
 
             return Json(new
             {
+                EmailId = email.EmailId,
                 Recipients = new
                 {
                     To = recipientsByType.ContainsKey("To") ? recipientsByType["To"] : new List<string>(),

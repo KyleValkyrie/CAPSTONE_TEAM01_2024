@@ -17,5 +17,7 @@ public class EmailRecipient
 
     [Required]
     public string RecipientType { get; set; } // Options: To, Cc, Bcc
+    [Required]
+    public bool IsRead { get; set; }
 }
 

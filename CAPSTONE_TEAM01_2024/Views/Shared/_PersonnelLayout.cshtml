@@ -25,12 +25,6 @@
                 Quản Lý Hoạt Động Cố Vấn Học Tập
             </a>
             <div class="d-flex">
-                <button class="btn btn-light me-2" type="button">
-                    <i class="bi bi-bell"></i>
-                </button>
-                <button class="btn btn-light me-2" type="button">
-                    <i class="bi bi-chat-dots"></i>
-                </button>
                 <div class="dropdown" style="position: relative;">
                     <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton">
                         <i class="bi bi-person-circle"></i> 
@@ -177,7 +171,9 @@
                             <a class="nav-link" role="button" aria-expanded="false" aria-controls="dropdownMenu5" id="toggleMenu5"
                                onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
                                onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
-                                <i class="bi bi-chat-dots"></i> TRAO ĐỔI <i class="bi bi-caret-down-fill" style="float:right;"></i>
+                                <i class="bi bi-chat-dots"></i> TRAO ĐỔI 
+                                <span id="totalEmailCount" class="badge rounded-pill bg-danger " style="display:none;"></span>
+                                <i class="bi bi-caret-down-fill" style="float:right;"></i>   
                             </a>
                             <ul class="collapse" id="dropdownMenu5" style="list-style-type: none; padding-left: 35px;">
                                 <li>
@@ -185,6 +181,7 @@
                                        onmouseover="this.style.backgroundColor='#c82333'; this.style.color='#fff';"
                                        onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fff';">
                                         <i class="bi bi-envelope-open"></i> Nhận
+                                        <span id="receivedEmailCount" class="badge rounded-pill bg-danger " style="display:none;"></span>
                                     </a>
                                 </li>
                                 <li>
@@ -258,26 +255,6 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src ="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
     <script>
-        // Establish a connection to the SignalR hub
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/notificationHub")  // URL of your SignalR hub
-            .build();
-
-        // Set up the method to handle messages from the server
-        connection.on("ReceiveNotification", function (message) {
-            // Display the received notification (you can update the UI here)
-            alert("New Notification: " + message);  // Example action
-        });
-
-        // Start the connection
-        connection.start()
-            .then(function () {
-                console.log("Connected to SignalR hub.");
-            })
-            .catch(function (err) {
-                console.error("Error connecting to SignalR hub: ", err);
-            });
-
 // Display Info JS
         document.addEventListener('DOMContentLoaded', function () {
             fetch('/Central/GetUserInfo')
@@ -404,6 +381,7 @@
         function clearSessionStorage() {
             sessionStorage.clear();
         }
+
 //Notification JS
         //Pill badge display
         document.addEventListener('DOMContentLoaded', function() {
@@ -469,5 +447,23 @@
                     }
                 });
             }
+
+// Email JS
+        //Pill badge display
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/Categories/GetUnreadEmailsCount') // Call the backend endpoint
+                .then(response => response.json()) // Parse the JSON response
+                .then(data => {
+                    if (data.count > 0) {
+                        document.getElementById('totalEmailCount').innerText = data.count; // Update badge text
+                        document.getElementById('totalEmailCount').style.display = 'inline-block'; // Show badge
+                        document.getElementById('receivedEmailCount').innerText = data.count; // Update badge text
+                        document.getElementById('receivedEmailCount').style.display = 'inline-block'; // Show badge
+                    } else {
+                        document.getElementById('totalEmailCount').style.display = 'none'; // Hide badge if count is 0
+                        document.getElementById('receivedEmailCount').style.display = 'none'; // Hide badge if count is 0
+                    }
+                });
+        });
     </script>
 </body>

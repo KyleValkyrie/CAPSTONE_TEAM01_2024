@@ -4,7 +4,7 @@
 ViewData["Title"] = "Announcements";
 var rolesString = HttpContextAccessor.HttpContext.Session.GetString("Roles");
 var roles = rolesString?.Split(',') ?? new string[0];
-bool isNotAdvitors = !roles.Contains("Cố Vấn");
+bool isNotAdvisor = !roles.Contains("CVHT");
 var counter = (Model.PageIndex - 1) * Model.PageSize;
 }
 <div class="content-wrapper" style="min-height: 912.2px;">
@@ -26,7 +26,7 @@ var counter = (Model.PageIndex - 1) * Model.PageSize;
 			<div class="card">
 				<div class="card-header">
 					<div class="row text-center">
-						@if (isNotAdvitors)
+						@if (isNotAdvisor)
 						{	
 						<div class="col-auto">
 							<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddAnnouncementModal">
@@ -68,7 +68,7 @@ var counter = (Model.PageIndex - 1) * Model.PageSize;
 								<th scope="col">Thời Gian Bắt Đầu</th>
 								<th scope="col">Thời Gian Kết Thúc</th>
 								<th scope="col">Loại Kế Hoạch</th>
-								@if (isNotAdvitors)
+								@if (isNotAdvisor)
 								{	
 								<th scope="col">Thao Tác</th>
 								}
@@ -86,7 +86,7 @@ var counter = (Model.PageIndex - 1) * Model.PageSize;
 								<td class="text-center">@announcement.EndTime.ToString("dd-MM-yyyy")</td>
 								<td class="text-center">@announcement.Type</td>
 								<td class="text-center">
-									@if (isNotAdvitors)
+									@if (isNotAdvisor)
 									{
 										<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#EditAnnouncementModal"
 										        data-id="@counter"
@@ -318,16 +318,16 @@ var counter = (Model.PageIndex - 1) * Model.PageSize;
         });
 
 // Special Characters
-	document.getElementById('Detail').addEventListener('input', function () {
-		var textarea = document.getElementById('Detail');
-		var errorMessage = document.getElementById('error-message');
-		var regex = /^[a-zA-Z0-9\s]*$/; // Only allows letters, numbers, and spaces
+document.getElementById('Detail').addEventListener('input', function () {
+	var textarea = document.getElementById('Detail');
+	var errorMessage = document.getElementById('error-message');
+	var regex = /^[\p{L}0-9\s]*$/u; 
 
-		if (!regex.test(textarea.value)) {
-			errorMessage.textContent = 'Không được dùng ký tự đặc biệt';
-		} else {
-			errorMessage.textContent = '';
-		}
-	});
+	if (!regex.test(textarea.value)) {
+		errorMessage.textContent = 'Không được dùng ký tự đặc biệt';
+	} else {
+		errorMessage.textContent = '';
+	}
+});
 
 </script>

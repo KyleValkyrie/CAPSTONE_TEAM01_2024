@@ -21,6 +21,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             this._context = context;
         }
 
+        
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Index(string? message = null)

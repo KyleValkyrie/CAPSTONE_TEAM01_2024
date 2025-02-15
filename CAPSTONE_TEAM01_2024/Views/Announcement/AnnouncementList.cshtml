@@ -324,7 +324,7 @@ document.getElementById('Detail').addEventListener('input', function () {
 	var regex = /^[\p{L}0-9\s]*$/u; 
 
 	if (!regex.test(textarea.value)) {
-		errorMessage.textContent = 'Không được dùng ký tự đặc biệt';
+		errorMessage.textContent = '';
 	} else {
 		errorMessage.textContent = '';
 	}

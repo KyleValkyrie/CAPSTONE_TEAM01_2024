@@ -338,13 +338,23 @@
                                 </td> 
                                 
                                 <td class="text-center">
-                                    
+                                    @if (isNotAdvisor)
+                                    {
+                                    <button class="btn btn-outline-success btn-sm"
+                                                title="Xem chi tiết"
+                                                onclick="openEditDetailModal(@report.ReportId)">
+                                        <i class="fa-solid fa-pencil"></i>
+                                    </button>
+                                    }
+                                    @if (report.AdvisorName == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                                    {
                                         <button class="btn btn-outline-success btn-sm"
                                                 title="Xem và Cập Nhật chi tiết"
                                                 onclick="openEditDetailModal(@report.ReportId)">
                                             <i class="fa-solid fa-pencil"></i>
                                         </button>
-                                    @if (isNotFaculty)
+                                    }
+                                    @if (isNotFaculty && report.AdvisorName == User.FindFirstValue(ClaimTypes.NameIdentifier))
                                     {
                                         <button class="btn btn-outline-primary btn-sm"
                                                 title="Cập Nhật"
@@ -369,7 +379,7 @@
                                             </button>
                                         }
                                     }
-                                    @if (isNotFaculty)
+                                    @if (isNotFaculty && report.AdvisorName == User.FindFirstValue(ClaimTypes.NameIdentifier))
                                     {
                                         <form method="post" action="/Categories/DuplicateReport" style="display:inline;">
                                             <input type="hidden" name="reportId" value="@report.ReportId"/>
@@ -685,7 +695,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <label for="selfAssessment" style="white-space: nowrap; font-weight: bold;">Cá Nhân Tự Đánh Giá:</label>
                         <textarea id="selfAssessment" name="selfAssessment"
                                       placeholder="Nhập đánh giá"
-                                      style="flex: 1; width: 850px; height: 50px;overflow-y: auto; "></textarea>
+                                      style="flex: 1; width: 700px; height: 50px;overflow-y: auto; "></textarea>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <label for="ranking" style="white-space: nowrap; font-weight: bold;">Cá Nhân Tự Xếp Loại:</label>
@@ -710,7 +720,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                             <label for="FaculityAssessment" style="white-space: nowrap; font-weight: bold;">BCN Khoa Đánh Giá:</label>
                             <textarea id="FaculityAssessment" name="FaculityAssessment"
                                       placeholder="Nhập đánh giá"
-                                      style="flex: 1; width: 850px; height: 50px;overflow-y: auto;margin-left: 13px; " readonly></textarea>
+                                      style="flex: 1; width: 700px; height: 50px;overflow-y: auto;margin-left: 13px; " readonly></textarea>
 
                         </div>
                         <div style="display: flex; align-items: center; gap: 10px;margin-left: 10px;">
@@ -1041,7 +1051,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                             <label for="selfAssessment" style="white-space: nowrap; font-weight: bold;">Cá Nhân Tự Đánh Giá:</label>
                             <textarea id="EditselfAssessment" name="EditselfAssessment"
                                   placeholder="Nhập đánh giá"
-                                  style="flex: 1; width: 850px; height: 50px;overflow-y: auto; " readonly></textarea>
+                                  style="flex: 1; width: 700px; height: 50px;overflow-y: auto; " readonly></textarea>
                         </div>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <label for="ranking" style="white-space: nowrap; font-weight: bold;">Cá Nhân Tự Xếp Loại:</label>
@@ -1063,7 +1073,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                         <label for="FaculityAssessment" style="white-space: nowrap; font-weight: bold;">BCN Khoa Đánh Giá:</label>
                         <textarea id="EditFaculityAssessment" name="EditFaculityAssessment"
                                   placeholder="Nhập đánh giá"
-                                  style="flex: 1; width: 850px; height: 50px;overflow-y: auto;margin-left: 13px; "></textarea>
+                                  style="flex: 1; width: 700px; height: 50px;overflow-y: auto;margin-left: 13px; "></textarea>
 
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px;margin-left: 10px;">
@@ -1305,7 +1315,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                             <label for="selfAssessment" style="white-space: nowrap; font-weight: bold;">Cá Nhân Tự Đánh Giá:</label>
                             <textarea id="EditselfAssessment" name="EditselfAssessment"
                                       placeholder="Nhập đánh giá"
-                                      style="flex: 1; width: 850px; height: 50px;overflow-y: auto; "></textarea>
+                                      style="flex: 1; width: 700px; height: 50px;overflow-y: auto; "></textarea>
                         </div>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <label for="ranking" style="white-space: nowrap; font-weight: bold;">Cá Nhân Tự Xếp Loại:</label>
@@ -1327,7 +1337,7 @@ Nếu khoa có chia chuyên ngành, CVHT tư vấn SV lựa chọn phù hợp v�
                             <label for="FaculityAssessment" style="white-space: nowrap; font-weight: bold;">BCN Khoa Đánh Giá:</label>
                             <textarea id="EditFaculityAssessment" name="EditFaculityAssessment"
                                       placeholder="Nhập đánh giá"
-                                      style="flex: 1; width: 850px; height: 50px;overflow-y: auto;margin-left: 13px;" readonly=""></textarea>
+                                      style="flex: 1; width: 700px; height: 50px;overflow-y: auto;margin-left: 13px;" readonly=""></textarea>
 
                         </div>
                         <div style="display: flex; align-items: center; gap: 10px;margin-left: 10px;">

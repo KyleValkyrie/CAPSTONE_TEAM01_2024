@@ -246,13 +246,23 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                                         }
                                     </td>
                                     <td class="text-center">
-                                        
+                                        @if (isNotFaculty && plan.AdvisorName == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                                        {
                                             <button class="btn btn-outline-success btn-sm"
                                                     title="Xem và Cập Nhật chi tiết"
                                                     onclick="openEditPlanDetailModal(@plan.PlanId, @plan.PeriodId, '@plan.ClassId', '@plan.Status')">
                                                 <i class="fa-solid fa-pencil"></i>
                                             </button>
-                                        @if (isNotFaculty)
+                                        }
+                                        @if (isNotAdvisor)
+                                        {
+                                            <button class="btn btn-outline-success btn-sm"
+                                                    title="Xem chi tiết"
+                                                    onclick="openEditPlanDetailModal(@plan.PlanId, @plan.PeriodId, '@plan.ClassId', '@plan.Status')">
+                                                <i class="fa-solid fa-pencil"></i>
+                                            </button>
+                                        }
+                                        @if (isNotFaculty && plan.AdvisorName == User.FindFirstValue(ClaimTypes.NameIdentifier))
                                         {
                                             <button class="btn btn-outline-primary btn-sm"
                                                     title="Cập Nhật"
@@ -276,7 +286,7 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                                                 </button>
                                             }
                                         }
-                                        @if (isNotFaculty)
+                                        @if (isNotFaculty && plan.AdvisorName == User.FindFirstValue(ClaimTypes.NameIdentifier))
                                         {
                                             <form method="post" action="/Categories/DuplicatePlan" style="display:inline;">
                                                 <input type="hidden" name="planId" value="@plan.PlanId"/>
@@ -703,11 +713,15 @@ bool isNotAdvisor = !roles.Contains("CVHT");
                     </div>
                 </div>
                
-                    <!-- Modal Footer -->
+                <!-- Modal Footer -->
+                @if (isNotFaculty)
+                {
                     <div class="modal-footer" style="display: flex; justify-content: flex-end; width: 100%; align-items: center;">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                         <button type="submit" class="btn btn-primary">Lưu</button> <!-- Submit button to send the form -->
                     </div>
+                }
+                   
                 
             </form>
         </div>

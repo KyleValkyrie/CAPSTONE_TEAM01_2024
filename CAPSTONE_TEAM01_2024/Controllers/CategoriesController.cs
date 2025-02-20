@@ -482,11 +482,7 @@ namespace CAPSTONE_TEAM01_2024.Controllers
             
 
             bool isCreator = report.AdvisorName == userId;
-            if (isOtherFieldsModified && !isCreator)
-            {
-                TempData["Error"] = "Bạn không có quyền chỉnh sửa các trường khác ngoài FacultyAssessment và FacultyRanking.";
-                return RedirectToAction("EndSemesterReport");
-            }
+            
             if (isCreator)
             {
                 report.SelfAssessment = form["EditselfAssessment"];
